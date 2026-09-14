@@ -11,8 +11,8 @@
   "defaultScriptType":0,
   "Folders":[
     {"$GMFolder":"","%Name":"Sprites","folderPath":"folders/Sprites.yy","name":"Sprites","resourceType":"GMFolder","resourceVersion":"2.0",},
-    {"$GMFolder":"","%Name":"Tile_Sets","folderPath":"folders/Sprites/Tile_Sets.yy","name":"Tile_Sets","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Sprite","folderPath":"folders/Sprites/Sprite.yy","name":"Sprite","resourceType":"GMFolder","resourceVersion":"2.0",},
+    {"$GMFolder":"","%Name":"Tile_Sets","folderPath":"folders/Sprites/Tile_Sets.yy","name":"Tile_Sets","resourceType":"GMFolder","resourceVersion":"2.0",},
   ],
   "ForcedPrefabProjectReferences":[],
   "IncludedFiles":[],
