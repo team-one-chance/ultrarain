@@ -27,6 +27,6 @@ if (on_ground)
     || keyboard_check_pressed(vk_up)
     || keyboard_check_pressed(vk_space))
     {
-        phy_speed_y = -2.5;
+        phy_speed_y = -4;
     }
 }
