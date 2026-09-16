@@ -1,11 +1,69 @@
-// Movement settings
-move_force = 0.05;
-max_speed = 3;
-friction = 0.85;
+// =====================================
+// MOVEMENT
+// =====================================
 
-// Jump settings
-jump_speed = 5;
-can_jump = false;
+move_speed = 3;
 
 
-on_ground = false;
+// =====================================
+// NORMAL JUMP
+// =====================================
+
+jump_speed = -5;
+
+
+// =====================================
+// WALL JUMP
+// =====================================
+
+wall_jump_x = 4;
+wall_jump_y = -6;
+
+wall_jumps_used = 0;
+max_wall_jumps = 2;
+
+
+// =====================================
+// WALL-JUMP CONTROL LOCK
+// =====================================
+
+wall_jump_lock_time = 0;
+wall_jump_lock_duration = 0.3;
+
+wall_jump_forced_direction = 0;
+
+
+// =====================================
+// COYOTE TIME
+// =====================================
+
+coyote_timer = 0;
+coyote_duration = 0.15;
+
+
+// =====================================
+// SLAM
+// =====================================
+
+slam_speed = 3;
+slam_max_speed = 30;
+slam_acceleration = 1.05;
+
+is_slamming = false;
+
+
+// =====================================
+// SLIDING
+// =====================================
+
+is_sliding = false;
+
+// Sliding is 1.5 times faster than normal movement
+slide_speed_multiplier = 1.5;
+slide_movespeed_multiplier = 1.3;
+slide_jump_speed = -6;
+slide_time = 4;
+slide_boost_timer = 0;
+// Direction of the slide
+// -1 = left, 1 = right
+slide_direction = 0;
