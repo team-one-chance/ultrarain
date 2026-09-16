@@ -1,0 +1,46 @@
+We started off by brainstorming ideas. Stuff that involves programming. We eventually converged on a videogame. After about half an hour of discussing whether to make a platformer or a deckbuilder, we decided on a fast paced 2d platformer with synergies between items and weapons. You can get items that change or improve your character or their weapons. A mix of ULTRAKILL and Risk of Rain, which is where I got the name ULTARARAIN
+
+i started off by installing git on everyone's computers. i made a github organization called Team One Chance (team-one-chance) and made a repository. Maksym added an empty GameMaker project to the repo. I made a Github Project and, with Maksym, made the entire MVP document where we detail what the baseline of the game should be. I used ChatGPT for the questions and answered them with Maksym.
+
+## Date
+15.09.2026
+### Time
+- Person: hours worked
+
+### Goal
+Lorenc intended to get the github repo structure further and prepare the steps for starting this project
+Maksym intended to get a movable character, placeholder assets and a small map for testing the character movement
+
+### Work completed
+- Person: concrete changes made
+- Current result and whether it works
+Lorenc: Made the MVP document along with Maksym, set up labels for the GitHub Project, started documenting our work
+Maksym: TYPE HERE
+
+### Decisions
+We did cut a few things like inventory slots, and decided on everything in the MVP
+- Alternatives considered
+- Why we chose this option
+
+### Problems and solutions
+- What went wrong
+- Suspected or confirmed cause
+- What we tried
+- Final solution or current blocker
+
+### Testing
+- What was tested
+- Expected result
+- Actual result
+- Any feedback received
+
+### Plan changes
+Anything added, removed or postponed from the MVP and why.
+
+### Evidence
+- Screenshots or short videos
+- Useful source, tutorial or asset links
+- Asset creator and licence where relevant
+
+### Next steps
+What each person should continue with next session.
