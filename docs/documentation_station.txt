@@ -44,3 +44,49 @@ Anything added, removed or postponed from the MVP and why.
 
 ### Next steps
 What each person should continue with next session.
+
+
+
+
+
+
+## Date
+
+### Time
+- Person: hours worked
+
+### Goal
+What we intended to achieve during this session.
+
+### Work completed
+- Person: concrete changes made
+- Current result and whether it works
+- Relevant GitHub issue, commit or pull request
+
+### Decisions
+- What we decided
+- Alternatives considered
+- Why we chose this option
+
+### Problems and solutions
+- What went wrong
+- Suspected or confirmed cause
+- What we tried
+- Final solution or current blocker
+
+### Testing
+- What was tested
+- Expected result
+- Actual result
+- Any feedback received
+
+### Plan changes
+Anything added, removed or postponed from the MVP and why.
+
+### Evidence
+- Screenshots or short videos
+- Useful source, tutorial or asset links
+- Asset creator and licence where relevant
+
+### Next steps
+What each person should continue with next session.
