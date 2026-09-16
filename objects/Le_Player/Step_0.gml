@@ -3,7 +3,18 @@ phy_angular_velocity = 0;
 phy_rotation = 0;
 
 // Horizontal movement
-var move = keyboard_check(vk_right) - keyboard_check(vk_left);
+var move = 0;
+
+if (keyboard_check(vk_right) || keyboard_check(ord("D")))
+{
+    move += 1;
+}
+
+if (keyboard_check(vk_left) || keyboard_check(ord("A")))
+{
+    move -= 1;
+}
+
 phy_speed_x = move * 3;
 
 // Check if the player is touching the ground
@@ -16,6 +27,6 @@ if (on_ground)
     || keyboard_check_pressed(vk_up)
     || keyboard_check_pressed(vk_space))
     {
-        phy_speed_y = -2;
+        phy_speed_y = -2.5;
     }
 }
