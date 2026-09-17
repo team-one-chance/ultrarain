@@ -11,10 +11,10 @@ phy_rotation = 0;
 // GROUND AND WALL DETECTION
 // =====================================
 
-var on_ground = place_meeting(x, y + 2, Le_Block);
+var on_ground = place_meeting(x, y + 2, o_Block);
 
-var touching_left_wall = place_meeting(x - 32, y, Le_Block);
-var touching_right_wall = place_meeting(x + 32, y, Le_Block);
+var touching_left_wall = place_meeting(x - 32, y, o_Block);
+var touching_right_wall = place_meeting(x + 32, y, o_Block);
 
 var touching_wall = touching_left_wall || touching_right_wall;
 
@@ -112,7 +112,7 @@ if (is_sliding)
 else
 {
     // Return to the normal sprite
-    sprite_index = Le_player_Sprite;
+    sprite_index = s_Player;
 }
 
 
@@ -286,8 +286,8 @@ if (on_ground)
 }
 
 
-show_debug_message(
-    "Left: " + string(touching_left_wall)
-    + " | Right: " + string(touching_right_wall)
-    + " | Wall jumps used: " + string(wall_jumps_used)
-);
+//show_debug_message(
+//    "Left: " + string(touching_left_wall)
+//    + " | Right: " + string(touching_right_wall)
+//    + " | Wall jumps used: " + string(wall_jumps_used)
+//);

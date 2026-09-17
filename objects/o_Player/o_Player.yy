@@ -1,16 +1,16 @@
 {
   "$GMObject":"",
-  "%Name":"Le_Player",
+  "%Name":"o_Player",
   "eventList":[
     {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":3,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
     {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
   ],
   "managed":true,
-  "name":"Le_Player",
+  "name":"o_Player",
   "overriddenProperties":[],
   "parent":{
-    "name":"ULTRA RAIN",
-    "path":"ULTRA RAIN.yyp",
+    "name":"Player&Player relevant",
+    "path":"folders/Objects/Player&Player relevant.yy",
   },
   "parentObjectId":null,
   "persistent":false,
@@ -36,8 +36,8 @@
   "resourceVersion":"2.0",
   "solid":false,
   "spriteId":{
-    "name":"Le_player_Sprite",
-    "path":"sprites/Le_player_Sprite/Le_player_Sprite.yy",
+    "name":"s_Player",
+    "path":"sprites/s_Player/s_Player.yy",
   },
   "spriteMaskId":null,
   "visible":true,

@@ -1,16 +1,16 @@
 {
   "$GMObject":"",
-  "%Name":"Le_Block",
+  "%Name":"o_Block",
   "eventList":[
     {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
     {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":3,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
   ],
   "managed":true,
-  "name":"Le_Block",
+  "name":"o_Block",
   "overriddenProperties":[],
   "parent":{
-    "name":"ULTRA RAIN",
-    "path":"ULTRA RAIN.yyp",
+    "name":"Player&Player relevant",
+    "path":"folders/Objects/Player&Player relevant.yy",
   },
   "parentObjectId":null,
   "persistent":false,
