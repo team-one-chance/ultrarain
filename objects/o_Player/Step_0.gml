@@ -341,3 +341,7 @@ if (on_ground)
 //{
     // Add alt-fire code here later
 //}
+if (dmg_cooldown > 0)
+{
+    dmg_cooldown--;
+}
