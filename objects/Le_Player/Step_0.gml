@@ -101,12 +101,12 @@ if (is_sliding)
     if (slide_direction == 1)
     {
         // Sliding right
-        sprite_index = Le_player_Sprite;
+        sprite_index = SLIDE_TEMP;
     }
     else if (slide_direction == -1)
     {
         // Sliding left
-        sprite_index = Le_player_Sprite;
+        sprite_index = SLIDE_TEMP_1;
     }
 }
 else
