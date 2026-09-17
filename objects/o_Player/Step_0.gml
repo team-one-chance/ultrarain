@@ -291,3 +291,8 @@ if (on_ground)
 //    + " | Right: " + string(touching_right_wall)
 //    + " | Wall jumps used: " + string(wall_jumps_used)
 //);
+
+if (dmg_cooldown > 0)
+{
+    dmg_cooldown--;
+}
