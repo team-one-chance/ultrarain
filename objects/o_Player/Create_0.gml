@@ -69,3 +69,23 @@ slide_boost_timer = 0;
 // Direction of the slide
 // -1 = left, 1 = right
 slide_direction = 0;
+
+// =====================================
+// WEAPON SYSTEM
+// =====================================
+
+// Current weapon
+weapon_type = "pistol";
+
+// Pistol properties
+pistol_damage = 5;
+pistol_range = 2000;
+pistol_cooldown = 0.5;
+pistol_piercing = 0;
+
+// Shooting timer
+weapon_fire_timer = 0;
+
+// Primary and alternate fire
+primary_fire = false;
+alt_fire = false;
