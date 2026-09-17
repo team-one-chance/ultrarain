@@ -298,49 +298,48 @@ if (on_ground)
 // =====================================
 
 // Count down cooldown
-//if (weapon_fire_timer > 0)
-//{
-  //  weapon_fire_timer -= delta_time / 1000000;
+if (weapon_fire_timer > 0)
+{
+    weapon_fire_timer -= delta_time / 1000000;
 
-    //if (weapon_fire_timer < 0)
-    //{
-      //  weapon_fire_timer = 0;
-    //}
-//}
-
+    if (weapon_fire_timer < 0)
+    {
+        weapon_fire_timer = 0;
+    }
+}
 
 // =====================================
 // PRIMARY FIRE - LEFT MOUSE
 // =====================================
 
-//if (mouse_check_button(mb_left))
-//{
-  //  if (weapon_fire_timer <= 0)
-    //{
-      //  if (weapon_type == "pistol")
-        //{
-          //  weapon_hitscan(
-            //    pistol_damage,
-              //  pistol_range,
-                //pistol_piercing
-            //);
+if (mouse_check_button(mb_left))
+{
+    if (weapon_fire_timer <= 0)
+    {
+        if (weapon_type == "pistol")
+        {
+            weapon_hitscan(
+                pistol_damage,
+                pistol_range,
+                pistol_piercing
+            );
 
-            //weapon_fire_timer = pistol_cooldown;
-        //}
-   // }
-//}
+            weapon_fire_timer = pistol_cooldown;
+        }
+    }
+}
 
 
 // =====================================
 // ALT FIRE - RIGHT MOUSE
 // =====================================
 
-// Reserved for future alt-fire abilities
+ //Reserved for future alt-fire abilities
 
-//if (mouse_check_button_pressed(mb_right))
-//{
+if (mouse_check_button_pressed(mb_right))
+{
     // Add alt-fire code here later
-//}
+}
 if (dmg_cooldown > 0)
 {
     dmg_cooldown--;

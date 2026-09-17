@@ -53,7 +53,7 @@ function weapon_hitscan(_damage, _range, _piercing)
         start_y,
         end_x,
         end_y,
-        o_Enemy_TEMP,
+        oEnemy_TEMP,
         false,
         true,
         enemy_list,
