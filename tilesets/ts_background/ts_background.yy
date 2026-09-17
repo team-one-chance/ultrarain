@@ -1,14 +1,14 @@
 {
   "$GMTileSet":"v1",
-  "%Name":"background_tile_set",
+  "%Name":"ts_background",
   "autoTileSets":[],
   "macroPageTiles":{
     "SerialiseHeight":0,
     "SerialiseWidth":0,
     "TileSerialiseData":[],
   },
-  "name":"background_tile_set",
-  "out_columns":2,
+  "name":"ts_background",
+  "out_columns":3,
   "out_tilehborder":2,
   "out_tilevborder":2,
   "parent":{
@@ -34,5 +34,5 @@
   "tileWidth":32,
   "tilexoff":0,
   "tileyoff":0,
-  "tile_count":5,
+  "tile_count":10,
 }
