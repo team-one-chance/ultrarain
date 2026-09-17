@@ -27,8 +27,11 @@
   "name":"ULTRA RAIN",
   "resources":[
     {"id":{"name":"o_Block","path":"objects/o_Block/o_Block.yy",},},
+    {"id":{"name":"o_HitscanVisual","path":"objects/o_HitscanVisual/o_HitscanVisual.yy",},},
     {"id":{"name":"o_Player","path":"objects/o_Player/o_Player.yy",},},
     {"id":{"name":"Room1","path":"rooms/Room1/Room1.yy",},},
+    {"id":{"name":"raycast_wall_distance","path":"scripts/raycast_wall_distance/raycast_wall_distance.yy",},},
+    {"id":{"name":"weapon_hitscan","path":"scripts/weapon_hitscan/weapon_hitscan.yy",},},
     {"id":{"name":"s_Player","path":"sprites/s_Player/s_Player.yy",},},
     {"id":{"name":"SLIDE_TEMP_1","path":"sprites/SLIDE_TEMP_1/SLIDE_TEMP_1.yy",},},
     {"id":{"name":"SLIDE_TEMP","path":"sprites/SLIDE_TEMP/SLIDE_TEMP.yy",},},
