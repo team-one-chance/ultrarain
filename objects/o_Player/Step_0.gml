@@ -13,8 +13,8 @@ phy_rotation = 0;
 
 var on_ground = place_meeting(x, y + 2, o_Block);
 
-var touching_left_wall = place_meeting(x - 32, y, o_Block);
-var touching_right_wall = place_meeting(x + 32, y, o_Block);
+var touching_left_wall = place_meeting(x - 50, y, o_Block);
+var touching_right_wall = place_meeting(x + 50, y, o_Block);
 
 var touching_wall = touching_left_wall || touching_right_wall;
 
@@ -340,7 +340,32 @@ if (mouse_check_button_pressed(mb_right))
 {
     // Add alt-fire code here later
 }
-if (dmg_cooldown > 0)
+//dmg cooldown is set to zero by default
+
+	dmg_cooldown -= delta_time / 1000000;
+	if (dmg_cooldown < 0){
+		dmg_cooldown = 0;
+	}
+	
+ //every second, damage cooldown is reduced by one
+//now the issue with this is, it runs with the game, not with how long the player and enemy are in contact
+//to fix this, we're gonna need an if condition that obliges to the following rules
+//if enemy and player collide, -10 hp, THEN wait for as long as damage_cooldown says so
+//that means, you take damage if cooldown is at zero
+//in the beginning, cooldown will be zero cause you haven't taken any damage yet
+//but everytime you do take damage, a cooldown will start.
+//until that cooldown is set to zero, you won't take any further damage
+
+	
+if (place_meeting(x, y, oEnemy_TEMP)  && dmg_cooldown =0) //if the enemy and player are in the same position
+//and if damage cooldown is precisely zero, which is what we begin with
 {
-    dmg_cooldown--;
+	pHP -=10;
+	show_debug_message(pHP);
+	dmg_cooldown = 1; //dmg cooldown is set to three
+	//because our dps is exactly one, whatever we set here will be in seconds
+	show_debug_message("PLAYER COLLIDED WITH ENEMY! and it is on CD");
+}
+if(pHP <= 0)
+{instance_destroy();
 }
