@@ -1,5 +1,5 @@
 if (instance_exists(player))
 {
-    x = player.x;
-    y = player.y + 20;
+    //x = player.x;
+    //y = player.y + 20;
 }
