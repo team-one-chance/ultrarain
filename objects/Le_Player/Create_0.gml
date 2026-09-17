@@ -45,9 +45,9 @@ coyote_duration = 0.15;
 // SLAM
 // =====================================
 
-slam_speed = 3;
+slam_speed = 8;
 slam_max_speed = 30;
-slam_acceleration = 1.05;
+slam_acceleration = 1.1;
 
 is_slamming = false;
 
@@ -59,9 +59,9 @@ is_slamming = false;
 is_sliding = false;
 
 // Sliding is 1.5 times faster than normal movement
-slide_speed_multiplier = 1.5;
-slide_movespeed_multiplier = 1.3;
-slide_jump_speed = -6;
+slide_speed_multiplier = 1.75;
+slide_movespeed_multiplier = 1.35;
+slide_jump_speed = -8;
 slide_time = 4;
 slide_boost_timer = 0;
 // Direction of the slide
