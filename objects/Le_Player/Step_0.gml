@@ -13,8 +13,8 @@ phy_rotation = 0;
 
 var on_ground = place_meeting(x, y + 2, Le_Block);
 
-var touching_left_wall = place_meeting(x - 2, y, Le_Block);
-var touching_right_wall = place_meeting(x + 2, y, Le_Block);
+var touching_left_wall = place_meeting(x - 32, y, Le_Block);
+var touching_right_wall = place_meeting(x + 32, y, Le_Block);
 
 var touching_wall = touching_left_wall || touching_right_wall;
 
@@ -250,7 +250,7 @@ else
         coyote_timer = 0;
     }
     // Wall jump
-    else if (touching_wall && wall_jumps_used < max_wall_jumps)
+	else if (!on_ground && touching_wall && wall_jumps_used < max_wall_jumps)
     {
         // Use one wall jump
         wall_jumps_used += 1;
@@ -284,3 +284,10 @@ if (on_ground)
 {
     is_slamming = false;
 }
+
+
+show_debug_message(
+    "Left: " + string(touching_left_wall)
+    + " | Right: " + string(touching_right_wall)
+    + " | Wall jumps used: " + string(wall_jumps_used)
+);
