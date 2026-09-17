@@ -12,7 +12,7 @@ function weapon_hitscan(_damage, _range, _piercing)
     );
 
     var start_x = x;
-    var start_y = y - 32;
+    var start_y = y;
 
 
     // =====================================
@@ -106,7 +106,6 @@ function weapon_hitscan(_damage, _range, _piercing)
     // =====================================
     // DAMAGE ENEMIES
     // =====================================
-
     var max_targets = _piercing + 1;
     var targets_hit = 0;
 
@@ -122,6 +121,18 @@ function weapon_hitscan(_damage, _range, _piercing)
         if (instance_exists(enemy))
         {
             enemy.ehp -= _damage;
+
+            show_debug_message(
+                "Hit enemy! HP remaining: " + string(enemy.ehp)
+            );
+
+            if (enemy.ehp <= 0)
+            {
+                instance_destroy(enemy);
+
+                show_debug_message("Enemy killed!");
+            }
+
             targets_hit++;
         }
     }
