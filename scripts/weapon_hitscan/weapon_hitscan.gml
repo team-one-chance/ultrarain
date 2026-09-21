@@ -5,7 +5,7 @@ function weapon_hitscan(_damage, _range, _piercing)
     // =====================================
 
     var start_x = x;
-    var start_y = y - 5;
+    var start_y = y -5;
 
     var shoot_direction = point_direction(
         start_x,
@@ -65,7 +65,7 @@ function weapon_hitscan(_damage, _range, _piercing)
             check_x,
             check_y,
 
-            [oEnemy_TEMP, o_Block],
+            [oEnemyParent, o_Block],
 
             false,
             true,
@@ -97,28 +97,32 @@ function weapon_hitscan(_damage, _range, _piercing)
             // =================================
             // ENEMY
             // =================================
+			
+			
 
-            if (instance_exists(inst)
-            && inst.object_index == oEnemy_TEMP)
-            {
-                inst.ehp -= _damage;
-				inst.hit_timer = 0.15;
-				
+           if (instance_exists(inst)
+&& (
+    inst.object_index == oEnemyParent
+    || object_is_ancestor(inst.object_index, oEnemyParent)
+))
+{
+    inst.ehp -= _damage;
 
-                show_debug_message(
-                    "Enemy hit! HP: "
-                    + string(inst.ehp)
-                );
+    // Trigger hit sprite
+    inst.hit_timer = 0.15;
 
-                if (inst.ehp <= 0)
-                {
-                    instance_destroy(inst);
+    show_debug_message(
+        "Enemy hit! HP: "
+        + string(inst.ehp)
+    );
 
-                    show_debug_message(
-                        "Enemy killed!"
-                    );
-                }
-            }
+    if (inst.ehp <= 0)
+    {
+        instance_destroy(inst);
+
+        show_debug_message("Enemy killed!");
+    }
+}
 
 
             // =================================

@@ -12,7 +12,7 @@ var view_height = camera_get_view_height(cam);
 // =====================================
 
 var target_x = o_Player.x - view_width / 2;
-var target_y = o_Player.y - view_height / 2;
+var target_y = o_Player.y - view_height / 1.4;
 
 // =====================================
 // CURRENT CAMERA POSITION

@@ -774,6 +774,9 @@ if (mouse_check_button_pressed(mb_right))
 }
 
 
+	
+if (place_meeting(x, y, oEnemyParent)  && dmg_cooldown =0) //if the enemy and player are in the same position
+//and if damage cooldown is precisely zero, which is what we begin with
 // =====================================
 // DAMAGE COOLDOWN
 // =====================================
