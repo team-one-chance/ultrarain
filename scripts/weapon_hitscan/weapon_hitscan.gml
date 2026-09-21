@@ -1,49 +1,81 @@
 function weapon_hitscan(_damage, _range, _piercing)
 {
     // =====================================
-    // AIM AT MOUSE
+    // AIM / MUZZLE
     // =====================================
 
+    var aim_x = x;
+    var aim_y = y - 12;
+
     var shoot_direction = point_direction(
-        x,
-        y,
+        aim_x,
+        aim_y,
         mouse_x,
         mouse_y
     );
 
-    var start_x = x;
-    var start_y = y;
+    var muzzle_distance = 12;
+
+    var start_x =
+        aim_x + lengthdir_x(muzzle_distance, shoot_direction);
+
+    var start_y =
+        aim_y + lengthdir_y(muzzle_distance, shoot_direction);
 
 
     // =====================================
-    // FIND WALL DISTANCE
+    // FULL RAY
     // =====================================
 
-    var wall_distance = raycast_wall_distance(
+    var end_x =
+        start_x + lengthdir_x(_range, shoot_direction);
+
+    var end_y =
+        start_y + lengthdir_y(_range, shoot_direction);
+
+
+    // This will contain BOTH walls and enemies
+    var all_hits = [];
+
+
+    // =====================================
+    // PHYSICS WALLS
+    // =====================================
+
+    var wall_hits = physics_raycast(
         start_x,
         start_y,
-        shoot_direction,
-        _range
+        end_x,
+        end_y,
+        o_Block,
+        true
     );
+
+    if (!is_undefined(wall_hits))
+    {
+        for (var i = 0; i < array_length(wall_hits); i++)
+        {
+            var wall_hit = wall_hits[i];
+
+            array_push(
+                all_hits,
+                {
+                    instance: wall_hit.instance,
+                    type: "wall",
+
+                    // physics_raycast already gives exact distance fraction
+                    fraction: wall_hit.fraction,
+
+                    hit_x: wall_hit.hitpointX,
+                    hit_y: wall_hit.hitpointY
+                }
+            );
+        }
+    }
 
 
     // =====================================
-    // CALCULATE SHOOT ENDPOINT
-    // =====================================
-
-    var end_x = start_x + lengthdir_x(
-        wall_distance,
-        shoot_direction
-    );
-
-    var end_y = start_y + lengthdir_y(
-        wall_distance,
-        shoot_direction
-    );
-
-
-    // =====================================
-    // FIND ENEMIES ALONG THE RAY
+    // NORMAL COLLISION ENEMIES
     // =====================================
 
     var enemy_list = ds_list_create();
@@ -61,12 +93,6 @@ function weapon_hitscan(_damage, _range, _piercing)
     );
 
 
-    // =====================================
-    // FIND CLOSEST ENEMIES
-    // =====================================
-
-    var enemy_data = [];
-
     for (var i = 0; i < ds_list_size(enemy_list); i++)
     {
         var enemy = enemy_list[| i];
@@ -80,10 +106,31 @@ function weapon_hitscan(_damage, _range, _piercing)
                 enemy.y
             );
 
-            array_push(enemy_data, {
-                instance: enemy,
-                distance: dist
-            });
+            var enemy_fraction = dist / _range;
+
+            array_push(
+                all_hits,
+                {
+                    instance: enemy,
+                    type: "enemy",
+
+                    fraction: enemy_fraction,
+
+                    hit_x:
+                        start_x
+                        + lengthdir_x(
+                            dist,
+                            shoot_direction
+                        ),
+
+                    hit_y:
+                        start_y
+                        + lengthdir_y(
+                            dist,
+                            shoot_direction
+                        )
+                }
+            );
         }
     }
 
@@ -91,55 +138,104 @@ function weapon_hitscan(_damage, _range, _piercing)
 
 
     // =====================================
-    // SORT ENEMIES BY DISTANCE
+    // SORT CLOSEST -> FURTHEST
     // =====================================
 
     array_sort(
-        enemy_data,
+        all_hits,
         function(a, b)
         {
-            return a.distance - b.distance;
+            return a.fraction - b.fraction;
         }
     );
 
 
     // =====================================
-    // DAMAGE ENEMIES
+    // PIERCING
     // =====================================
-    var max_targets = _piercing + 1;
-    var targets_hit = 0;
 
-    for (var i = 0; i < array_length(enemy_data); i++)
+    var max_hits = _piercing + 1;
+
+    var amount_to_process = min(
+        array_length(all_hits),
+        max_hits
+    );
+
+
+    // =====================================
+    // DAMAGE / PROCESS OBJECTS
+    // =====================================
+
+    for (var i = 0; i < amount_to_process; i++)
     {
-        if (targets_hit >= max_targets)
+        var hit = all_hits[i];
+        var inst = hit.instance;
+
+
+        if (!instance_exists(inst))
         {
-            break;
+            continue;
         }
 
-        var enemy = enemy_data[i].instance;
 
-        if (instance_exists(enemy))
+        // -----------------------------
+        // ENEMY
+        // -----------------------------
+
+        if (hit.type == "enemy")
         {
-            enemy.ehp -= _damage;
+            inst.ehp -= _damage;
 
             show_debug_message(
-                "Hit enemy! HP remaining: " + string(enemy.ehp)
+                "Enemy hit! HP: "
+                + string(inst.ehp)
             );
 
-            if (enemy.ehp <= 0)
+            if (inst.ehp <= 0)
             {
-                instance_destroy(enemy);
+                instance_destroy(inst);
 
-                show_debug_message("Enemy killed!");
+                show_debug_message(
+                    "Enemy killed!"
+                );
             }
+        }
 
-            targets_hit++;
+
+        // -----------------------------
+        // WALL
+        // -----------------------------
+
+        else if (hit.type == "wall")
+        {
+            show_debug_message(
+                "Wall hit!"
+            );
         }
     }
 
 
     // =====================================
-    // CREATE YELLOW VISUAL
+    // WHERE DOES THE VISUAL STOP?
+    // =====================================
+
+    var final_x = end_x;
+    var final_y = end_y;
+
+
+    // Enough objects were hit to consume all piercing
+    if (array_length(all_hits) >= max_hits)
+    {
+        var stopping_hit =
+            all_hits[max_hits - 1];
+
+        final_x = stopping_hit.hit_x;
+        final_y = stopping_hit.hit_y;
+    }
+
+
+    // =====================================
+    // YELLOW HITSCAN VISUAL
     // =====================================
 
     var shot = instance_create_layer(
@@ -151,6 +247,7 @@ function weapon_hitscan(_damage, _range, _piercing)
 
     shot.line_x1 = start_x;
     shot.line_y1 = start_y;
-    shot.line_x2 = end_x;
-    shot.line_y2 = end_y;
+
+    shot.line_x2 = final_x;
+    shot.line_y2 = final_y;
 }
