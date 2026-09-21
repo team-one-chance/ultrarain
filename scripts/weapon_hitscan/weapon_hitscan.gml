@@ -184,7 +184,8 @@ function weapon_hitscan(_damage, _range, _piercing)
 
         if (hit.type == "enemy")
         {
-            inst.ehp -= _damage;
+            enemy.ehp -= _damage;
+			enemy.hit_timer = 0.15;
 
             show_debug_message(
                 "Enemy hit! HP: "
@@ -247,6 +248,11 @@ function weapon_hitscan(_damage, _range, _piercing)
 
     shot.line_x1 = start_x;
     shot.line_y1 = start_y;
+    shot.line_x2 = end_x;
+    shot.line_y2 = end_y;
+}
+
+
 
     shot.line_x2 = final_x;
     shot.line_y2 = final_y;
