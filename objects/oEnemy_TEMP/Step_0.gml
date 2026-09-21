@@ -35,3 +35,18 @@ if (player != noone)//if the enemy isn't already at the player's pos
 //		show_debug_log("scheisse");
 //}
 //}
+
+// =====================================
+// HIT SPRITE
+// =====================================
+
+if (hit_timer > 0)
+{
+    hit_timer -= delta_time / 1000000;
+
+    sprite_index = hit_sprite;
+}
+else
+{
+    sprite_index = normal_sprite;
+}

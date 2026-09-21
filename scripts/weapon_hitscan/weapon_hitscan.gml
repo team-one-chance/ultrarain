@@ -121,6 +121,7 @@ function weapon_hitscan(_damage, _range, _piercing)
         if (instance_exists(enemy))
         {
             enemy.ehp -= _damage;
+			enemy.hit_timer = 0.15;
 
             show_debug_message(
                 "Hit enemy! HP remaining: " + string(enemy.ehp)
@@ -154,3 +155,5 @@ function weapon_hitscan(_damage, _range, _piercing)
     shot.line_x2 = end_x;
     shot.line_y2 = end_y;
 }
+
+
