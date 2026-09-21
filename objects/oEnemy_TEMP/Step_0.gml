@@ -20,8 +20,8 @@ if (player != noone)//if the enemy isn't already at the player's pos
             player.y - 40
         );
 
-        //x += lengthdir_x(2, dir);  //xsp
-       // y += lengthdir_y(2, dir); //ysp
+        x += lengthdir_x(2, dir);  //xsp
+        y += lengthdir_y(2, dir); //ysp
 		//we have two parameters again, 2 is the speed and dir is the directin it needs to move in
     }
 }

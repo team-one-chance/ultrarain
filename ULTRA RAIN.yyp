@@ -34,6 +34,7 @@
     {"id":{"name":"oEnemy_TEMP","path":"objects/oEnemy_TEMP/oEnemy_TEMP.yy",},},
     {"id":{"name":"oHeal","path":"objects/oHeal/oHeal.yy",},},
     {"id":{"name":"Room1","path":"rooms/Room1/Room1.yy",},},
+    {"id":{"name":"ray_bbox_fraction","path":"scripts/ray_bbox_fraction/ray_bbox_fraction.yy",},},
     {"id":{"name":"raycast_wall_distance","path":"scripts/raycast_wall_distance/raycast_wall_distance.yy",},},
     {"id":{"name":"weapon_hitscan","path":"scripts/weapon_hitscan/weapon_hitscan.yy",},},
     {"id":{"name":"AIR_TEMP","path":"sprites/AIR_TEMP/AIR_TEMP.yy",},},
