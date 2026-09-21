@@ -14,7 +14,10 @@
     "name":"ULTRA RAIN",
     "path":"ULTRA RAIN.yyp",
   },
-  "parentObjectId":null,
+  "parentObjectId":{
+    "name":"oEnemyParent",
+    "path":"objects/oEnemyParent/oEnemyParent.yy",
+  },
   "persistent":false,
   "physicsAngularDamping":0.1,
   "physicsDensity":0.5,

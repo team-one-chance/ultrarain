@@ -417,7 +417,7 @@ if (mouse_check_button_pressed(mb_right))
 //until that cooldown is set to zero, you won't take any further damage
 
 	
-if (place_meeting(x, y, oEnemy_TEMP)  && dmg_cooldown =0) //if the enemy and player are in the same position
+if (place_meeting(x, y, oEnemyParent)  && dmg_cooldown =0) //if the enemy and player are in the same position
 //and if damage cooldown is precisely zero, which is what we begin with
 {
 	pHP -=10;
