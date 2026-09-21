@@ -13,7 +13,7 @@ phy_rotation = 0;
 
 var on_ground = place_meeting(x + 4, y + 16, o_Block) || place_meeting(x - 4, y + 16, o_Block);
 
-var touching_left_wall = place_meeting(x - 40, y, o_Block);
+var touching_left_wall = place_meeting(x - 60, y, o_Block);
 var touching_right_wall = place_meeting(x + 20, y, o_Block);
 
 var touching_wall = touching_left_wall || touching_right_wall;
@@ -122,25 +122,56 @@ if (is_sliding)
 
 
 // =====================================
-// SLIDE SPRITE SWITCHING
+// SPRITE / ANIMATION
 // =====================================
 
 if (is_sliding)
 {
+    // Sliding sprites
     if (slide_direction == 1)
     {
-        // Sliding right
         sprite_index = SLIDE_TEMP;
+        image_xscale = 1;
     }
     else if (slide_direction == -1)
     {
-        // Sliding left
         sprite_index = SLIDE_TEMP_1;
+        image_xscale = 1;
+    }
+}
+else if (!on_ground)
+{
+    // Air animation
+    sprite_index = AIR_TEMP;
+
+    // Keep facing the direction of movement
+    if (move > 0)
+    {
+        image_xscale = 1;
+    }
+    else if (move < 0)
+    {
+        image_xscale = -1;
+    }
+}
+else if (move != 0)
+{
+    // Walking animation
+    sprite_index = s_Player_Run;
+
+    // Face the direction we're moving
+    if (move > 0)
+    {
+        image_xscale = 1;
+    }
+    else if (move < 0)
+    {
+        image_xscale = -1;
     }
 }
 else
 {
-    // Return to the normal sprite
+    // Idle
     sprite_index = s_Player;
 }
 

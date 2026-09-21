@@ -26,10 +26,10 @@
   "physicsSensor":false,
   "physicsShape":1,
   "physicsShapePoints":[
-    {"x":2.0,"y":0.0,},
-    {"x":30.0,"y":0.0,},
-    {"x":30.0,"y":64.0,},
-    {"x":2.0,"y":64.0,},
+    {"x":13.0,"y":0.0,},
+    {"x":41.0,"y":0.0,},
+    {"x":41.0,"y":64.0,},
+    {"x":13.0,"y":64.0,},
   ],
   "physicsStartAwake":true,
   "properties":[],
@@ -37,12 +37,12 @@
   "resourceVersion":"2.0",
   "solid":false,
   "spriteId":{
-    "name":"s_Player",
-    "path":"sprites/s_Player/s_Player.yy",
+    "name":"s_Player_Run",
+    "path":"sprites/s_Player_Run/s_Player_Run.yy",
   },
   "spriteMaskId":{
-    "name":"s_Player",
-    "path":"sprites/s_Player/s_Player.yy",
+    "name":"s_Player_Run",
+    "path":"sprites/s_Player_Run/s_Player_Run.yy",
   },
   "visible":true,
 }
