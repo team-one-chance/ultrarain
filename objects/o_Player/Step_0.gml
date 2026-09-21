@@ -13,7 +13,7 @@ phy_rotation = 0;
 
 var on_ground = place_meeting(x + 4, y + 16, o_Block) || place_meeting(x - 4, y + 16, o_Block);
 
-var touching_left_wall = place_meeting(x - 60, y, o_Block);
+var touching_left_wall = place_meeting(x - 20, y, o_Block);
 var touching_right_wall = place_meeting(x + 20, y, o_Block);
 
 var touching_wall = touching_left_wall || touching_right_wall;
