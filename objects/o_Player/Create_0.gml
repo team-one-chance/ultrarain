@@ -3,8 +3,20 @@
 // =====================================
 // MOVEMENT
 // =====================================
+
 pHP= 100;
 dmg_cooldown = 0;
+
+move_speed = 3;
+
+dmg_cooldown = 0;
+ o_Player.pHP_max = 100;
+
+slide_exit_timer = 0;
+slide_exit_delay = 0;
+
+
+
 
 move_speed = 3;
 

@@ -330,6 +330,8 @@ if (mouse_check_button(mb_left))
 }
 
 
+
+
 // =====================================
 // ALT FIRE - RIGHT MOUSE
 // =====================================
@@ -340,6 +342,8 @@ if (mouse_check_button_pressed(mb_right))
 {
     // Add alt-fire code here later
 }
+//dmg cooldown is set to zero by default
+
 //dmg cooldown is set to zero by default
 
 	dmg_cooldown -= delta_time / 1000000;

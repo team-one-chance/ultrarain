@@ -121,6 +121,7 @@ function weapon_hitscan(_damage, _range, _piercing)
         if (instance_exists(enemy))
         {
             enemy.ehp -= _damage;
+			enemy.hit_timer = 0.15; //enemy turns black to indicate damage
 
             show_debug_message(
                 "Hit enemy! HP remaining: " + string(enemy.ehp)
