@@ -96,3 +96,28 @@ weapon_fire_timer = 0;
 // Primary and alternate fire
 primary_fire = false;
 alt_fire = false;
+
+// =================================
+// ground detect
+// =================================
+ground_check_y_offset = 16;
+ground_check_x_offset = 10;
+
+// =====================================
+// LEDGE CLIMB
+// =====================================
+
+is_ledge_climbing = false;
+
+ledge_climb_timer = 0;
+ledge_climb_duration = 0.18;
+
+ledge_start_x = 0;
+ledge_start_y = 0;
+
+ledge_target_x = 0;
+ledge_target_y = 0;
+
+ledge_direction = 0;
+
+ledge_climb_forward = 20;

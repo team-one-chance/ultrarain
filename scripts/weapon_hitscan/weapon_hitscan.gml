@@ -5,7 +5,7 @@ function weapon_hitscan(_damage, _range, _piercing)
     // =====================================
 
     var start_x = x;
-    var start_y = y;
+    var start_y = y - 5;
 
     var shoot_direction = point_direction(
         start_x,
