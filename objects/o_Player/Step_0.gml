@@ -11,10 +11,10 @@ phy_rotation = 0;
 // GROUND AND WALL DETECTION
 // =====================================
 
-var on_ground = place_meeting(x, y + 2, o_Block);
+var on_ground = place_meeting(x + 4, y + 16, o_Block) || place_meeting(x - 4, y + 16, o_Block);
 
-var touching_left_wall = place_meeting(x - 50, y, o_Block);
-var touching_right_wall = place_meeting(x + 50, y, o_Block);
+var touching_left_wall = place_meeting(x - 40, y, o_Block);
+var touching_right_wall = place_meeting(x + 20, y, o_Block);
 
 var touching_wall = touching_left_wall || touching_right_wall;
 
@@ -82,13 +82,42 @@ if (!is_sliding && slide_held && on_ground && move != 0)
 
     // Lock the direction when the slide begins
     slide_direction = move;
+
+    // Reset the exit timer
+    slide_exit_timer = 0;
 }
 
-// Stop sliding when the key is released or the player leaves the ground
-if (is_sliding && (!slide_held || !on_ground))
+// =====================================
+// SLIDE EXIT DELAY none
+// =====================================
+
+if (is_sliding)
 {
-    is_sliding = false;
-    slide_direction = 0;
+    // Releasing the slide key ends sliding immediately
+    if (!slide_held)
+    {
+        is_sliding = false;
+        slide_direction = 0;
+        slide_exit_timer = 0;
+    }
+    // If the player leaves the ground, start counting
+    else if (!on_ground)
+    {
+        slide_exit_timer += delta_time / 1000000;
+
+        // End sliding after 0.3 seconds off the ground
+        if (slide_exit_timer >= 0)
+        {
+            is_sliding = false;
+            slide_direction = 0;
+            slide_exit_timer = 0;
+        }
+    }
+    // If the player is grounded again, reset the timer
+    else
+    {
+        slide_exit_timer = 0;
+    }
 }
 
 

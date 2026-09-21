@@ -21,6 +21,9 @@ slide_exit_delay = 0;
 move_speed = 3;
 
 dmg_cooldown = 0;
+
+slide_exit_timer = 0;
+slide_exit_delay = 0;
 // =====================================
 // NORMAL JUMP
 // =====================================
