@@ -461,7 +461,7 @@ if (is_ledge_climbing)
 {
     // Replace this later with a dedicated
     // climbing animation if you make one.
-    sprite_index = WALLHOLD_TEMP;
+    sprite_index = s_Player_wallHold_Right;
 
     if (ledge_direction == -1)
     {
@@ -477,13 +477,13 @@ else if (is_sliding)
 {
     if (slide_direction == 1)
     {
-        sprite_index = SLIDE_TEMP;
+        sprite_index = s_Player_Slide_Right;
         image_xscale = 1;
     }
 
     else if (slide_direction == -1)
     {
-        sprite_index = SLIDE_TEMP_1;
+        sprite_index = s_Player_Slide_Left;
         image_xscale = 1;
     }
 }
@@ -491,7 +491,7 @@ else if (is_sliding)
 else if (!on_ground
 && wall_jump_lock_time > 0)
 {
-    sprite_index = WALLJUMP_TEMP;
+    sprite_index = s_Player_wallJump;
 
     image_xscale =
         wall_jump_forced_direction;
@@ -501,7 +501,7 @@ else if (!on_ground
 && touching_wall
 && coyote_timer <= 0)
 {
-    sprite_index = WALLHOLD_TEMP;
+    sprite_index = s_Player_wallHold_Right;
 
     if (touching_left_wall)
     {
@@ -516,7 +516,7 @@ else if (!on_ground
 
 else if (!on_ground)
 {
-    sprite_index = AIR_TEMP;
+    sprite_index = s_Player_Air;
 
     if (move > 0)
     {
