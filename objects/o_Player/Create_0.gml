@@ -4,7 +4,7 @@
 // MOVEMENT
 // =====================================
 pHP= 100;
-pHP_max = 100;
+pHP_max = 1000;
 pHP = pHP_max;
 dmg_cooldown = 0;
 
@@ -121,3 +121,4 @@ ledge_target_y = 0;
 ledge_direction = 0;
 
 ledge_climb_forward = 20;
+

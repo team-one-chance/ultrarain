@@ -1,31 +1,7 @@
-// =====================================
-// HP
-// =====================================
-var cell_size = 16;
-
-nav_grid = mp_grid_create(
-    0,
-    0,
-    ceil(room_width / cell_size),
-    ceil(room_height / cell_size),
-    cell_size,
-    cell_size
-);
-
-enemy_path = path_add();
-repath_timer = 0;
-
-
-
-
-
-
-ehp_max = 100;
-ehp = ehp_max;
-
+event_inherited()
 
 // =====================================
-// HIT EFFECT
+// HIT EFFECT IS UNIQUE
 // =====================================
 
 hit_timer = 0;

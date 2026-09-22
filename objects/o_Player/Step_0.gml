@@ -724,7 +724,28 @@ if (on_ground)
     is_slamming = false;
 }
 
+// =====================================
+// MELEE ATTACK - RIGHT MOUSE
+// =====================================
 
+if (keyboard_check_pressed(ord("Q")))
+{
+    var slash_dir = sign(image_xscale);
+
+    if (slash_dir == 0)
+    {
+        slash_dir = 1;
+    }
+
+    var slash = instance_create_depth(
+        x + (40 * slash_dir),
+        y,
+        depth - 1,
+        oSlashEffect
+    );
+
+    slash.image_xscale = slash_dir;
+}
 // =====================================
 // WEAPON SYSTEM
 // =====================================
