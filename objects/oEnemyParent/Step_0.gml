@@ -1,3 +1,37 @@
+// =====================================
+// KNOCKBACK OR NORMAL MOVEMENT
+// =====================================
+
+if (knockback_timer > 0)
+{
+    knockback_timer -= delta_time / 1000000;
+
+    var move_x = knockback_x * 0.2;
+    var move_y = knockback_y * 0.2;
+
+    if (!place_meeting(x + move_x, y, o_Block))
+    {
+        x += move_x;
+    }
+
+    if (!place_meeting(x, y + move_y, o_Block))
+    {
+        y += move_y;
+    }
+
+    knockback_x *= 0.8;
+    knockback_y *= 0.8;
+}
+else
+{
+    // =====================================
+    // YOUR NORMAL CHASE/PATHFINDING CODE
+    // GOES HERE
+    // =====================================
+}
+
+
+
 var player = instance_nearest(x, y, o_Player);
 
 if (player != noone)
@@ -54,11 +88,9 @@ if (player != noone)
 if (hit_timer > 0)
 {
     hit_timer -= delta_time / 1000000;
-
     sprite_index = hit_sprite;
 }
 else
 {
     sprite_index = normal_sprite;
 }
-

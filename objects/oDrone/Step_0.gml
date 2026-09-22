@@ -1,3 +1,6 @@
+// =====================================
+// UNIQUE MOVEMENT PATTERN MUST BE KEPT
+// =====================================
 var player = instance_nearest(x, y, o_Player);
 
 if (player != noone)
@@ -48,7 +51,7 @@ if (player != noone)
 
 
 // =====================================
-// HIT SPRITE
+// UNIQUE HIT SPRITE MUST BE KEPT
 // =====================================
 
 if (hit_timer > 0)
@@ -63,7 +66,7 @@ else
 }
 
 // =====================================
-// SHOOT PLAYER
+// UNIQUE SHOOT SYSTEM MUST BE KEPT
 // =====================================
 
 if (shoot_timer > 0)
