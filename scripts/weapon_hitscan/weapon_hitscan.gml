@@ -65,7 +65,7 @@ function weapon_hitscan(_damage, _range, _piercing)
             check_x,
             check_y,
 
-            [oEnemyParent, o_Block],
+            [oEnemyParent, o_Block, o_Coin],
 
             false,
             true,
@@ -93,6 +93,27 @@ function weapon_hitscan(_damage, _range, _piercing)
             // First time encountering this object
             ds_list_add(already_hit, inst);
 
+// =================================
+// COIN
+// =================================
+
+if (instance_exists(inst)
+&& inst.object_index == o_Coin)
+{
+    coin_ricochet(
+        inst,
+        _damage * 2,
+        _range
+    );
+
+    // Original shot ends at the coin
+    final_x = check_x;
+    final_y = check_y;
+
+    stopped = true;
+
+    break;
+}
 
             // =================================
             // ENEMY
