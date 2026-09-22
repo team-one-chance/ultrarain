@@ -34,6 +34,7 @@
     {"id":{"name":"oDrone","path":"objects/oDrone/oDrone.yy",},},
     {"id":{"name":"oEnemy_drone","path":"objects/oEnemy_drone/oEnemy_drone.yy",},},
     {"id":{"name":"oEnemy_TEMP","path":"objects/oEnemy_TEMP/oEnemy_TEMP.yy",},},
+    {"id":{"name":"oEnemyBullet","path":"objects/oEnemyBullet/oEnemyBullet.yy",},},
     {"id":{"name":"oEnemyParent","path":"objects/oEnemyParent/oEnemyParent.yy",},},
     {"id":{"name":"oHeal","path":"objects/oHeal/oHeal.yy",},},
     {"id":{"name":"Room1","path":"rooms/Room1/Room1.yy",},},

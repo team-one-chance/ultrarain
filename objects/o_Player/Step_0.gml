@@ -773,51 +773,30 @@ if (mouse_check_button_pressed(mb_right))
     // Reserved for future alt-fire abilities
 }
 
+	dmg_cooldown -= delta_time / 1000000;
+	if (dmg_cooldown < 0){
+		dmg_cooldown = 0;
+	}
+	
+ //every second, damage cooldown is reduced by one
+//now the issue with this is, it runs with the game, not with how long the player and enemy are in contact
+//to fix this, we're gonna need an if condition that obliges to the following rules
+//if enemy and player collide, -10 hp, THEN wait for as long as damage_cooldown says so
+//that means, you take damage if cooldown is at zero
+//in the beginning, cooldown will be zero cause you haven't taken any damage yet
+//but everytime you do take damage, a cooldown will start.
+//until that cooldown is set to zero, you won't take any further damage
 
 	
 if (place_meeting(x, y, oEnemyParent)  && dmg_cooldown =0) //if the enemy and player are in the same position
 //and if damage cooldown is precisely zero, which is what we begin with
-// =====================================
-// DAMAGE COOLDOWN
-// =====================================
-
-dmg_cooldown -=
-    delta_time / 1000000;
-
-if (dmg_cooldown < 0)
 {
-    dmg_cooldown = 0;
+	pHP -=10;
+	show_debug_message(pHP);
+	dmg_cooldown = 1; //dmg cooldown is set to three
+	//because our dps is exactly one, whatever we set here will be in seconds
+	show_debug_message("PLAYER COLLIDED WITH ENEMY! and it is on CD");
 }
-
-
-// =====================================
-// ENEMY CONTACT DAMAGE
-// =====================================
-
-if (place_meeting(
-        x,
-        y,
-        oEnemy_TEMP
-    )
-&& dmg_cooldown = 0)
-{
-    pHP -= 10;
-
-    show_debug_message(pHP);
-
-    dmg_cooldown = 1;
-
-    show_debug_message(
-        "PLAYER COLLIDED WITH ENEMY! and it is on CD"
-    );
-}
-
-
-// =====================================
-// PLAYER DEATH
-// =====================================
-
-if (pHP <= 0)
-{
-    instance_destroy();
+if(pHP <= 0)
+{instance_destroy();
 }

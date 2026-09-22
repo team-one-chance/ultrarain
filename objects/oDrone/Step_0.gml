@@ -62,3 +62,34 @@ else
     sprite_index = normal_sprite;
 }
 
+// =====================================
+// SHOOT PLAYER
+// =====================================
+
+if (shoot_timer > 0)
+{
+    shoot_timer -= delta_time / 1000000;
+}
+
+var shoot_player = instance_nearest(x, y, o_Player);
+
+if (shoot_player != noone && shoot_timer <= 0)
+{
+    var bullet = instance_create_depth(
+        x,
+        y,
+        depth - 1,
+        oEnemyBullet
+    );
+
+    bullet.direction = point_direction(
+        x,
+        y,
+        shoot_player.x,
+        shoot_player.y
+    );
+
+    shoot_timer = shoot_cooldown;
+
+    show_debug_message("ENEMY FIRED BULLET");
+}
