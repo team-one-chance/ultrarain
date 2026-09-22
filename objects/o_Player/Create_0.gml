@@ -4,7 +4,7 @@
 // MOVEMENT
 // =====================================
 pHP= 100;
-pHP_max = 100;
+pHP_max = 1000;
 pHP = pHP_max;
 dmg_cooldown = 0;
 

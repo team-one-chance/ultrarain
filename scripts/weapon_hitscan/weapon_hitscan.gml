@@ -121,28 +121,13 @@ if (instance_exists(inst)
 			
 			
 
-           if (instance_exists(inst)
+          if (instance_exists(inst)
 && (
     inst.object_index == oEnemyParent
     || object_is_ancestor(inst.object_index, oEnemyParent)
 ))
 {
-    inst.ehp -= _damage;
-
-    // Trigger hit sprite
-    inst.hit_timer = 0.15;
-
-    show_debug_message(
-        "Enemy hit! HP: "
-        + string(inst.ehp)
-    );
-
-    if (inst.ehp <= 0)
-    {
-        instance_destroy(inst);
-
-        show_debug_message("Enemy killed!");
-    }
+    inst.take_damage(_damage);
 }
 
 

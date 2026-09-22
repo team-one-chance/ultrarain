@@ -1127,7 +1127,28 @@ if (on_ground)
     is_slamming = false;
 }
 
+// =====================================
+// MELEE ATTACK - RIGHT MOUSE
+// =====================================
 
+if (keyboard_check_pressed(ord("Q")))
+{
+    var slash_dir = sign(image_xscale);
+
+    if (slash_dir == 0)
+    {
+        slash_dir = 1;
+    }
+
+    var slash = instance_create_depth(
+        x + (40 * slash_dir),
+        y,
+        depth - 1,
+        oSlashEffect
+    );
+
+    slash.image_xscale = slash_dir;
+}
 // =====================================
 // WEAPON SYSTEM
 // =====================================
@@ -1275,24 +1296,30 @@ if (place_meeting(
         oEnemy_TEMP
     )
 && dmg_cooldown = 0)
+	/*dmg_cooldown -= delta_time / 1000000;
+	if (dmg_cooldown < 0){
+		dmg_cooldown = 0;
+	}
+	
+ //every second, damage cooldown is reduced by one
+//now the issue with this is, it runs with the game, not with how long the player and enemy are in contact
+//to fix this, we're gonna need an if condition that obliges to the following rules
+//if enemy and player collide, -10 hp, THEN wait for as long as damage_cooldown says so
+//that means, you take damage if cooldown is at zero
+//in the beginning, cooldown will be zero cause you haven't taken any damage yet
+//but everytime you do take damage, a cooldown will start.
+//until that cooldown is set to zero, you won't take any further damage
+
+	
+if (place_meeting(x, y, oEnemyParent)  && dmg_cooldown =0) //if the enemy and player are in the same position
+//and if damage cooldown is precisely zero, which is what we begin with*/ // I AM ASSUMING THAT THIS CODE PART IS NOW OBSOLETE BUT I KEPT IT REGARDLESS IN CASE SOMETHING GOES WRONG
 {
-    pHP -= 10;
-
-    show_debug_message(pHP);
-
-    dmg_cooldown = 1;
-
-    show_debug_message(
-        "PLAYER COLLIDED WITH ENEMY! and it is on CD"
-    );
+	pHP -=10;
+	show_debug_message(pHP);
+	dmg_cooldown = 1; //dmg cooldown is set to three
+	//because our dps is exactly one, whatever we set here will be in seconds
+	show_debug_message("PLAYER COLLIDED WITH ENEMY! and it is on CD");
 }
-
-
-// =====================================
-// PLAYER DEATH
-// =====================================
-
-if (pHP <= 0)
-{
-    instance_destroy();
+if(pHP <= 0)
+{instance_destroy();
 }
