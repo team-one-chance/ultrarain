@@ -3,7 +3,8 @@
 // =====================================
 
 phy_angular_velocity = 0;
-phy_rotation = 0;
+phy_rotation = 0
+phy_fixed_rotation = 1;
 
 
 // =====================================
@@ -452,10 +453,35 @@ if (wall_jump_lock_time > 0)
     }
 }
 
+// =====================================
+// CURSOR AIMING
+// =====================================
+
+var aim_origin_x = x;
+var aim_origin_y = y + rig_shoulder_l_y - 64;
+
+aim_angle = point_direction(
+    aim_origin_x,
+    aim_origin_y,
+    mouse_x,
+    mouse_y
+);
+
+// Small dead zone prevents flickering when
+// the cursor is directly above the player.
+var aim_dx = mouse_x - aim_origin_x;
+
+if (abs(aim_dx) > 1)
+{
+    aim_facing = sign(aim_dx);
+}
 
 // =====================================
 // SPRITE / ANIMATION
 // =====================================
+
+// Reset animation direction for non-running states
+image_speed = 1;
 
 if (is_ledge_climbing)
 {
@@ -532,7 +558,10 @@ else if (!on_ground)
 else if (move != 0)
 {
     sprite_index = s_Player_Run;
-
+	
+	// 1 when moving forward, -1 when backpedaling
+    image_speed = move * aim_facing;
+	
     if (move > 0)
     {
         image_xscale = 1;
@@ -549,6 +578,19 @@ else
     sprite_index = s_Player;
 }
 
+// Normal poses face toward the cursor.
+// Direction-specific poses keep their forced direction.
+
+var facing_locked =
+    is_sliding
+    || is_ledge_climbing
+    || (!on_ground && wall_jump_lock_time > 0)
+    || (!on_ground && touching_wall && coyote_timer <= 0);
+
+if (!facing_locked)
+{
+    image_xscale = aim_facing;
+}
 
 // =====================================
 // SLAM AND HORIZONTAL MOVEMENT

@@ -121,3 +121,34 @@ ledge_target_y = 0;
 ledge_direction = 0;
 
 ledge_climb_forward = 20;
+
+// =====================================
+// PLAYER AIM RIG
+// =====================================
+
+aim_angle = 0;
+aim_facing = 1;
+
+// points in s_Player for attachments
+rig_neck_x = 18;
+rig_neck_y = 12;
+
+rig_shoulder_l_x = 19;
+rig_shoulder_l_y = 16;
+
+rig_shoulder_r_x = 12;
+rig_shoulder_r_y = 16;
+
+//Joint-to-Joint lengths
+rig_upper_arm_length = 12;
+rig_lower_arm_length = 17;
+
+// Distance from shoulder centre to trigger grip
+rig_weapon_distance = 22;
+
+// Points inside s_Pistol
+rig_support_grip_x = 3;
+rig_support_grip_y = 3;
+
+rig_muzzle_x = 10;
+rig_muzzle_y = 1;
