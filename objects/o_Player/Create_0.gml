@@ -8,7 +8,7 @@ pHP_max = 100;
 pHP = pHP_max;
 dmg_cooldown = 0;
 
-move_speed = 3;
+move_speed = 4;
 
 dmg_cooldown = 0;
 
@@ -26,7 +26,7 @@ jump_speed = -5;
 // =====================================
 
 wall_jump_x = 4;
-wall_jump_y = -6;
+wall_jump_y = -7;
 
 wall_jumps_used = 0;
 max_wall_jumps = 2;
@@ -55,7 +55,7 @@ coyote_duration = 0.15;
 // =====================================
 
 slam_speed = 8;
-slam_max_speed = 30;
+slam_max_speed = 40;
 slam_acceleration = 1.1;
 
 is_slamming = false;
@@ -68,8 +68,8 @@ is_slamming = false;
 is_sliding = false;
 
 // Sliding is 1.5 times faster than normal movement
-slide_speed_multiplier = 1.75;
-slide_movespeed_multiplier = 1.35;
+slide_speed_multiplier = 1.8;
+slide_movespeed_multiplier = 1.45;
 slide_jump_speed = -8;
 slide_time = 4;
 slide_boost_timer = 0;
@@ -100,7 +100,7 @@ alt_fire = false;
 // =================================
 // ground detect
 // =================================
-ground_check_y_offset = 16;
+ground_check_y_offset = 4;
 ground_check_x_offset = 10;
 
 // =====================================
@@ -121,3 +121,52 @@ ledge_target_y = 0;
 ledge_direction = 0;
 
 ledge_climb_forward = 20;
+
+// =====================================
+// COIN ALT FIRE
+// =====================================
+
+// Extra upward force added when tossing
+coin_throw_up = 4;
+
+// Small extra forward push
+coin_throw_forward = 1.5;
+
+// Cooldown
+coin_cooldown = 0.5;
+coin_throw_timer = 0;
+
+// =====================================
+// MANTLE LUNGE
+// =====================================
+
+is_mantle_lunging = false;
+mantle_lunge_direction = 0;
+
+mantle_lunge_speed = 10;
+mantle_lunge_up = -6;
+
+is_mantle_lunging = false;
+
+// =====================================
+// SLIDE DOUBLE JUMP
+// =====================================
+
+// How quickly the second jump must be pressed
+slide_double_jump_window = 0.25;
+slide_double_jump_timer = 0;
+
+slide_double_jump_direction = 0;
+
+// Immediate forward launch on second press
+slide_double_jump_launch_multiplier = 2.5;
+
+// Boost stages
+slide_double_boost_stage = 0;
+slide_double_boost_timer = 0;
+
+slide_double_boost_stage1_duration = 3;
+slide_double_boost_stage2_duration = 4;
+
+slide_double_boost_stage1_multiplier = 1.8;
+slide_double_boost_stage2_multiplier = 1.6;

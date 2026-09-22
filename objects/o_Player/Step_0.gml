@@ -2,8 +2,7 @@
 // KEEP PLAYER UPRIGHT
 // =====================================
 
-phy_angular_velocity = 0;
-phy_rotation = 0;
+phy_fixed_rotation = true;
 
 
 // =====================================
@@ -30,7 +29,6 @@ var ground_right =
         true
     ) != noone;
 
-// BOTH points must detect ground
 var on_ground = ground_left || ground_right;
 
 
@@ -47,8 +45,8 @@ var left_wall_lower =
         false,
         true
     );
-	
-	// middle...
+
+// Middle
 var left_wall_mid =
     collision_point(
         x - 15,
@@ -78,8 +76,9 @@ var right_wall_lower =
         false,
         true
     );
-// middle...
-	var right_wall_mid =
+
+// Middle
+var right_wall_mid =
     collision_point(
         x + 15,
         y - 24,
@@ -87,7 +86,8 @@ var right_wall_lower =
         false,
         true
     );
-// right wall up
+
+// Upper
 var right_wall_upper =
     collision_point(
         x + 15,
@@ -119,25 +119,65 @@ var touching_wall =
 // LEDGE DETECTION
 // =====================================
 
-// Lower part touches wall,
-// upper part is above the wall.
+var left_ledge = false;
+var right_ledge = false;
 
-var left_ledge =
-    left_wall_lower != noone
-    && left_wall_mid != noone
-    && left_wall_upper == noone;
+var left_ledge_top = 0;
+var right_ledge_top = 0;
 
-var right_ledge =
-    right_wall_lower != noone
-    && right_wall_mid != noone
-    && right_wall_upper == noone;
+
+// LEFT
+if (left_wall_lower != noone
+&& left_wall_upper == noone)
+{
+    var left_block = left_wall_lower;
+
+    if (left_wall_mid != noone
+    && left_wall_mid.bbox_top < left_block.bbox_top)
+    {
+        left_block = left_wall_mid;
+    }
+
+    left_ledge_top = left_block.bbox_top;
+
+    if (y - 64 <= left_ledge_top)
+    {
+        left_ledge = true;
+    }
+}
+
+
+// RIGHT
+if (right_wall_lower != noone
+&& right_wall_upper == noone)
+{
+    var right_block = right_wall_lower;
+
+    if (right_wall_mid != noone
+    && right_wall_mid.bbox_top < right_block.bbox_top)
+    {
+        right_block = right_wall_mid;
+    }
+
+    right_ledge_top = right_block.bbox_top;
+
+    if (y - 64 <= right_ledge_top)
+    {
+        right_ledge = true;
+    }
+}
 
 
 // =====================================
 // COYOTE TIME
 // =====================================
 
-if (on_ground)
+// Only refresh coyote time while actually
+// grounded and NOT moving upward.
+//
+// This prevents a normal jump from creating
+// a second coyote jump.
+if (on_ground && phy_speed_y >= 0)
 {
     coyote_timer = coyote_duration;
 }
@@ -182,6 +222,14 @@ if (keyboard_check(vk_left)
 
 
 // =====================================
+// MANTLE INPUT
+// =====================================
+
+var mantle_held =
+    keyboard_check(ord("W")); 
+
+
+// =====================================
 // AUTOMATIC LEDGE CLIMB START
 // =====================================
 
@@ -194,7 +242,10 @@ if (!on_ground
     // LEFT LEDGE
     // ---------------------------------
 
-    if (left_ledge)
+    // Must hold W AND move toward the wall.
+    if (left_ledge
+   // && mantle_held
+    && move < 0)
     {
         is_ledge_climbing = true;
 
@@ -209,7 +260,8 @@ if (!on_ground
             phy_position_x
             - ledge_climb_forward;
 
-        // Put feet at top of block
+        // Keeping your current mantle target
+        // behaviour for now.
         ledge_target_y =
             left_wall_lower.bbox_top
             - ground_check_y_offset;
@@ -231,7 +283,9 @@ if (!on_ground
     // RIGHT LEDGE
     // ---------------------------------
 
-    else if (right_ledge)
+    else if (right_ledge
+   // && mantle_held
+    && move > 0)
     {
         is_ledge_climbing = true;
 
@@ -246,7 +300,8 @@ if (!on_ground
             phy_position_x
             + ledge_climb_forward;
 
-        // Put feet at top of block
+        // Keeping your current mantle target
+        // behaviour for now.
         ledge_target_y =
             right_wall_lower.bbox_top
             - ground_check_y_offset;
@@ -361,21 +416,69 @@ if (is_ledge_climbing)
         phy_position_y =
             ledge_target_y;
 
-        phy_speed_x = 0;
-        phy_speed_y = 0;
-
         is_ledge_climbing = false;
-        ledge_direction = 0;
 
         wall_jump_lock_time = 0;
         wall_jump_forced_direction = 0;
 
         wall_jumps_used = 0;
 
-        // We deliberately placed the player
-        // onto the top of the platform.
-        // Prevent an AIR_TEMP frame here.
-        on_ground = true;
+
+        // =================================
+        // MANTLE LUNGE
+        // =================================
+
+        // If W + ANY horizontal direction
+        // are held when the mantle finishes,
+        // launch in THAT direction.
+        //
+        // It does not matter which side
+        // the ledge was on.
+
+        if (keyboard_check(ord("W"))
+        && move != 0)
+        {
+            is_mantle_lunging = true;
+
+            mantle_lunge_direction =
+                move;
+
+            // Inject momentum ONCE.
+            // Air movement will preserve it.
+            phy_speed_x =
+                mantle_lunge_direction
+                * mantle_lunge_speed;
+
+            phy_speed_y =
+                mantle_lunge_up;
+
+            // Start wall-jump animation
+            sprite_index =
+                WALLJUMP_TEMP;
+
+            image_index = 0;
+            image_speed = 1;
+
+            image_xscale =
+                mantle_lunge_direction;
+
+            // We launched away from the ledge,
+            // so do NOT count as grounded.
+            on_ground = false;
+
+            coyote_timer = 0;
+        }
+
+        else
+        {
+            phy_speed_x = 0;
+            phy_speed_y = 0;
+
+            on_ground = true;
+        }
+
+
+        ledge_direction = 0;
     }
 }
 
@@ -459,14 +562,13 @@ if (wall_jump_lock_time > 0)
 
 if (is_ledge_climbing)
 {
-    // Replace this later with a dedicated
-    // climbing animation if you make one.
     sprite_index = WALLHOLD_TEMP;
 
     if (ledge_direction == -1)
     {
         image_xscale = -1;
     }
+
     else if (ledge_direction == 1)
     {
         image_xscale = 1;
@@ -488,6 +590,42 @@ else if (is_sliding)
     }
 }
 
+
+// =====================================
+// MANTLE LUNGE ANIMATION
+// =====================================
+//
+// No timer.
+//
+// WALLJUMP_TEMP plays once and then
+// is_mantle_lunging turns itself off.
+
+else if (is_mantle_lunging)
+{
+    if (sprite_index != WALLJUMP_TEMP)
+    {
+        sprite_index =
+            WALLJUMP_TEMP;
+
+        image_index = 0;
+    }
+
+    image_xscale =
+        mantle_lunge_direction;
+
+
+    // Animation finished
+    if (image_index >= image_number - 1)
+    {
+        is_mantle_lunging = false;
+    }
+}
+
+
+// =====================================
+// NORMAL WALL-JUMP ANIMATION
+// =====================================
+
 else if (!on_ground
 && wall_jump_lock_time > 0)
 {
@@ -496,6 +634,7 @@ else if (!on_ground
     image_xscale =
         wall_jump_forced_direction;
 }
+
 
 else if (!on_ground
 && touching_wall
@@ -514,6 +653,7 @@ else if (!on_ground
     }
 }
 
+
 else if (!on_ground)
 {
     sprite_index = AIR_TEMP;
@@ -529,6 +669,7 @@ else if (!on_ground)
     }
 }
 
+
 else if (move != 0)
 {
     sprite_index = s_Player_Run;
@@ -542,11 +683,36 @@ else if (move != 0)
     {
         image_xscale = -1;
     }
+
+    // Run animation speed follows movement speed
+image_speed =
+    max(
+        0.5,
+        abs(phy_speed_x) / move_speed
+    );
 }
+
 
 else
 {
     sprite_index = s_Player;
+}
+
+
+// =====================================
+// SLAM INPUT
+// =====================================
+
+// Slam only while airborne and not mantling
+if (!on_ground
+&& !is_slamming
+&& !is_ledge_climbing)
+{
+    if (keyboard_check_pressed(ord("S"))
+    || keyboard_check_pressed(vk_down))
+    {
+        is_slamming = true;
+    }
 }
 
 
@@ -560,6 +726,7 @@ if (is_ledge_climbing)
     phy_speed_x = 0;
     phy_speed_y = 0;
 }
+
 
 else if (is_slamming)
 {
@@ -579,12 +746,14 @@ else if (is_slamming)
     }
 }
 
+
 else if (wall_jump_lock_time > 0)
 {
     phy_speed_x =
         wall_jump_forced_direction
         * wall_jump_x;
 }
+
 
 else
 {
@@ -600,19 +769,144 @@ else
             * slide_speed_multiplier;
     }
 
-    else if (slide_boost_timer > 0)
+
+    // =====================================
+    // AIR MOVEMENT / MOMENTUM
+    // =====================================
+
+    else if (!on_ground)
     {
-        phy_speed_x =
-            move
-            * move_speed
-            * slide_movespeed_multiplier;
+        var air_friction = 0.025;
+        var air_accel = 0.35;
+
+        var air_speed_limit =
+            move_speed;
+		// Slide double-jump boost has priority.
+if (slide_double_boost_stage == 1)
+{
+    air_speed_limit =
+        move_speed
+        * slide_double_boost_stage1_multiplier;
+}
+
+else if (slide_double_boost_stage == 2)
+{
+    air_speed_limit =
+        move_speed
+        * slide_double_boost_stage2_multiplier;
+}
+
+// Normal slide boost
+else if (slide_boost_timer > 0)
+{
+    air_speed_limit =
+        move_speed
+        * slide_movespeed_multiplier;
+}
+
+
+        // Post-slide boost raises the speed
+        // air control can accelerate toward.
+        // It still does NOT overwrite faster momentum.
+
+
+        // =================================
+        // AIR FRICTION
+        // =================================
+
+        if (phy_speed_x > 0)
+        {
+            phy_speed_x =
+                max(
+                    0,
+                    phy_speed_x - air_friction
+                );
+        }
+
+        else if (phy_speed_x < 0)
+        {
+            phy_speed_x =
+                min(
+                    0,
+                    phy_speed_x + air_friction
+                );
+        }
+
+
+        // =================================
+        // AIR CONTROL
+        // =================================
+
+        if (move != 0)
+        {
+            // Same direction as current momentum
+            if (sign(phy_speed_x) == move)
+            {
+                // Only add speed if we're BELOW
+                // the normal allowed air speed.
+                //
+                // If something launched us faster,
+                // preserve that speed.
+                if (abs(phy_speed_x) < air_speed_limit)
+                {
+                    phy_speed_x +=
+                        move * air_accel;
+
+                    // Don't let normal air control
+                    // itself exceed the speed limit.
+                    if (abs(phy_speed_x) > air_speed_limit)
+                    {
+                        phy_speed_x =
+                            move
+                            * air_speed_limit;
+                    }
+                }
+            }
+
+            // Opposite direction:
+            // slowly fight existing momentum.
+            else
+            {
+                phy_speed_x +=
+                    move * air_accel;
+            }
+        }
     }
 
-    else
-    {
-        phy_speed_x =
-            move * move_speed;
-    }
+
+// =====================================
+// GROUND SPEED BOOSTS
+// =====================================
+
+else if (slide_double_boost_stage == 1)
+{
+    phy_speed_x =
+        move
+        * move_speed
+        * slide_double_boost_stage1_multiplier;
+}
+
+else if (slide_double_boost_stage == 2)
+{
+    phy_speed_x =
+        move
+        * move_speed
+        * slide_double_boost_stage2_multiplier;
+}
+
+else if (slide_boost_timer > 0)
+{
+    phy_speed_x =
+        move
+        * move_speed
+        * slide_movespeed_multiplier;
+}
+
+else
+{
+    phy_speed_x =
+        move * move_speed;
+}
 }
 
 
@@ -632,6 +926,52 @@ if (slide_boost_timer > 0)
 }
 
 
+
+// =====================================
+// SLIDE DOUBLE JUMP WINDOW
+// =====================================
+
+if (slide_double_jump_timer > 0)
+{
+    slide_double_jump_timer -=
+        delta_time / 1000000;
+
+    if (slide_double_jump_timer < 0)
+    {
+        slide_double_jump_timer = 0;
+        slide_double_jump_direction = 0;
+    }
+}
+
+// =====================================
+// SLIDE DOUBLE JUMP BOOST
+// =====================================
+
+if (slide_double_boost_stage > 0)
+{
+    slide_double_boost_timer -=
+        delta_time / 1000000;
+
+    if (slide_double_boost_timer <= 0)
+    {
+        // Stage 1 finished:
+        if (slide_double_boost_stage == 1)
+        {
+            slide_double_boost_stage = 2;
+
+            slide_double_boost_timer =
+                slide_double_boost_stage2_duration;
+        }
+
+        // Stage 2 finished
+        else
+        {
+            slide_double_boost_stage = 0;
+            slide_double_boost_timer = 0;
+        }
+    }
+}
+
 // =====================================
 // JUMP AND WALL JUMP
 // =====================================
@@ -642,20 +982,82 @@ var jump_pressed =
     || keyboard_check_pressed(vk_space);
 
 
-// Ignore jump input while automatic mantle
-// is happening.
 if (jump_pressed
 && !is_ledge_climbing)
 {
     // =================================
+    // SLIDE DOUBLE JUMP
+    // =================================
+
+    // A slide jump already happened and
+    // the player pressed jump again quickly.
+    if (slide_double_jump_timer > 0
+    && slide_double_jump_direction != 0)
+    {
+        // Cancel the huge upward slide jump.
+        // Convert it into forward movement.
+        phy_speed_y = -3;
+
+
+        // Give immediate forward momentum.
+        var slide_double_launch_speed =
+            move_speed
+            * slide_double_jump_launch_multiplier;
+
+        // Don't accidentally REDUCE momentum
+        // if we're somehow already going faster.
+        if (abs(phy_speed_x)
+        < slide_double_launch_speed)
+        {
+            phy_speed_x =
+                slide_double_jump_direction
+                * slide_double_launch_speed;
+        }
+
+
+        // Start 2x boost for 4 seconds.
+        slide_double_boost_stage = 1;
+
+        slide_double_boost_timer =
+            slide_double_boost_stage1_duration;
+
+
+        // The old normal slide boost isn't
+        // needed anymore for this jump.
+        slide_boost_timer = 0;
+
+
+        // Consume the double-jump window.
+        slide_double_jump_timer = 0;
+
+
+        // Keep direction for sprite/facing if needed.
+        image_xscale =
+            slide_double_jump_direction;
+    }
+
+
+    // =================================
     // NORMAL JUMP / COYOTE JUMP
     // =================================
 
-    if (on_ground
+    else if (on_ground
     || coyote_timer > 0)
     {
         if (is_sliding)
         {
+            // IMPORTANT:
+            // Remember which way we were sliding
+            // BEFORE resetting slide_direction.
+            slide_double_jump_direction =
+                slide_direction;
+
+            // Arm second jump press.
+            slide_double_jump_timer =
+                slide_double_jump_window;
+
+
+            // Existing strong slide jump.
             phy_speed_y =
                 slide_jump_speed;
 
@@ -668,6 +1070,7 @@ if (jump_pressed
             phy_speed_y =
                 jump_speed;
         }
+
 
         is_sliding = false;
         slide_direction = 0;
@@ -764,19 +1167,75 @@ if (mouse_check_button(mb_left))
 }
 
 
+/* (TOO EARLY TO BEGIN WITH)
 // =====================================
-// ALT FIRE - RIGHT MOUSE
+// ALT FIRE - RIGHT MOUSE / THROW COIN
 // =====================================
 
 if (mouse_check_button_pressed(mb_right))
 {
-    // Reserved for future alt-fire abilities
+    if (coin_throw_timer <= 0)
+    {
+        var coin = instance_create_layer(
+            x + 32,
+            y - 64,
+            "Instances",
+            o_Coin
+        );
+
+
+        // =================================
+        // AIM AT MOUSE
+        // =================================
+
+        var coin_throw_direction =
+            point_direction(
+                coin.x,
+                coin.y,
+                mouse_x,
+                mouse_y
+            );
+
+
+        // =================================
+        // INHERIT PLAYER MOMENTUM
+        // =================================
+
+        coin.phy_speed_x = phy_speed_x;
+        coin.phy_speed_y = phy_speed_y;
+
+
+        // =================================
+        // ADD THROW FORCE
+        // =================================
+
+        coin.phy_speed_x +=
+            lengthdir_x(
+                3,
+                coin_throw_direction
+            );
+
+        coin.phy_speed_y = -5;
+
+        //coin.phy_speed_y +=
+        //    lengthdir_y(
+        //        5,
+        //        coin_throw_direction
+        //    );
+
+
+        // Cooldown
+        coin_throw_timer = coin_cooldown;
+    }
 }
 
+*/
 
-	
-if (place_meeting(x, y, oEnemyParent)  && dmg_cooldown =0) //if the enemy and player are in the same position
-//and if damage cooldown is precisely zero, which is what we begin with
+
+if (place_meeting(x, y, oEnemyParent)
+&& dmg_cooldown = 0)
+
+
 // =====================================
 // DAMAGE COOLDOWN
 // =====================================
@@ -787,6 +1246,22 @@ dmg_cooldown -=
 if (dmg_cooldown < 0)
 {
     dmg_cooldown = 0;
+}
+
+
+// =====================================
+// COIN THROW COOLDOWN
+// =====================================
+
+if (coin_throw_timer > 0)
+{
+    coin_throw_timer -=
+        delta_time / 100000;
+
+    if (coin_throw_timer < 0)
+    {
+        coin_throw_timer = 0;
+    }
 }
 
 
