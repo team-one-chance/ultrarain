@@ -10,8 +10,8 @@
   "name":"oDrone",
   "overriddenProperties":[],
   "parent":{
-    "name":"ULTRA RAIN",
-    "path":"ULTRA RAIN.yyp",
+    "name":"Enemy&Enemy relevant",
+    "path":"folders/Objects/Enemy&Enemy relevant.yy",
   },
   "parentObjectId":{
     "name":"oEnemyParent",
@@ -24,7 +24,7 @@
   "physicsGroup":1,
   "physicsKinematic":false,
   "physicsLinearDamping":0.1,
-  "physicsObject":false,
+  "physicsObject":true,
   "physicsRestitution":0.1,
   "physicsSensor":false,
   "physicsShape":1,

@@ -8,8 +8,8 @@
   "name":"o_Coin",
   "overriddenProperties":[],
   "parent":{
-    "name":"ULTRA RAIN",
-    "path":"ULTRA RAIN.yyp",
+    "name":"Player&Player relevant",
+    "path":"folders/Objects/Player&Player relevant.yy",
   },
   "parentObjectId":null,
   "persistent":false,

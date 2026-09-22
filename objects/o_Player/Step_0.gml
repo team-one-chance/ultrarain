@@ -594,9 +594,7 @@ else if (is_sliding)
 // =====================================
 // MANTLE LUNGE ANIMATION
 // =====================================
-//
 // No timer.
-//
 // WALLJUMP_TEMP plays once and then
 // is_mantle_lunging turns itself off.
 
@@ -623,7 +621,7 @@ else if (is_mantle_lunging)
 
 
 // =====================================
-// NORMAL WALL-JUMP ANIMATION
+// OTHER ANIMATIONS
 // =====================================
 
 else if (!on_ground
@@ -986,55 +984,75 @@ if (jump_pressed
 && !is_ledge_climbing)
 {
     // =================================
-    // SLIDE DOUBLE JUMP
-    // =================================
+// SLIDE DOUBLE JUMP
+// =================================
 
-    // A slide jump already happened and
-    // the player pressed jump again quickly.
-    if (slide_double_jump_timer > 0
-    && slide_double_jump_direction != 0)
+if (slide_double_jump_timer > 0)
+{
+    // Use the direction the player is facing NOW,
+    // not the direction the original slide started in.
+    var double_jump_direction = move;
+
+    // If no A/D is currently held,
+    // use the current facing direction.
+    if (double_jump_direction == 0)
     {
-        // Cancel the huge upward slide jump.
-        // Convert it into forward movement.
-        phy_speed_y = -3;
+        double_jump_direction =
+            sign(image_xscale);
+    }
 
-
-        // Give immediate forward momentum.
-        var slide_double_launch_speed =
-            move_speed
-            * slide_double_jump_launch_multiplier;
-
-        // Don't accidentally REDUCE momentum
-        // if we're somehow already going faster.
-        if (abs(phy_speed_x)
-        < slide_double_launch_speed)
-        {
-            phy_speed_x =
-                slide_double_jump_direction
-                * slide_double_launch_speed;
-        }
-
-
-        // Start 2x boost for 4 seconds.
-        slide_double_boost_stage = 1;
-
-        slide_double_boost_timer =
-            slide_double_boost_stage1_duration;
-
-
-        // The old normal slide boost isn't
-        // needed anymore for this jump.
-        slide_boost_timer = 0;
-
-
-        // Consume the double-jump window.
-        slide_double_jump_timer = 0;
-
-
-        // Keep direction for sprite/facing if needed.
-        image_xscale =
+    // Final fallback to original slide direction
+    if (double_jump_direction == 0)
+    {
+        double_jump_direction =
             slide_double_jump_direction;
     }
+
+
+    // Smaller upward boost
+    phy_speed_y = -3;
+
+
+    // Give immediate forward momentum
+    var slide_double_launch_speed =
+        move_speed
+        * slide_double_jump_launch_multiplier;
+
+
+    if (abs(phy_speed_x)
+    < slide_double_launch_speed)
+    {
+        phy_speed_x =
+            double_jump_direction
+            * slide_double_launch_speed;
+    }
+    else
+    {
+        // IMPORTANT:
+        // If we're already moving faster,
+        // still turn that momentum around.
+        phy_speed_x =
+            double_jump_direction
+            * abs(phy_speed_x);
+    }
+
+
+    // Start boost
+    slide_double_boost_stage = 1;
+
+    slide_double_boost_timer =
+        slide_double_boost_stage1_duration;
+
+
+    slide_boost_timer = 0;
+
+    slide_double_jump_timer = 0;
+
+
+    image_xscale =
+        double_jump_direction;
+}
+    
 
 
     // =================================
