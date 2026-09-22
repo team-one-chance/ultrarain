@@ -10,6 +10,7 @@
   },
   "defaultScriptType":1,
   "Folders":[
+    {"$GMFolder":"","%Name":"Scripts","folderPath":"folders/Scripts.yy","name":"Scripts","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Objects","folderPath":"folders/Objects.yy","name":"Objects","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Enemy&Enemy relevant","folderPath":"folders/Objects/Enemy&Enemy relevant.yy","name":"Enemy&Enemy relevant","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Player&Player relevant","folderPath":"folders/Objects/Player&Player relevant.yy","name":"Player&Player relevant","resourceType":"GMFolder","resourceVersion":"2.0",},
