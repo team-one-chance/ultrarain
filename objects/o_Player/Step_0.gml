@@ -13,7 +13,7 @@ var speed_boost_multiplier = 1;
 // Normal post-slide boost
 if (slide_boost_timer > 0)
 {
-    speed_boost_multiplier = 1.06
+    speed_boost_multiplier = 1.15
        /* max(
             speed_boost_multiplier,
             slide_movespeed_multiplier
@@ -23,7 +23,7 @@ if (slide_boost_timer > 0)
 // Slide double jump - stage 1
 if (slide_double_boost_stage == 1)
 {
-    speed_boost_multiplier = 1.18
+    speed_boost_multiplier = 1.3
        /* max(
             speed_boost_multiplier,
             slide_double_boost_stage1_multiplier
@@ -33,7 +33,7 @@ if (slide_double_boost_stage == 1)
 // Slide double jump - stage 2
 if (slide_double_boost_stage == 2)
 {
-    speed_boost_multiplier = 1.13
+    speed_boost_multiplier = 1.25
       /*  max(
             speed_boost_multiplier,
             slide_double_boost_stage2_multiplier
