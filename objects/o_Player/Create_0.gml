@@ -68,7 +68,7 @@ is_sliding = false;
 // Sliding is 1.5 times faster than normal movement
 slide_speed_multiplier = 1.8;
 slide_movespeed_multiplier = 1.25;
-slide_jump_speed = -8;
+slide_jump_speed = -7;
 slide_time = 4;
 slide_boost_timer = 0;
 // Direction of the slide
@@ -157,7 +157,7 @@ slide_double_jump_timer = 0;
 slide_double_jump_direction = 0;
 
 // Immediate forward launch on second press
-slide_double_jump_launch_multiplier = 2.5;
+slide_double_jump_launch_multiplier = 2;
 
 // Boost stages
 slide_double_boost_stage = 0;
@@ -167,8 +167,8 @@ slide_double_boost_stage1_duration = 2;
 slide_double_boost_stage2_duration = 2;
 slide_double_boost_stage3_duration = 5;
 
-slide_double_boost_stage1_multiplier = 1.6;
-slide_double_boost_stage2_multiplier = 1.4;
+slide_double_boost_stage1_multiplier = 1.5;
+slide_double_boost_stage2_multiplier = 1.33;
 
 // =====================================
 // WALL SLIDE
@@ -184,7 +184,7 @@ wall_slide_decel = 0.15;
 // =====================================
 
 dash_speed = 6;
-air_dash_speed = 4;
+air_dash_speed = 3;
 dash_decay = 0.1;
 
 dash_active = false;
