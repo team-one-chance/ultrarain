@@ -126,6 +126,7 @@ ledge_climb_forward = 20;
 // PLAYER AIM RIG
 // =====================================
 
+aim_rig_mode = AimRigMode.ONE_HANDED;
 aim_angle = 0;
 aim_facing = 1;
 
@@ -143,8 +144,17 @@ rig_shoulder_r_y = 16;
 rig_upper_arm_length = 12;
 rig_lower_arm_length = 17;
 
+// Resting position for the unused arm
+rig_free_hand_offset_x = 0;
+rig_free_hand_offset_y = 36;
+rig_free_arm_reach = 22;
+rig_free_arm_swing = 35;
+rig_free_arm_phase = 0;
+rig_free_arm_swing_speed = 2;
+rig_free_arm_frame_hold = 1;
+
 // Distance from shoulder centre to trigger grip
-rig_weapon_distance = 22;
+rig_weapon_distance = 28;
 
 // Points inside s_Pistol
 rig_support_grip_x = 3;

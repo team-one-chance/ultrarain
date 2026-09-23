@@ -7,6 +7,26 @@ var _origin_y = sprite_get_yoffset(sprite_index);
 
 var _part_facing = aim_facing;
 
+var _hide_rest_arm =
+    aim_rig_mode == AimRigMode.ONE_HANDED
+    && (
+        sprite_index == s_Player_wallHold_Left
+        || sprite_index == s_Player_wallHold_Right
+    );
+
+var _arm_layer_facing = _part_facing;
+
+if (sprite_index == s_Player_wallHold_Left)
+{
+    // Gun arm behind torso
+    _arm_layer_facing = -1;
+}
+else if (sprite_index == s_Player_wallHold_Right)
+{
+    // Gun arm in front of torso
+    _arm_layer_facing = 1;
+}
+
 if (sprite_index == s_Player_Slide_Right)
 {
     _part_facing = 1;
@@ -67,11 +87,24 @@ else
     _shoulder_l_y = _front_socket_y;
 }
 // Pistol position: its origin is the trigger grip
-var _aim_origin_x =
-    (_back_socket_x + _front_socket_x) * 0.5;
+var _aim_origin_x;
+var _aim_origin_y;
 
-var _aim_origin_y =
-    (_back_socket_y + _front_socket_y) * 0.5;
+if (aim_rig_mode == AimRigMode.ONE_HANDED)
+{
+    // Measure pistol distance directly from the firing shoulder
+    _aim_origin_x = _shoulder_r_x;
+    _aim_origin_y = _shoulder_r_y;
+}
+else
+{
+    // Two-handed weapons remain centred between both shoulders
+    _aim_origin_x =
+        (_back_socket_x + _front_socket_x) * 0.5;
+
+    _aim_origin_y =
+        (_back_socket_y + _front_socket_y) * 0.5;
+}
 
 var _weapon_x =
     _aim_origin_x
@@ -103,32 +136,72 @@ var _support_y =
     - _support_dx * dsin(aim_angle)
     + _support_dy * dcos(aim_angle);
 
-// Right hand operates the trigger.
-// Left hand uses the support grip.
+// Right hand always operates the trigger
 var _right_target_x = _weapon_x;
 var _right_target_y = _weapon_y;
 
-var _left_target_x = _support_x;
-var _left_target_y = _support_y;
+var _left_target_x;
+var _left_target_y;
 
-// Draw rear arm
-if (_part_facing == 1)
+if (aim_rig_mode == AimRigMode.TWO_HANDED)
 {
-    draw_ik_arm(
-        s_Player_Arm_Upper_L,
-        s_Player_Arm_Lower_L,
-        _shoulder_l_x,
-        _shoulder_l_y,
-        _left_target_x,
-        _left_target_y,
-        rig_upper_arm_length,
-        rig_lower_arm_length,
-        _part_facing,
-        _part_facing
-    );
+    // Left hand holds the weapon
+    _left_target_x = _support_x;
+    _left_target_y = _support_y;
 }
 else
 {
+    // Default: arm hanging downward
+    var _free_arm_angle = 270;
+
+    // Swing the free arm while running
+	if (sprite_index == s_Player_Run)
+	{
+		var _arm_frame =
+			floor(image_index / rig_free_arm_frame_hold)
+			* rig_free_arm_frame_hold;
+
+		var _run_cycle =
+			(_arm_frame / max(1, image_number)) * 360;
+
+		_free_arm_angle +=
+			dsin(_run_cycle + rig_free_arm_phase)
+			* rig_free_arm_swing
+			* _part_facing;
+	}
+
+    _left_target_x =
+        _shoulder_l_x
+        + lengthdir_x(rig_free_arm_reach, _free_arm_angle);
+
+    _left_target_y =
+        _shoulder_l_y
+        + lengthdir_y(rig_free_arm_reach, _free_arm_angle);
+}
+
+// Draw rear arm
+if (_arm_layer_facing == 1)
+{
+    // Left arm is the resting arm
+    if (!_hide_rest_arm)
+    {
+        draw_ik_arm(
+            s_Player_Arm_Upper_L,
+            s_Player_Arm_Lower_L,
+            _shoulder_l_x,
+            _shoulder_l_y,
+            _left_target_x,
+            _left_target_y,
+            rig_upper_arm_length,
+            rig_lower_arm_length,
+            _part_facing,
+            _part_facing
+        );
+    }
+}
+else
+{
+    // Right arm holds the pistol
     draw_ik_arm(
         s_Player_Arm_Upper_R,
         s_Player_Arm_Lower_R,
@@ -184,8 +257,10 @@ draw_sprite_ext(
 );
 
 // Draw front arm
-if (_part_facing == 1)
+// Draw front arm
+if (_arm_layer_facing == 1)
 {
+    // Right arm holds the pistol
     draw_ik_arm(
         s_Player_Arm_Upper_R,
         s_Player_Arm_Lower_R,
@@ -201,16 +276,22 @@ if (_part_facing == 1)
 }
 else
 {
-    draw_ik_arm(
-        s_Player_Arm_Upper_L,
-        s_Player_Arm_Lower_L,
-        _shoulder_l_x,
-        _shoulder_l_y,
-        _left_target_x,
-        _left_target_y,
-        rig_upper_arm_length,
-        rig_lower_arm_length,
-        _part_facing,
-        _part_facing
-    );
+    // Left arm is the resting arm
+    if (!_hide_rest_arm)
+    {
+        draw_ik_arm(
+            s_Player_Arm_Upper_L,
+            s_Player_Arm_Lower_L,
+            _shoulder_l_x,
+            _shoulder_l_y,
+            _left_target_x,
+            _left_target_y,
+            rig_upper_arm_length,
+            rig_lower_arm_length,
+            _part_facing,
+            _part_facing
+        );
+    }
 }
+
+draw_text(x - 30, y - 80, sprite_get_name(sprite_index));

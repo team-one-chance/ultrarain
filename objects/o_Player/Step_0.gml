@@ -527,15 +527,14 @@ else if (!on_ground
 && touching_wall
 && coyote_timer <= 0)
 {
-    sprite_index = s_Player_wallHold_Right;
-
     if (touching_left_wall)
     {
+        sprite_index = s_Player_wallHold_Left;
         image_xscale = -1;
     }
-
     else if (touching_right_wall)
     {
+        sprite_index = s_Player_wallHold_Right;
         image_xscale = 1;
     }
 }

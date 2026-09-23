@@ -1,3 +1,9 @@
+enum AimRigMode
+{
+    ONE_HANDED,
+    TWO_HANDED
+}
+
 function player_rig_pose(_sprite, _frame)
 {
     // One entry means the same attachment points are used for every frame.
@@ -42,30 +48,72 @@ function player_rig_pose(_sprite, _frame)
     }
 	];
 
-	static _wallholdleft = [
+	static _wallhold_left = [
     {
-        neck_x: 56, neck_y: 12,
-        back_x: 45, back_y: 13,
-        front_x: 52, front_y: 13
+        neck_x: 5, neck_y: 2,
+        back_x: 4, back_y: 5,
+        front_x: 4, front_y: 5
+    }
+	];
+	
+	static _wallhold_right = [
+    {
+        neck_x: 5, neck_y: 6,
+        back_x: 4, back_y: 9,
+        front_x: 4, front_y: 9
     }
 	];
 
-    // One entry per animation frame when the torso moves.
-    static _walljump = [
-        {
-            neck_x: 16, neck_y: 9,
-            back_x: 19, back_y: 16,
-            front_x: 12, front_y: 16
-        },
+// One entry per wall-jump animation frame.
+static _walljump = [
+    {
+        neck_x: 48, neck_y: 11,
+        back_x: 42, back_y: 14,
+        front_x: 41, front_y: 13
+    },
 
-        {
-            neck_x: 16, neck_y: 9,
-            back_x: 19, back_y: 16,
-            front_x: 12, front_y: 16
-        }
+    {
+        neck_x: 46, neck_y: 8,
+        back_x: 41, back_y: 12,
+        front_x: 40, front_y: 11
+    },
 
-        // Copy another {...} block for each remaining frame.
-    ];
+    {
+        neck_x: 44, neck_y: 6,
+        back_x: 40, back_y: 11,
+        front_x: 39, front_y: 10
+    },
+
+    {
+        neck_x: 43, neck_y: 3,
+        back_x: 38, back_y: 9,
+        front_x: 37, front_y: 8
+    },
+
+    {
+        neck_x: 39, neck_y: 3,
+        back_x: 36, back_y: 9,
+        front_x: 35, front_y: 8
+    },
+
+    {
+        neck_x: 37, neck_y: 2,
+        back_x: 34, back_y: 8,
+        front_x: 33, front_y: 7
+    },
+
+    {
+        neck_x: 36, neck_y: 2,
+        back_x: 33, back_y: 7,
+        front_x: 32, front_y: 6
+    },
+
+    {
+        neck_x: 33, neck_y: 1,
+        back_x: 31, back_y: 8,
+        front_x: 30, front_y: 7
+    }
+];
 	
     var _poses = _idle;
 
@@ -93,6 +141,14 @@ function player_rig_pose(_sprite, _frame)
 			
 		case s_Player_Slide_Left:
 			_poses = _slide_left;
+			break;
+
+		case s_Player_wallHold_Left:
+			_poses = _wallhold_left;
+			break;
+			
+		case s_Player_wallHold_Right:
+			_poses = _wallhold_right;
 			break;
     }
 
