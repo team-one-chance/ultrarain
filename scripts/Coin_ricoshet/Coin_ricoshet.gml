@@ -14,7 +14,7 @@ function coin_ricochet(_coin, _damage, _range)
         instance_nearest(
             _coin.x,
             _coin.y,
-            oEnemy_TEMP
+            oEnemyParent
         );
 
 

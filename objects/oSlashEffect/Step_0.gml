@@ -50,9 +50,10 @@ else
 }
 
 enemy.take_damage(
-    25,
+    slash_damage,
     knockback_dir,
-    30
+    knockback_force,
+	true
 );
     }
 }
@@ -68,3 +69,59 @@ if (duration <= 0)
 {
     instance_destroy();
 }
+
+
+// =====================================
+// HIT COINS
+// =====================================
+
+var coins = ds_list_create();
+
+collision_rectangle_list(
+    bbox_left,
+    bbox_top,
+    bbox_right,
+    bbox_bottom,
+    o_Coin,
+    false,
+    true,
+    coins,
+    false
+);
+
+for (var c = 0; c < ds_list_size(coins); c++)
+{
+    var coin = coins[| c];
+
+    if (instance_exists(coin))
+    {
+        var beam_dir;
+
+        if (image_xscale > 0)
+        {
+            beam_dir = 0;
+        }
+        else
+        {
+            beam_dir = 180;
+        }
+
+        var beam = instance_create_layer(
+    coin.x,
+    y,
+    "Instances",
+    oSwordBeam
+);
+
+        beam.move_dir = beam_dir;
+        beam.image_xscale = sign(image_xscale);
+
+        // Copy this slash's damage and knockback
+        beam.beam_damage = slash_damage;
+        beam.knockback_force = knockback_force;
+
+        instance_destroy(coin);
+    }
+}
+
+ds_list_destroy(coins);

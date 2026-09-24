@@ -1206,7 +1206,7 @@ if (mouse_check_button(mb_left))
 }
 
 
-/* (TOO EARLY TO BEGIN WITH)
+// (TOO EARLY TO BEGIN WITH)
 // =====================================
 // ALT FIRE - RIGHT MOUSE / THROW COIN
 // =====================================
@@ -1268,7 +1268,7 @@ if (mouse_check_button_pressed(mb_right))
     }
 }
 
-*/
+
 
 
 if (place_meeting(x, y, oEnemyParent)
@@ -1295,7 +1295,7 @@ if (dmg_cooldown < 0)
 if (coin_throw_timer > 0)
 {
     coin_throw_timer -=
-        delta_time / 100000;
+        delta_time / 1000000;
 
     if (coin_throw_timer < 0)
     {
@@ -1305,37 +1305,18 @@ if (coin_throw_timer > 0)
 
 
 // =====================================
-// ENEMY CONTACT DAMAGE
+// ENEMY CONTACT DAMAGE, DO NOT TOUCH OR CHANGE!!!!!!!!!!!!
 // =====================================
 
-if (place_meeting(
-        x,
-        y,
-        oEnemy_TEMP
-    )
-&& dmg_cooldown = 0)
-	/*dmg_cooldown -= delta_time / 1000000;
+dmg_cooldown -= delta_time / 1000000;
 	if (dmg_cooldown < 0){
 		dmg_cooldown = 0;
 	}
-	
- //every second, damage cooldown is reduced by one
-//now the issue with this is, it runs with the game, not with how long the player and enemy are in contact
-//to fix this, we're gonna need an if condition that obliges to the following rules
-//if enemy and player collide, -10 hp, THEN wait for as long as damage_cooldown says so
-//that means, you take damage if cooldown is at zero
-//in the beginning, cooldown will be zero cause you haven't taken any damage yet
-//but everytime you do take damage, a cooldown will start.
-//until that cooldown is set to zero, you won't take any further damage
-
-	
-if (place_meeting(x, y, oEnemyParent)  && dmg_cooldown =0) //if the enemy and player are in the same position
-//and if damage cooldown is precisely zero, which is what we begin with*/ // I AM ASSUMING THAT THIS CODE PART IS NOW OBSOLETE BUT I KEPT IT REGARDLESS IN CASE SOMETHING GOES WRONG
+if (place_meeting(x, y, oEnemyParent)  && dmg_cooldown =0) 
 {
 	pHP -=10;
 	show_debug_message(pHP);
-	dmg_cooldown = 1; //dmg cooldown is set to three
-	//because our dps is exactly one, whatever we set here will be in seconds
+	dmg_cooldown = 1; 
 	show_debug_message("PLAYER COLLIDED WITH ENEMY! and it is on CD");
 }
 if(pHP <= 0)

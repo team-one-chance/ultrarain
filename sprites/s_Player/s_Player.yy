@@ -23,7 +23,7 @@
   ],
   "name":"s_Player",
   "nineSlice":null,
-  "origin":7,
+  "origin":9,
   "parent":{
     "name":"Player_1",
     "path":"folders/Sprites/Sprite/Player_1.yy",
@@ -76,7 +76,7 @@
     "visibleRange":null,
     "volume":1.0,
     "xorigin":16,
-    "yorigin":64,
+    "yorigin":63,
   },
   "swatchColours":null,
   "swfPrecision":0.5,

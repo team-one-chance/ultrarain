@@ -23,7 +23,7 @@
   ],
   "name":"sSlash",
   "nineSlice":null,
-  "origin":7,
+  "origin":8,
   "parent":{
     "name":"Sprite",
     "path":"folders/Sprites/Sprite.yy",
@@ -75,7 +75,7 @@
     ],
     "visibleRange":null,
     "volume":1.0,
-    "xorigin":17,
+    "xorigin":35,
     "yorigin":65,
   },
   "swatchColours":null,
