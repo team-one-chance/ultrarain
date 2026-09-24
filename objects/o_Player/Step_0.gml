@@ -4,6 +4,42 @@
 
 phy_fixed_rotation = true;
 
+// =====================================
+// ACTIVE SPEED BOOST
+// =====================================
+
+var speed_boost_multiplier = 1;
+
+// Normal post-slide boost
+if (slide_boost_timer > 0)
+{
+    speed_boost_multiplier = 1.15
+       /* max(
+            speed_boost_multiplier,
+            slide_movespeed_multiplier
+        );*/
+}
+
+// Slide double jump - stage 1
+if (slide_double_boost_stage == 1)
+{
+    speed_boost_multiplier = 1.3
+       /* max(
+            speed_boost_multiplier,
+            slide_double_boost_stage1_multiplier
+        );*/
+}
+
+// Slide double jump - stage 2
+if (slide_double_boost_stage == 2)
+{
+    speed_boost_multiplier = 1.25
+      /*  max(
+            speed_boost_multiplier,
+            slide_double_boost_stage2_multiplier
+        );*/
+}
+
 
 // =====================================
 // GROUND DETECTION
@@ -30,6 +66,11 @@ var ground_right =
     ) != noone;
 
 var on_ground = ground_left || ground_right;
+
+if (on_ground)
+{
+    air_dash_cooldown_timer = 0;
+}
 
 
 // =====================================
@@ -447,10 +488,12 @@ if (is_ledge_climbing)
             // Air movement will preserve it.
             phy_speed_x =
                 mantle_lunge_direction
-                * mantle_lunge_speed;
+                * mantle_lunge_speed
+				* speed_boost_multiplier;
 
             phy_speed_y =
-                mantle_lunge_up;
+                mantle_lunge_up
+				* speed_boost_multiplier;
 
             // Start wall-jump animation
             sprite_index =
@@ -624,10 +667,12 @@ else if (is_mantle_lunging)
 // OTHER ANIMATIONS
 // =====================================
 
+
 else if (!on_ground
 && wall_jump_lock_time > 0)
 {
     sprite_index = WALLJUMP_TEMP;
+	//image_speed = 1;
 
     image_xscale =
         wall_jump_forced_direction;
@@ -639,6 +684,7 @@ else if (!on_ground
 && coyote_timer <= 0)
 {
     sprite_index = WALLHOLD_TEMP;
+	image_speed = 1;
 
     if (touching_left_wall)
     {
@@ -655,6 +701,7 @@ else if (!on_ground
 else if (!on_ground)
 {
     sprite_index = AIR_TEMP;
+	image_speed = 1;
 
     if (move > 0)
     {
@@ -715,6 +762,17 @@ if (!on_ground
 
 
 // =====================================
+// WALL HOLD STATE
+// =====================================
+
+// You are holding the wall unless you
+// deliberately press AWAY from it.
+var wall_holding =
+    (touching_left_wall && move <= 0)
+    || (touching_right_wall && move >= 0);
+
+
+// =====================================
 // SLAM AND HORIZONTAL MOVEMENT
 // =====================================
 
@@ -724,7 +782,6 @@ if (is_ledge_climbing)
     phy_speed_x = 0;
     phy_speed_y = 0;
 }
-
 
 else if (is_slamming)
 {
@@ -752,15 +809,19 @@ else if (wall_jump_lock_time > 0)
         * wall_jump_x;
 }
 
+// =====================================
+// HORIZONTAL MOVEMENT
+// =====================================
 
-else
+// Ground dash owns horizontal velocity
+// while it is active.
+if (dash_active && on_ground)
 {
-    // =====================================
-    // HORIZONTAL MOVEMENT
-    // =====================================
+    // Dash code below handles phy_speed_x.
+}
 
-    if (is_sliding)
-    {
+else if (is_sliding)
+{
         phy_speed_x =
             slide_direction
             * move_speed
@@ -779,33 +840,29 @@ else
 
         var air_speed_limit =
             move_speed;
-		// Slide double-jump boost has priority.
-if (slide_double_boost_stage == 1)
-{
-    air_speed_limit =
-        move_speed
-        * slide_double_boost_stage1_multiplier;
-}
-
-else if (slide_double_boost_stage == 2)
-{
-    air_speed_limit =
-        move_speed
-        * slide_double_boost_stage2_multiplier;
-}
-
-// Normal slide boost
-else if (slide_boost_timer > 0)
-{
-    air_speed_limit =
-        move_speed
-        * slide_movespeed_multiplier;
-}
 
 
-        // Post-slide boost raises the speed
-        // air control can accelerate toward.
-        // It still does NOT overwrite faster momentum.
+        // Slide double-jump boost has priority
+        if (slide_double_boost_stage == 1)
+        {
+            air_speed_limit =
+                move_speed
+                * slide_double_boost_stage1_multiplier;
+        }
+
+        else if (slide_double_boost_stage == 2)
+        {
+            air_speed_limit =
+                move_speed
+                * slide_double_boost_stage2_multiplier;
+        }
+
+        else if (slide_boost_timer > 0)
+        {
+            air_speed_limit =
+                move_speed
+                * slide_movespeed_multiplier;
+        }
 
 
         // =================================
@@ -837,21 +894,13 @@ else if (slide_boost_timer > 0)
 
         if (move != 0)
         {
-            // Same direction as current momentum
             if (sign(phy_speed_x) == move)
             {
-                // Only add speed if we're BELOW
-                // the normal allowed air speed.
-                //
-                // If something launched us faster,
-                // preserve that speed.
                 if (abs(phy_speed_x) < air_speed_limit)
                 {
                     phy_speed_x +=
                         move * air_accel;
 
-                    // Don't let normal air control
-                    // itself exceed the speed limit.
                     if (abs(phy_speed_x) > air_speed_limit)
                     {
                         phy_speed_x =
@@ -861,8 +910,6 @@ else if (slide_boost_timer > 0)
                 }
             }
 
-            // Opposite direction:
-            // slowly fight existing momentum.
             else
             {
                 phy_speed_x +=
@@ -872,39 +919,296 @@ else if (slide_boost_timer > 0)
     }
 
 
+    // =====================================
+    // GROUND SPEED BOOSTS
+    // =====================================
+
+    else if (slide_double_boost_stage == 1)
+    {
+        phy_speed_x =
+            move
+            * move_speed
+            * slide_double_boost_stage1_multiplier;
+    }
+
+    else if (slide_double_boost_stage == 2)
+    {
+        phy_speed_x =
+            move
+            * move_speed
+            * slide_double_boost_stage2_multiplier;
+    }
+
+    else if (slide_boost_timer > 0)
+    {
+        phy_speed_x =
+            move
+            * move_speed
+            * slide_movespeed_multiplier;
+    }
+
+    else
+    {
+        phy_speed_x =
+            move * move_speed;
+    }
+
 // =====================================
-// GROUND SPEED BOOSTS
+// DASH COOLDOWNS
 // =====================================
 
-else if (slide_double_boost_stage == 1)
+// Ground dash
+if (ground_dash_cooldown_timer > 0)
 {
-    phy_speed_x =
-        move
-        * move_speed
-        * slide_double_boost_stage1_multiplier;
+    ground_dash_cooldown_timer -=
+        delta_time / 1000000;
+
+    if (ground_dash_cooldown_timer < 0)
+    {
+        ground_dash_cooldown_timer = 0;
+    }
 }
 
-else if (slide_double_boost_stage == 2)
+
+// Air dash
+if (air_dash_cooldown_timer > 0)
 {
-    phy_speed_x =
-        move
-        * move_speed
-        * slide_double_boost_stage2_multiplier;
+    air_dash_cooldown_timer -=
+        delta_time / 1000000;
+
+    if (air_dash_cooldown_timer < 0)
+    {
+        air_dash_cooldown_timer = 0;
+    }
 }
 
-else if (slide_boost_timer > 0)
+
+// =====================================
+// GROUND DASH
+// =====================================
+
+if (dash_active)
 {
-    phy_speed_x =
-        move
-        * move_speed
-        * slide_movespeed_multiplier;
+    if (!on_ground)
+    {
+        dash_active = false;
+        dash_direction = 0;
+        dash_current_speed = 0;
+        dash_burst_timer = 0;
+    }
+
+
+    // =================================
+    // DASH FROM STANDSTILL
+    // =================================
+
+    else if (!dash_started_moving)
+    {
+        dash_burst_timer -=
+            delta_time / 1000000;
+
+        phy_speed_x =
+            dash_direction
+            * dash_stationary_speed;
+
+        if (dash_burst_timer <= 0)
+        {
+            dash_active = false;
+            dash_direction = 0;
+            dash_current_speed = 0;
+            dash_burst_timer = 0;
+
+            phy_speed_x = 0;
+        }
+    }
+
+
+    // =================================
+    // DASH WHILE RUNNING
+    // =================================
+
+    else
+    {
+        // Letting go cancels the boost.
+        if (move == 0)
+        {
+            dash_active = false;
+            dash_direction = 0;
+            dash_current_speed = 0;
+
+            phy_speed_x = 0;
+        }
+
+        // Turning around also cancels it.
+        else if (move != dash_direction)
+        {
+            dash_active = false;
+            dash_direction = 0;
+            dash_current_speed = 0;
+
+            phy_speed_x =
+                move * move_speed;
+        }
+
+        // Still holding the dash direction:
+        // decay toward normal running speed.
+        else
+        {
+            dash_current_speed =
+                max(
+                    move_speed,
+                    dash_current_speed - dash_decay
+                );
+
+            phy_speed_x =
+                dash_direction
+                * dash_current_speed;
+
+            if (dash_current_speed <= move_speed)
+            {
+                dash_active = false;
+                dash_direction = 0;
+                dash_current_speed = 0;
+            }
+        }
+    }
+}
+
+// =====================================
+// DASH INPUT
+// =====================================
+
+var dash_pressed =
+    keyboard_check_pressed(vk_shift);
+
+if (dash_pressed)
+{
+    var dash_dir =
+        sign(image_xscale);
+
+    if (dash_dir == 0)
+    {
+        dash_dir = 1;
+    }
+
+
+    // =================================
+    // GROUND DASH
+    // =================================
+
+    if (on_ground
+    && move != 0
+    && ground_dash_cooldown_timer <= 0)
+    {
+        // Cancel wall-jump control lock
+        wall_jump_lock_time = 0;
+        wall_jump_forced_direction = 0;
+
+        dash_active = true;
+        dash_direction = dash_dir;
+        dash_started_moving = true;
+
+        dash_current_speed =
+            abs(phy_speed_x)
+            + dash_speed;
+
+        phy_speed_x =
+            dash_direction
+            * dash_current_speed;
+
+        ground_dash_cooldown_timer =
+            dash_cooldown;
+    }
+
+
+    // =================================
+    // AIR DASH
+    // =================================
+
+    else if (!on_ground
+    && air_dash_cooldown_timer <= 0)
+    {
+        // Cancel wall-jump control lock
+        wall_jump_lock_time = 0;
+        wall_jump_forced_direction = 0;
+
+        phy_speed_x +=
+            dash_dir
+            * air_dash_speed;
+
+        phy_speed_y = -3;
+
+        dash_active = false;
+        dash_direction = 0;
+
+        air_dash_cooldown_timer =
+            air_dash_cooldown;
+    }
+}
+
+// =====================================
+// WALL SLIDE FRICTION
+// =====================================
+
+var pressing_away_from_wall =
+    (touching_left_wall && keyboard_check(ord("D")))
+    ||
+    (touching_right_wall && keyboard_check(ord("A")));
+
+if (pressing_away_from_wall && wall_slide_active)
+{
+    phy_speed_y = min(phy_speed_y, 0);
+
+    wall_slide_active = false;
+    wall_slide_speed = 0;
+}
+
+if (!on_ground
+&& wall_holding
+&& coyote_timer <= 0
+&& !is_slamming
+&& wall_jump_lock_time <= 0)
+{
+    // Start wall slide when falling
+    if (!wall_slide_active
+    && phy_speed_y > 0)
+    {
+        wall_slide_active = true;
+
+        wall_slide_speed =
+            phy_speed_y;
+    }
+
+    if (wall_slide_active)
+    {
+        // Neither A nor D is held:
+        // slide downward at speed 3
+        if (move == 0)
+        {
+            wall_slide_speed = 3;
+        }
+
+        // Holding toward the wall:
+        // gradually stop sliding
+        else
+        {
+            wall_slide_speed =
+                max(
+                    0,
+                    wall_slide_speed
+                    - wall_slide_decel
+                );
+        }
+
+        phy_speed_y =
+            wall_slide_speed;
+    }
 }
 
 else
 {
-    phy_speed_x =
-        move * move_speed;
-}
+    wall_slide_active = false;
+    wall_slide_speed = 0;
 }
 
 
@@ -983,7 +1287,7 @@ var jump_pressed =
 if (jump_pressed
 && !is_ledge_climbing)
 {
-    // =================================
+// =================================
 // SLIDE DOUBLE JUMP
 // =================================
 

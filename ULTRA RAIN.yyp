@@ -60,6 +60,7 @@
     {"id":{"name":"sEnemyClimb","path":"sprites/sEnemyClimb/sEnemyClimb.yy",},},
     {"id":{"name":"sEnemyStunned","path":"sprites/sEnemyStunned/sEnemyStunned.yy",},},
     {"id":{"name":"sHeal","path":"sprites/sHeal/sHeal.yy",},},
+    {"id":{"name":"SLAM_TEMP","path":"sprites/SLAM_TEMP/SLAM_TEMP.yy",},},
     {"id":{"name":"SLIDE_TEMP_1","path":"sprites/SLIDE_TEMP_1/SLIDE_TEMP_1.yy",},},
     {"id":{"name":"SLIDE_TEMP","path":"sprites/SLIDE_TEMP/SLIDE_TEMP.yy",},},
     {"id":{"name":"spr_background_tiles","path":"sprites/spr_background_tiles/spr_background_tiles.yy",},},
