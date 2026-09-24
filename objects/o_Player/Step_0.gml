@@ -1510,7 +1510,7 @@ if (mouse_check_button(mb_left))
 }
 
 
-/* (TOO EARLY TO BEGIN WITH)
+// (TOO EARLY TO BEGIN WITH)
 // =====================================
 // ALT FIRE - RIGHT MOUSE / THROW COIN
 // =====================================
@@ -1572,7 +1572,7 @@ if (mouse_check_button_pressed(mb_right))
     }
 }
 
-*/
+
 
 
 if (place_meeting(x, y, oEnemyParent)
@@ -1599,7 +1599,7 @@ if (dmg_cooldown < 0)
 if (coin_throw_timer > 0)
 {
     coin_throw_timer -=
-        delta_time / 100000;
+        delta_time / 1000000;
 
     if (coin_throw_timer < 0)
     {
@@ -1609,32 +1609,20 @@ if (coin_throw_timer > 0)
 
 
 // =====================================
-// ENEMY CONTACT DAMAGE
+// ENEMY CONTACT DAMAGE, DO NOT TOUCH OR CHANGE!!!!!!!!!!!!
 // =====================================
 
-if (place_meeting(
-        x,
-        y,
-        oEnemy_TEMP
-    )
-&& dmg_cooldown = 0)
-
-	dmg_cooldown -= delta_time / 1000000;
+dmg_cooldown -= delta_time / 1000000;
 	if (dmg_cooldown < 0){
 		dmg_cooldown = 0;
 	}
-
-	
-if (place_meeting(x, y, oEnemyParent)  && dmg_cooldown =0) //if the enemy and player are in the same position
-//and if damage cooldown is precisely zero, which is what we begin with // I AM ASSUMING THAT THIS CODE PART IS NOW OBSOLETE BUT I KEPT IT REGARDLESS IN CASE SOMETHING GOES WRONG
+if (place_meeting(x, y, oEnemyParent)  && dmg_cooldown =0) 
 {
 	pHP -=10;
 	show_debug_message(pHP);
-	dmg_cooldown = 1; //dmg cooldown is set to three
-	//because our dps is exactly one, whatever we set here will be in seconds
+	dmg_cooldown = 1; 
 	show_debug_message("PLAYER COLLIDED WITH ENEMY! and it is on CD");
 }
-
 if(pHP <= 0)
 {instance_destroy();
 }
