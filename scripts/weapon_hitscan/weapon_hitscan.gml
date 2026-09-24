@@ -4,15 +4,158 @@ function weapon_hitscan(_damage, _range, _piercing)
     // AIM
     // =====================================
 
-    var start_x = x;
-    var start_y = y -5;
+// =====================================
+// GET ACTUAL PISTOL MUZZLE POSITION
+// =====================================
 
-    var shoot_direction = point_direction(
-        start_x,
-        start_y,
-        mouse_x,
-        mouse_y
+// Body direction
+var _body_facing = sign(image_xscale);
+
+if (_body_facing == 0)
+{
+    _body_facing = 1;
+}
+
+
+// Direction the gun/arms are aiming
+var _part_facing = aim_facing;
+
+// Slides use direction-specific sprites
+if (sprite_index == s_Player_Slide_Right)
+{
+    _part_facing = 1;
+}
+else if (sprite_index == s_Player_Slide_Left)
+{
+    _part_facing = -1;
+}
+
+
+// Get the current rig pose
+var _rig =
+    player_rig_pose(
+        sprite_index,
+        image_index
     );
+
+var _origin_x =
+    sprite_get_xoffset(sprite_index);
+
+var _origin_y =
+    sprite_get_yoffset(sprite_index);
+
+
+// =====================================
+// SHOULDER SOCKETS
+// =====================================
+
+var _back_socket_x =
+    x
+    + (_rig.back_x - _origin_x)
+    * _body_facing;
+
+var _back_socket_y =
+    y
+    + _rig.back_y
+    - _origin_y;
+
+var _front_socket_x =
+    x
+    + (_rig.front_x - _origin_x)
+    * _body_facing;
+
+var _front_socket_y =
+    y
+    + _rig.front_y
+    - _origin_y;
+
+
+// Find the firing/right shoulder
+var _shoulder_r_x;
+var _shoulder_r_y;
+
+if (_part_facing == 1)
+{
+    _shoulder_r_x = _front_socket_x;
+    _shoulder_r_y = _front_socket_y;
+}
+else
+{
+    _shoulder_r_x = _back_socket_x;
+    _shoulder_r_y = _back_socket_y;
+}
+
+
+// =====================================
+// PISTOL POSITION
+// =====================================
+
+var _aim_origin_x;
+var _aim_origin_y;
+
+if (aim_rig_mode == AimRigMode.ONE_HANDED)
+{
+    _aim_origin_x = _shoulder_r_x;
+    _aim_origin_y = _shoulder_r_y;
+}
+else
+{
+    _aim_origin_x =
+        (_back_socket_x + _front_socket_x)
+        * 0.5;
+
+    _aim_origin_y =
+        (_back_socket_y + _front_socket_y)
+        * 0.5;
+}
+
+
+var _weapon_x =
+    _aim_origin_x
+    + lengthdir_x(
+        rig_weapon_distance,
+        aim_angle
+    );
+
+var _weapon_y =
+    _aim_origin_y
+    + lengthdir_y(
+        rig_weapon_distance,
+        aim_angle
+    );
+
+
+// =====================================
+// MUZZLE POSITION
+// =====================================
+
+// Position of muzzle relative to pistol origin
+var _muzzle_dx =
+    rig_muzzle_x
+    - sprite_get_xoffset(s_Pistol);
+
+var _muzzle_dy =
+    rig_muzzle_y
+    - sprite_get_yoffset(s_Pistol);
+
+// Same vertical mirror used when drawing pistol
+_muzzle_dy *= _part_facing;
+
+
+// Rotate local muzzle position into world space
+var start_x =
+    _weapon_x
+    + _muzzle_dx * dcos(aim_angle)
+    + _muzzle_dy * dsin(aim_angle);
+
+var start_y =
+    _weapon_y
+    - _muzzle_dx * dsin(aim_angle)
+    + _muzzle_dy * dcos(aim_angle);
+
+
+// Shoot exactly along the direction the pistol is drawn
+var shoot_direction = aim_angle;
 
 
     // Default: bullet reaches full range

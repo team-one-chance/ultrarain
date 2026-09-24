@@ -2,8 +2,6 @@
 // KEEP PLAYER UPRIGHT
 // =====================================
 
-phy_angular_velocity = 0;
-phy_rotation = 0;
 phy_fixed_rotation = true;
 
 // =====================================
@@ -21,13 +19,13 @@ if (slide_boost_timer > 0)
 // Slide double jump - stage 1
 if (slide_double_boost_stage == 1)
 {
-    speed_boost_multiplier = 1.3;
+    speed_boost_multiplier = 1.25;
 }
 
 // Slide double jump - stage 2
 if (slide_double_boost_stage == 2)
 {
-    speed_boost_multiplier = 1.25;
+    speed_boost_multiplier = 1.2;
 }
 
 
@@ -761,7 +759,7 @@ else
 
 // Normal poses face toward the cursor.
 // Direction-specific poses keep their forced direction.
-
+/*
 var facing_locked =
     is_sliding
     || is_ledge_climbing
@@ -772,7 +770,7 @@ if (!facing_locked)
 {
     image_xscale = aim_facing;
 }
-
+*/
 // =====================================
 // SLAM INPUT
 // =====================================

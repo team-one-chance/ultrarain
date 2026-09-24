@@ -32,7 +32,7 @@ if (player != noone)
 // =====================================
 
 // Centre of the drone's desired combat area
-var approach_x = player.x;
+/*var approach_x = player.x;
 var approach_y = player.y - 140;
 
 var approach_distance = point_distance(
@@ -40,7 +40,7 @@ var approach_distance = point_distance(
     y,
     approach_x,
     approach_y
-);
+);*/
 
 if (!drone_engaged)
 {
