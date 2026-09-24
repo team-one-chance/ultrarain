@@ -1,14 +1,12 @@
-
-
 // =====================================
 // MOVEMENT
 // =====================================
 pHP= 100;
-pHP_max = 100;
+pHP_max = 1000;
 pHP = pHP_max;
 dmg_cooldown = 0;
 
-move_speed = 3;
+move_speed = 4.4;
 
 dmg_cooldown = 0;
 
@@ -26,7 +24,7 @@ jump_speed = -5;
 // =====================================
 
 wall_jump_x = 4;
-wall_jump_y = -6;
+wall_jump_y = -7;
 
 wall_jumps_used = 0;
 max_wall_jumps = 2;
@@ -49,13 +47,13 @@ wall_jump_forced_direction = 0;
 coyote_timer = 0;
 coyote_duration = 0.15;
 
-
+movement_boost_multiplier = 1;
 // =====================================
 // SLAM
 // =====================================
 
 slam_speed = 8;
-slam_max_speed = 30;
+slam_max_speed = 40;
 slam_acceleration = 1.1;
 
 is_slamming = false;
@@ -68,9 +66,9 @@ is_slamming = false;
 is_sliding = false;
 
 // Sliding is 1.5 times faster than normal movement
-slide_speed_multiplier = 1.75;
-slide_movespeed_multiplier = 1.35;
-slide_jump_speed = -8;
+slide_speed_multiplier = 1.8;
+slide_movespeed_multiplier = 1.25;
+slide_jump_speed = -7;
 slide_time = 4;
 slide_boost_timer = 0;
 // Direction of the slide
@@ -100,7 +98,7 @@ alt_fire = false;
 // =================================
 // ground detect
 // =================================
-ground_check_y_offset = 16;
+ground_check_y_offset = 4;
 ground_check_x_offset = 10;
 
 // =====================================
@@ -140,7 +138,7 @@ rig_shoulder_l_y = 16;
 rig_shoulder_r_x = 12;
 rig_shoulder_r_y = 16;
 
-//Joint-to-Joint lengths
+// Joint-to-Joint lengths
 rig_upper_arm_length = 12;
 rig_lower_arm_length = 17;
 
@@ -162,3 +160,91 @@ rig_support_grip_y = 3;
 
 rig_muzzle_x = 10;
 rig_muzzle_y = 1;
+
+
+// =====================================
+// COIN ALT FIRE
+// =====================================
+
+// Extra upward force added when tossing
+coin_throw_up = 4;
+
+// Small extra forward push
+coin_throw_forward = 1.5;
+
+// Cooldown
+coin_cooldown = 0.5;
+coin_throw_timer = 0;
+
+
+// =====================================
+// MANTLE LUNGE
+// =====================================
+
+is_mantle_lunging = false;
+mantle_lunge_direction = 0;
+
+mantle_lunge_speed = 8;
+mantle_lunge_up = -6;
+
+
+// =====================================
+// SLIDE DOUBLE JUMP
+// =====================================
+
+// How quickly the second jump must be pressed
+slide_double_jump_window = 0.25;
+slide_double_jump_timer = 0;
+
+slide_double_jump_direction = 0;
+
+// Immediate forward launch on second press
+slide_double_jump_launch_multiplier = 2;
+
+// Boost stages
+slide_double_boost_stage = 0;
+slide_double_boost_timer = 0;
+
+slide_double_boost_stage1_duration = 2;
+slide_double_boost_stage2_duration = 2;
+slide_double_boost_stage3_duration = 5;
+
+slide_double_boost_stage1_multiplier = 1.5;
+slide_double_boost_stage2_multiplier = 1.33;
+
+
+// =====================================
+// WALL SLIDE
+// =====================================
+
+wall_slide_active = false;
+wall_slide_speed = 0;
+
+wall_slide_decel = 0.15;
+
+
+// =====================================
+// DASH
+// =====================================
+
+dash_speed = 6;
+air_dash_speed = 3;
+dash_decay = 0.1;
+
+dash_active = false;
+dash_direction = 0;
+
+// Ground dash
+dash_cooldown = 0.8;
+ground_dash_cooldown_timer = 0;
+
+// Air dash
+air_dash_cooldown = 1.5;
+air_dash_cooldown_timer = 0;
+dash_current_speed = 0;
+
+dash_started_moving = false;
+
+dash_burst_timer = 0;
+dash_burst_duration = 0.12;
+dash_stationary_speed = 15;

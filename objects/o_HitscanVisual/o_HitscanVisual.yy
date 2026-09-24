@@ -10,8 +10,8 @@
   "name":"o_HitscanVisual",
   "overriddenProperties":[],
   "parent":{
-    "name":"ULTRA RAIN",
-    "path":"ULTRA RAIN.yyp",
+    "name":"Objects",
+    "path":"folders/Objects.yy",
   },
   "parentObjectId":null,
   "persistent":false,
