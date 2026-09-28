@@ -117,8 +117,8 @@ for (var c = 0; c < ds_list_size(coins); c++)
         beam.image_xscale = sign(image_xscale);
 
         // Copy this slash's damage and knockback
-        beam.beam_damage = slash_damage;
-        beam.knockback_force = knockback_force;
+       beam.move_dir = beam_dir;
+beam.image_xscale = sign(image_xscale);
 
         instance_destroy(coin);
     }

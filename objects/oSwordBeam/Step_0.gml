@@ -89,10 +89,13 @@ for (var i = 0; i < ds_list_size(hits); i++)
         ds_list_add(hit_enemies, enemy);
 
         enemy.take_damage(
-            beam_damage,
-            move_dir,
-            knockback_force
-        );
+    beam_damage,
+    move_dir,
+    knockback_force,
+    false,
+    x,
+    true
+);
     }
 }
 

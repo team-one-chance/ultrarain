@@ -5,7 +5,7 @@
 move_speed = 16;
 move_dir = 0;
 
-beam_damage = 25;
+beam_damage = 40;
 knockback_force = 30;
 
 life = 1.5;
