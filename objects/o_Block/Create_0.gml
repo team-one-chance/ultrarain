@@ -5,11 +5,8 @@ player = noone;
 // GET STRETCHED SIZE
 // =====================================
 
-var wall_width =
-    sprite_width * abs(image_xscale);
-
-var wall_height =
-    sprite_height * abs(image_yscale);
+var wall_width  = sprite_get_width(sprite_index)  * abs(image_xscale);
+var wall_height = sprite_get_height(sprite_index) * abs(image_yscale);
 
 
 // =====================================

@@ -89,7 +89,7 @@ var left_wall_mid =
 var left_wall_upper =
     collision_point(
         x - 15,
-        y - 64,
+        y - 54,
         o_Block,
         false,
         true
@@ -120,7 +120,7 @@ var right_wall_mid =
 var right_wall_upper =
     collision_point(
         x + 15,
-        y - 64,
+        y - 54,
         o_Block,
         false,
         true
@@ -132,12 +132,22 @@ var right_wall_upper =
 // =====================================
 
 var touching_left_wall =
-    left_wall_lower != noone
-    && left_wall_upper != noone;
+    (left_wall_lower != noone && left_wall_upper != noone)
+    ||
+    (left_wall_lower != noone && left_wall_mid != noone)
+    ||
+    (left_wall_upper != noone && left_wall_mid != noone)
+	||
+	(left_wall_upper != noone);
 
 var touching_right_wall =
-    right_wall_lower != noone
-    && right_wall_upper != noone;
+    (right_wall_lower != noone && right_wall_upper != noone)
+    ||
+    (right_wall_lower != noone && right_wall_mid != noone)
+    ||
+    (right_wall_upper != noone && right_wall_mid != noone)
+	||
+	(right_wall_upper != noone);
 
 var touching_wall =
     touching_left_wall
@@ -196,6 +206,12 @@ if (right_wall_lower != noone
     }
 }
 
+if (keyboard_check(vk_shift)
+&& keyboard_check_pressed(ord("Z")))
+{
+    room_goto(LE_TUTORIAL_WIP);
+}
+
 
 // =====================================
 // COYOTE TIME
@@ -227,9 +243,9 @@ else
 
 if (on_ground)
 {
-    wall_jumps_used = 0;
+    left_wall_jumps_used = 0;
+    right_wall_jumps_used = 0;
 }
-
 
 // =====================================
 // HORIZONTAL INPUT
@@ -854,6 +870,12 @@ if (is_sliding)
 }
 else if (dash_active && on_ground)
 {
+        phy_speed_x =
+            slide_direction
+            * move_speed
+            * slide_speed_multiplier
+			+ 1;
+    }
     // Dash code below handles phy_speed_x.
 }
 
@@ -1349,7 +1371,8 @@ if (slide_double_jump_timer > 0)
     // Give immediate forward momentum
     var slide_double_launch_speed =
         move_speed
-        * slide_double_jump_launch_multiplier;
+        * slide_double_jump_launch_multiplier
+		+2;
 
 
     if (abs(phy_speed_x)
@@ -1430,42 +1453,54 @@ if (slide_double_jump_timer > 0)
     }
 
 
-    // =================================
-    // WALL JUMP
-    // =================================
+// =================================
+// WALL JUMP
+// =================================
 
-    else if (!on_ground
-    && touching_wall
-    && wall_jumps_used < max_wall_jumps)
+else if (!on_ground
+&& touching_wall)
+{
+    // LEFT WALL
+    if (touching_left_wall
+    && left_wall_jumps_used < max_wall_jumps_per_side)
     {
-        wall_jumps_used += 1;
+        left_wall_jumps_used += 1;
 
         phy_speed_y =
             wall_jump_y;
 
+        wall_jump_forced_direction = 1;
 
-        if (touching_left_wall)
-        {
-            wall_jump_forced_direction = 1;
-
-            phy_speed_x =
-                wall_jump_x;
-        }
-
-        else if (touching_right_wall)
-        {
-            wall_jump_forced_direction = -1;
-
-            phy_speed_x =
-                -wall_jump_x;
-        }
-
+        phy_speed_x =
+            wall_jump_x;
 
         wall_jump_lock_time =
             wall_jump_lock_duration;
 
         image_index = 0;
     }
+
+
+    // RIGHT WALL
+    else if (touching_right_wall
+    && right_wall_jumps_used < max_wall_jumps_per_side)
+    {
+        right_wall_jumps_used += 1;
+
+        phy_speed_y =
+            wall_jump_y;
+
+        wall_jump_forced_direction = -1;
+
+        phy_speed_x =
+            -wall_jump_x;
+
+        wall_jump_lock_time =
+            wall_jump_lock_duration;
+
+        image_index = 0;
+    }
+	}
 }
 
 

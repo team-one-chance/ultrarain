@@ -1,7 +1,7 @@
 {
   "$GMSprite":"v2",
   "%Name":"s_Player_wallHold_Right",
-  "bboxMode":0,
+  "bboxMode":2,
   "bbox_bottom":54,
   "bbox_left":0,
   "bbox_right":34,
