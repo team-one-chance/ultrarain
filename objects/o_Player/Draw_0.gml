@@ -16,7 +16,7 @@ var _hide_rest_arm =
         || sprite_index == s_Player_wallHold_Right
     );
 
-var _arm_layer_facing = _part_facing;
+var _arm_layer_facing = _body_facing;
 
 if (sprite_index == s_Player_wallHold_Left)
 {
@@ -70,7 +70,7 @@ var _shoulder_l_y = 0;
 var _shoulder_r_x = 0;
 var _shoulder_r_y = 0;
 
-if (_part_facing == 1)
+if (_body_facing == 1)
 {
     // Facing right: left arm behind, right arm in front
     _shoulder_l_x = _back_socket_x;
@@ -169,7 +169,7 @@ else
 		_free_arm_angle +=
 			dsin(_run_cycle + rig_free_arm_phase)
 			* rig_free_arm_swing
-			* _part_facing;
+			* _body_facing;
 	}
 
     _left_target_x =
@@ -196,8 +196,8 @@ if (_arm_layer_facing == 1)
             _left_target_y,
             rig_upper_arm_length,
             rig_lower_arm_length,
-            _part_facing,
-            _part_facing
+            _body_facing,
+            _body_facing
         );
     }
 }
@@ -290,8 +290,8 @@ else
             _left_target_y,
             rig_upper_arm_length,
             rig_lower_arm_length,
-            _part_facing,
-            _part_facing
+            _body_facing,
+            _body_facing
         );
     }
 }

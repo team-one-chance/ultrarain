@@ -546,6 +546,11 @@ if (!is_sliding
 && move != 0)
 {
     is_sliding = true;
+	
+	dash_active = false;
+	dash_direction = 0;
+	dash_current_speed = 0;
+	dash_burst_timer = 0;
 
     slide_direction = move;
 
@@ -858,12 +863,12 @@ else if (wall_jump_lock_time > 0)
 
 // Ground dash owns horizontal velocity
 // while it is active.
-if (dash_active && on_ground)
+if (is_sliding)
 {
-    // Dash code below handles phy_speed_x.
+    phy_speed_x =
+        slide_direction * move_speed * slide_speed_multiplier;
 }
-
-else if (is_sliding)
+else if (dash_active && on_ground)
 {
         phy_speed_x =
             slide_direction
@@ -871,6 +876,8 @@ else if (is_sliding)
             * slide_speed_multiplier
 			+ 1;
     }
+    // Dash code below handles phy_speed_x.
+}
 
 
     // =====================================
@@ -1125,7 +1132,7 @@ if (dash_active)
 var dash_pressed =
     keyboard_check_pressed(vk_shift);
 
-if (dash_pressed)
+if (dash_pressed && !is_slidingd)
 {
     var dash_dir =
         sign(image_xscale);
@@ -1571,6 +1578,30 @@ if (mouse_check_button(mb_left))
 // =====================================
 // ALT FIRE - RIGHT MOUSE / THROW COIN
 // =====================================
+
+if (keyboard_check_pressed(vk_f3))
+{
+    repeat (100)
+    {
+        var _coin = instance_create_layer(
+            x + 12 * aim_facing + random_range(-3, 3),
+            y - 48 + random_range(-3, 3),
+            "Instances",
+            o_Coin
+        );
+
+        var _angle = aim_angle + random_range(-65, 65);
+        var _speed = random_range(3, 9);
+
+        _coin.phy_speed_x =
+            phy_speed_x + lengthdir_x(_speed, _angle);
+
+        _coin.phy_speed_y =
+            phy_speed_y
+            + lengthdir_y(_speed, _angle)
+            - random_range(2, 5);
+    }
+}
 
 if (mouse_check_button_pressed(mb_right))
 {
