@@ -16,7 +16,7 @@ slide_exit_delay = 0;
 // NORMAL JUMP
 // =====================================
 
-jump_speed = -5;
+jump_speed = -5.2;
 
 
 // =====================================
@@ -26,8 +26,10 @@ jump_speed = -5;
 wall_jump_x = 4;
 wall_jump_y = -7;
 
-wall_jumps_used = 0;
-max_wall_jumps = 2;
+left_wall_jumps_used = 0;
+right_wall_jumps_used = 0;
+
+max_wall_jumps_per_side = 2;
 
 
 // =====================================
@@ -68,7 +70,7 @@ is_sliding = false;
 // Sliding is 1.5 times faster than normal movement
 slide_speed_multiplier = 1.8;
 slide_movespeed_multiplier = 1.25;
-slide_jump_speed = -7;
+slide_jump_speed = -8;
 slide_time = 4;
 slide_boost_timer = 0;
 // Direction of the slide
