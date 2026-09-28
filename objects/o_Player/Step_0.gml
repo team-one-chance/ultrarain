@@ -877,7 +877,6 @@ else if (dash_active && on_ground)
 			+ 1;
     }
     // Dash code below handles phy_speed_x.
-}
 
 
     // =====================================
@@ -1132,7 +1131,7 @@ if (dash_active)
 var dash_pressed =
     keyboard_check_pressed(vk_shift);
 
-if (dash_pressed && !is_slidingd)
+if (dash_pressed && !is_sliding)
 {
     var dash_dir =
         sign(image_xscale);

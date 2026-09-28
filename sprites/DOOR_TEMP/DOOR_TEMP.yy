@@ -25,8 +25,8 @@
   "nineSlice":null,
   "origin":0,
   "parent":{
-    "name":"ULTRA RAIN",
-    "path":"ULTRA RAIN.yyp",
+    "name":"Environment",
+    "path":"folders/Sprites/Sprite/Environment.yy",
   },
   "preMultiplyAlpha":false,
   "resourceType":"GMSprite",
