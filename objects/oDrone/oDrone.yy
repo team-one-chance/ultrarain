@@ -10,8 +10,8 @@
   "name":"oDrone",
   "overriddenProperties":[],
   "parent":{
-    "name":"Enemy&Enemy relevant",
-    "path":"folders/Objects/Enemy&Enemy relevant.yy",
+    "name":"ULTRA RAIN",
+    "path":"ULTRA RAIN.yyp",
   },
   "parentObjectId":{
     "name":"oEnemyParent",

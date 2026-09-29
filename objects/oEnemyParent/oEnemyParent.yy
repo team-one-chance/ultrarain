@@ -11,8 +11,8 @@
   "name":"oEnemyParent",
   "overriddenProperties":[],
   "parent":{
-    "name":"Enemy&Enemy relevant",
-    "path":"folders/Objects/Enemy&Enemy relevant.yy",
+    "name":"ULTRA RAIN",
+    "path":"ULTRA RAIN.yyp",
   },
   "parentObjectId":null,
   "persistent":false,
