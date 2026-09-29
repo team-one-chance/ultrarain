@@ -3,6 +3,8 @@
   "%Name":"o_Coin",
   "eventList":[
     {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":3,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":8,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
   ],
   "managed":true,
   "name":"o_Coin",
@@ -25,7 +27,7 @@
   "physicsShape":0,
   "physicsShapePoints":[
     {"x":4.0,"y":4.0,},
-    {"x":4.0,"y":4.0,},
+    {"x":5.0,"y":4.0,},
   ],
   "physicsStartAwake":true,
   "properties":[],
