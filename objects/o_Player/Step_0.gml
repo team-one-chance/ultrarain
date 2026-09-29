@@ -13,31 +13,19 @@ var speed_boost_multiplier = 1;
 // Normal post-slide boost
 if (slide_boost_timer > 0)
 {
-    speed_boost_multiplier = 1.15
-       /* max(
-            speed_boost_multiplier,
-            slide_movespeed_multiplier
-        );*/
+    speed_boost_multiplier = 1.15;
 }
 
 // Slide double jump - stage 1
 if (slide_double_boost_stage == 1)
 {
-    speed_boost_multiplier = 1.3
-       /* max(
-            speed_boost_multiplier,
-            slide_double_boost_stage1_multiplier
-        );*/
+    speed_boost_multiplier = 1.25;
 }
 
 // Slide double jump - stage 2
 if (slide_double_boost_stage == 2)
 {
-    speed_boost_multiplier = 1.25
-      /*  max(
-            speed_boost_multiplier,
-            slide_double_boost_stage2_multiplier
-        );*/
+    speed_boost_multiplier = 1.2;
 }
 
 
@@ -101,7 +89,7 @@ var left_wall_mid =
 var left_wall_upper =
     collision_point(
         x - 15,
-        y - 64,
+        y - 54,
         o_Block,
         false,
         true
@@ -132,7 +120,7 @@ var right_wall_mid =
 var right_wall_upper =
     collision_point(
         x + 15,
-        y - 64,
+        y - 54,
         o_Block,
         false,
         true
@@ -144,12 +132,22 @@ var right_wall_upper =
 // =====================================
 
 var touching_left_wall =
-    left_wall_lower != noone
-    && left_wall_upper != noone;
+    (left_wall_lower != noone && left_wall_upper != noone)
+    ||
+    (left_wall_lower != noone && left_wall_mid != noone)
+    ||
+    (left_wall_upper != noone && left_wall_mid != noone)
+	||
+	(left_wall_upper != noone);
 
 var touching_right_wall =
-    right_wall_lower != noone
-    && right_wall_upper != noone;
+    (right_wall_lower != noone && right_wall_upper != noone)
+    ||
+    (right_wall_lower != noone && right_wall_mid != noone)
+    ||
+    (right_wall_upper != noone && right_wall_mid != noone)
+	||
+	(right_wall_upper != noone);
 
 var touching_wall =
     touching_left_wall
@@ -208,6 +206,12 @@ if (right_wall_lower != noone
     }
 }
 
+if (keyboard_check(vk_shift)
+&& keyboard_check_pressed(ord("Z")))
+{
+    room_goto(LE_TUTORIAL_WIP);
+}
+
 
 // =====================================
 // COYOTE TIME
@@ -239,9 +243,9 @@ else
 
 if (on_ground)
 {
-    wall_jumps_used = 0;
+    left_wall_jumps_used = 0;
+    right_wall_jumps_used = 0;
 }
-
 
 // =====================================
 // HORIZONTAL INPUT
@@ -497,7 +501,7 @@ if (is_ledge_climbing)
 
             // Start wall-jump animation
             sprite_index =
-                WALLJUMP_TEMP;
+                s_Player_wallJump;
 
             image_index = 0;
             image_speed = 1;
@@ -542,6 +546,11 @@ if (!is_sliding
 && move != 0)
 {
     is_sliding = true;
+	
+	dash_active = false;
+	dash_direction = 0;
+	dash_current_speed = 0;
+	dash_burst_timer = 0;
 
     slide_direction = move;
 
@@ -598,14 +607,40 @@ if (wall_jump_lock_time > 0)
     }
 }
 
+// =====================================
+// CURSOR AIMING
+// =====================================
+
+var aim_origin_x = x;
+var aim_origin_y = y + rig_shoulder_l_y - 64;
+
+aim_angle = point_direction(
+    aim_origin_x,
+    aim_origin_y,
+    mouse_x,
+    mouse_y
+);
+
+// Small dead zone prevents flickering when
+// the cursor is directly above the player.
+var aim_dx = mouse_x - aim_origin_x;
+
+if (abs(aim_dx) > 1)
+{
+    aim_facing = sign(aim_dx);
+}
 
 // =====================================
 // SPRITE / ANIMATION
 // =====================================
 
+// Reset animation direction for non-running states
+image_speed = 1;
+
 if (is_ledge_climbing)
 {
-    sprite_index = WALLHOLD_TEMP;
+
+sprite_index = s_Player_wallHold_Right;
 
     if (ledge_direction == -1)
     {
@@ -622,13 +657,13 @@ else if (is_sliding)
 {
     if (slide_direction == 1)
     {
-        sprite_index = SLIDE_TEMP;
+        sprite_index = s_Player_Slide_Right;
         image_xscale = 1;
     }
 
     else if (slide_direction == -1)
     {
-        sprite_index = SLIDE_TEMP_1;
+        sprite_index = s_Player_Slide_Left;
         image_xscale = 1;
     }
 }
@@ -638,15 +673,15 @@ else if (is_sliding)
 // MANTLE LUNGE ANIMATION
 // =====================================
 // No timer.
-// WALLJUMP_TEMP plays once and then
+// s_Player_wallJump plays once and then
 // is_mantle_lunging turns itself off.
 
 else if (is_mantle_lunging)
 {
-    if (sprite_index != WALLJUMP_TEMP)
+    if (sprite_index != s_Player_wallJump)
     {
         sprite_index =
-            WALLJUMP_TEMP;
+            s_Player_wallJump;
 
         image_index = 0;
     }
@@ -671,8 +706,7 @@ else if (is_mantle_lunging)
 else if (!on_ground
 && wall_jump_lock_time > 0)
 {
-    sprite_index = WALLJUMP_TEMP;
-	//image_speed = 1;
+sprite_index = s_Player_wallJump;
 
     image_xscale =
         wall_jump_forced_direction;
@@ -683,16 +717,15 @@ else if (!on_ground
 && touching_wall
 && coyote_timer <= 0)
 {
-    sprite_index = WALLHOLD_TEMP;
-	image_speed = 1;
 
     if (touching_left_wall)
     {
+        sprite_index = s_Player_wallHold_Left;
         image_xscale = -1;
     }
-
     else if (touching_right_wall)
     {
+        sprite_index = s_Player_wallHold_Right;
         image_xscale = 1;
     }
 }
@@ -700,8 +733,7 @@ else if (!on_ground
 
 else if (!on_ground)
 {
-    sprite_index = AIR_TEMP;
-	image_speed = 1;
+sprite_index = s_Player_Air;
 
     if (move > 0)
     {
@@ -718,7 +750,10 @@ else if (!on_ground)
 else if (move != 0)
 {
     sprite_index = s_Player_Run;
-
+	
+	// 1 when moving forward, -1 when backpedaling
+    image_speed = move * aim_facing;
+	
     if (move > 0)
     {
         image_xscale = 1;
@@ -743,7 +778,20 @@ else
     sprite_index = s_Player;
 }
 
+// Normal poses face toward the cursor.
+// Direction-specific poses keep their forced direction.
+/*
+var facing_locked =
+    is_sliding
+    || is_ledge_climbing
+    || (!on_ground && wall_jump_lock_time > 0)
+    || (!on_ground && touching_wall && coyote_timer <= 0);
 
+if (!facing_locked)
+{
+    image_xscale = aim_facing;
+}
+*/
 // =====================================
 // SLAM INPUT
 // =====================================
@@ -815,18 +863,21 @@ else if (wall_jump_lock_time > 0)
 
 // Ground dash owns horizontal velocity
 // while it is active.
-if (dash_active && on_ground)
+if (is_sliding)
 {
-    // Dash code below handles phy_speed_x.
+    phy_speed_x =
+        slide_direction * move_speed * slide_speed_multiplier;
 }
-
-else if (is_sliding)
+else if (dash_active && on_ground)
 {
         phy_speed_x =
             slide_direction
             * move_speed
-            * slide_speed_multiplier;
+            * slide_speed_multiplier
+			+ 1;
     }
+    // Dash code below handles phy_speed_x.
+}
 
 
     // =====================================
@@ -1081,7 +1132,7 @@ if (dash_active)
 var dash_pressed =
     keyboard_check_pressed(vk_shift);
 
-if (dash_pressed)
+if (dash_pressed && !is_slidingd)
 {
     var dash_dir =
         sign(image_xscale);
@@ -1320,7 +1371,8 @@ if (slide_double_jump_timer > 0)
     // Give immediate forward momentum
     var slide_double_launch_speed =
         move_speed
-        * slide_double_jump_launch_multiplier;
+        * slide_double_jump_launch_multiplier
+		+2;
 
 
     if (abs(phy_speed_x)
@@ -1401,42 +1453,54 @@ if (slide_double_jump_timer > 0)
     }
 
 
-    // =================================
-    // WALL JUMP
-    // =================================
+// =================================
+// WALL JUMP
+// =================================
 
-    else if (!on_ground
-    && touching_wall
-    && wall_jumps_used < max_wall_jumps)
+else if (!on_ground
+&& touching_wall)
+{
+    // LEFT WALL
+    if (touching_left_wall
+    && left_wall_jumps_used < max_wall_jumps_per_side)
     {
-        wall_jumps_used += 1;
+        left_wall_jumps_used += 1;
 
         phy_speed_y =
             wall_jump_y;
 
+        wall_jump_forced_direction = 1;
 
-        if (touching_left_wall)
-        {
-            wall_jump_forced_direction = 1;
-
-            phy_speed_x =
-                wall_jump_x;
-        }
-
-        else if (touching_right_wall)
-        {
-            wall_jump_forced_direction = -1;
-
-            phy_speed_x =
-                -wall_jump_x;
-        }
-
+        phy_speed_x =
+            wall_jump_x;
 
         wall_jump_lock_time =
             wall_jump_lock_duration;
 
         image_index = 0;
     }
+
+
+    // RIGHT WALL
+    else if (touching_right_wall
+    && right_wall_jumps_used < max_wall_jumps_per_side)
+    {
+        right_wall_jumps_used += 1;
+
+        phy_speed_y =
+            wall_jump_y;
+
+        wall_jump_forced_direction = -1;
+
+        phy_speed_x =
+            -wall_jump_x;
+
+        wall_jump_lock_time =
+            wall_jump_lock_duration;
+
+        image_index = 0;
+    }
+	}
 }
 
 
@@ -1514,6 +1578,30 @@ if (mouse_check_button(mb_left))
 // =====================================
 // ALT FIRE - RIGHT MOUSE / THROW COIN
 // =====================================
+
+if (keyboard_check_pressed(vk_f3))
+{
+    repeat (100)
+    {
+        var _coin = instance_create_layer(
+            x + 12 * aim_facing + random_range(-3, 3),
+            y - 48 + random_range(-3, 3),
+            "Instances",
+            o_Coin
+        );
+
+        var _angle = aim_angle + random_range(-65, 65);
+        var _speed = random_range(3, 9);
+
+        _coin.phy_speed_x =
+            phy_speed_x + lengthdir_x(_speed, _angle);
+
+        _coin.phy_speed_y =
+            phy_speed_y
+            + lengthdir_y(_speed, _angle)
+            - random_range(2, 5);
+    }
+}
 
 if (mouse_check_button_pressed(mb_right))
 {

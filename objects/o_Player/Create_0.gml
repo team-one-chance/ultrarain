@@ -16,7 +16,7 @@ slide_exit_delay = 0;
 // NORMAL JUMP
 // =====================================
 
-jump_speed = -5;
+jump_speed = -5.2;
 
 
 // =====================================
@@ -26,8 +26,10 @@ jump_speed = -5;
 wall_jump_x = 4;
 wall_jump_y = -7;
 
-wall_jumps_used = 0;
-max_wall_jumps = 2;
+left_wall_jumps_used = 0;
+right_wall_jumps_used = 0;
+
+max_wall_jumps_per_side = 2;
 
 
 // =====================================
@@ -68,7 +70,7 @@ is_sliding = false;
 // Sliding is 1.5 times faster than normal movement
 slide_speed_multiplier = 1.8;
 slide_movespeed_multiplier = 1.25;
-slide_jump_speed = -7;
+slide_jump_speed = -8;
 slide_time = 4;
 slide_boost_timer = 0;
 // Direction of the slide
@@ -121,6 +123,48 @@ ledge_direction = 0;
 ledge_climb_forward = 20;
 
 // =====================================
+// PLAYER AIM RIG
+// =====================================
+
+aim_rig_mode = AimRigMode.ONE_HANDED;
+aim_angle = 0;
+aim_facing = 1;
+
+// points in s_Player for attachments
+rig_neck_x = 18;
+rig_neck_y = 12;
+
+rig_shoulder_l_x = 19;
+rig_shoulder_l_y = 16;
+
+rig_shoulder_r_x = 12;
+rig_shoulder_r_y = 16;
+
+// Joint-to-Joint lengths
+rig_upper_arm_length = 12;
+rig_lower_arm_length = 17;
+
+// Resting position for the unused arm
+rig_free_hand_offset_x = 0;
+rig_free_hand_offset_y = 36;
+rig_free_arm_reach = 22;
+rig_free_arm_swing = 35;
+rig_free_arm_phase = 0;
+rig_free_arm_swing_speed = 2;
+rig_free_arm_frame_hold = 1;
+
+// Distance from shoulder centre to trigger grip
+rig_weapon_distance = 28;
+
+// Points inside s_Pistol
+rig_support_grip_x = 3;
+rig_support_grip_y = 3;
+
+rig_muzzle_x = 10;
+rig_muzzle_y = 1;
+
+
+// =====================================
 // COIN ALT FIRE
 // =====================================
 
@@ -134,6 +178,7 @@ coin_throw_forward = 1.5;
 coin_cooldown = 0.5;
 coin_throw_timer = 0;
 
+
 // =====================================
 // MANTLE LUNGE
 // =====================================
@@ -144,7 +189,6 @@ mantle_lunge_direction = 0;
 mantle_lunge_speed = 8;
 mantle_lunge_up = -6;
 
-is_mantle_lunging = false;
 
 // =====================================
 // SLIDE DOUBLE JUMP
@@ -170,6 +214,7 @@ slide_double_boost_stage3_duration = 5;
 slide_double_boost_stage1_multiplier = 1.5;
 slide_double_boost_stage2_multiplier = 1.33;
 
+
 // =====================================
 // WALL SLIDE
 // =====================================
@@ -178,6 +223,7 @@ wall_slide_active = false;
 wall_slide_speed = 0;
 
 wall_slide_decel = 0.15;
+
 
 // =====================================
 // DASH
