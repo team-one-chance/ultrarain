@@ -89,7 +89,7 @@ var left_wall_mid =
 var left_wall_upper =
     collision_point(
         x - 15,
-        y - 54,
+        y - 58,
         o_Block,
         false,
         true
@@ -120,7 +120,7 @@ var right_wall_mid =
 var right_wall_upper =
     collision_point(
         x + 15,
-        y - 54,
+        y - 58,
         o_Block,
         false,
         true
@@ -152,7 +152,6 @@ var touching_right_wall =
 var touching_wall =
     touching_left_wall
     || touching_right_wall;
-
 
 // =====================================
 // LEDGE DETECTION
@@ -365,6 +364,7 @@ if (!on_ground
 }
 
 
+
 // =====================================
 // AUTOMATIC LEDGE CLIMB MOVEMENT
 // =====================================
@@ -546,6 +546,10 @@ if (!is_sliding
 && move != 0)
 {
     is_sliding = true;
+	if (!player_collider_short)
+{
+    player_set_collider(true);
+}
 	
 	dash_active = false;
 	dash_direction = 0;
@@ -558,31 +562,38 @@ if (!is_sliding
 }
 
 
+
 // =====================================
 // SLIDE EXIT
 // =====================================
 
 if (is_sliding)
 {
-    if (!slide_held)
+if (!slide_held)
+{
+    // Only stand up if there is actually room.
+    if (player_can_stand())
     {
         is_sliding = false;
         slide_direction = 0;
         slide_exit_timer = 0;
-    }
 
-    else if (!on_ground)
+        player_set_collider(false);
+    }
+}
+
+else if (!on_ground)
+{
+    is_sliding = false;
+    slide_direction = 0;
+    slide_exit_timer = 0;
+
+    if (player_collider_short
+    && player_can_stand())
     {
-        slide_exit_timer +=
-            delta_time / 1000000;
-
-        if (slide_exit_timer >= 0)
-        {
-            is_sliding = false;
-            slide_direction = 0;
-            slide_exit_timer = 0;
-        }
+        player_set_collider(false);
     }
+}
 
     else
     {
@@ -809,6 +820,7 @@ if (!on_ground
 }
 
 
+
 // =====================================
 // WALL HOLD STATE
 // =====================================
@@ -877,7 +889,6 @@ else if (dash_active && on_ground)
 			+ 1;
     }
     // Dash code below handles phy_speed_x.
-}
 
 
     // =====================================
@@ -886,7 +897,7 @@ else if (dash_active && on_ground)
 
     else if (!on_ground)
     {
-        var air_friction = 0.025;
+        var air_friction = 0.00625;
         var air_accel = 0.35;
 
         var air_speed_limit =
@@ -1007,6 +1018,22 @@ else if (dash_active && on_ground)
 // =====================================
 // DASH COOLDOWNS
 // =====================================
+
+// =====================================
+// GROUND DASH CHAIN TIMER
+// =====================================
+
+if (dash_chain_timer > 0)
+{
+    dash_chain_timer -=
+        delta_time / 1000000;
+
+    if (dash_chain_timer <= 0)
+    {
+        dash_chain_timer = 0;
+        dash_chain = 0;
+    }
+}
 
 // Ground dash
 if (ground_dash_cooldown_timer > 0)
@@ -1132,7 +1159,7 @@ if (dash_active)
 var dash_pressed =
     keyboard_check_pressed(vk_shift);
 
-if (dash_pressed && !is_slidingd)
+if (dash_pressed && !is_sliding)
 {
     var dash_dir =
         sign(image_xscale);
@@ -1158,14 +1185,37 @@ if (dash_pressed && !is_slidingd)
         dash_active = true;
         dash_direction = dash_dir;
         dash_started_moving = true;
+		// =================================
+		// BUILD DASH CHAIN
+		// =================================
 
-        dash_current_speed =
-            abs(phy_speed_x)
-            + dash_speed;
+		dash_chain =
+			min(
+				dash_chain + 1,
+				dash_chain_max
+				);
 
-        phy_speed_x =
-            dash_direction
-            * dash_current_speed;
+		dash_chain_timer =
+		dash_chain_window;
+
+
+
+
+// First dash gets no extra chain bonus.
+// Every dash after it becomes faster.
+var chain_bonus =
+    (dash_chain - 1)
+    * dash_chain_speed_per_dash;
+
+
+dash_current_speed =
+    abs(phy_speed_x)
+    + dash_speed
+    + chain_bonus;
+
+phy_speed_x =
+    dash_direction
+    * dash_current_speed;
 
         ground_dash_cooldown_timer =
             dash_cooldown;
@@ -1248,7 +1298,7 @@ if (!on_ground
                     0,
                     wall_slide_speed
                     - wall_slide_decel
-                );
+                )-0.2865;
         }
 
         phy_speed_y =
@@ -1437,13 +1487,52 @@ if (slide_double_jump_timer > 0)
 
             slide_boost_timer =
                 slide_time;
+				if (player_collider_short
+	&& player_can_stand())
+	{
+		player_set_collider(false);
+	}
         }
 
-        else
+else
+{
+    phy_speed_y =
+        jump_speed;
+
+    if (dash_chain > 0)
+    {
+        var jump_direction = move;
+
+        if (jump_direction == 0)
         {
-            phy_speed_y =
-                jump_speed;
+            jump_direction =
+                sign(phy_speed_x);
         }
+
+        if (jump_direction == 0)
+        {
+            jump_direction =
+                sign(image_xscale);
+        }
+
+
+        // Extra forward launch
+        phy_speed_x +=
+            jump_direction
+            * dash_chain
+            * dash_chain_jump_bonus;
+
+
+        // Extra upward launch
+        phy_speed_y -=
+            dash_chain
+            * dash_chain_jump_bonus;
+
+
+        dash_chain = 0;
+        dash_chain_timer = 0;
+    }
+}
 
 
         is_sliding = false;
@@ -1574,7 +1663,6 @@ if (mouse_check_button(mb_left))
 }
 
 
-// (TOO EARLY TO BEGIN WITH)
 // =====================================
 // ALT FIRE - RIGHT MOUSE / THROW COIN
 // =====================================
