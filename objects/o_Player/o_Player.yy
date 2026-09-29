@@ -13,8 +13,8 @@
   "name":"o_Player",
   "overriddenProperties":[],
   "parent":{
-    "name":"Player&Player relevant",
-    "path":"folders/Objects/Player&Player relevant.yy",
+    "name":"ULTRA RAIN",
+    "path":"ULTRA RAIN.yyp",
   },
   "parentObjectId":null,
   "persistent":false,

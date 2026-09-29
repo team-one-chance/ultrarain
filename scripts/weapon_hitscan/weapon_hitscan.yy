@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"weapon_hitscan",
   "parent":{
-    "name":"Scripts",
-    "path":"folders/Scripts.yy",
+    "name":"ULTRA RAIN",
+    "path":"ULTRA RAIN.yyp",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

@@ -85,7 +85,7 @@ slide_direction = 0;
 weapon_type = "pistol";
 
 // Pistol properties
-pistol_damage = 20;
+pistol_damage = 5;
 pistol_range = 2000;
 pistol_cooldown = 0.5;
 pistol_piercing = 0;
