@@ -4,4 +4,4 @@ line_x2 = 0;
 line_y2 = 0;
 
 // How long the line stays visible
-life = 0.2;
+life = 0.0005;
