@@ -1,5 +1,5 @@
 // =====================================
-// NAVIGATION
+// NAVIGATION GLOBAL
 // =====================================
 
 var cell_size = 16;
@@ -18,26 +18,7 @@ repath_timer = 0;
 
 
 // =====================================
-// HP
-// =====================================
-
-ehp_max = 100;
-ehp = ehp_max;
-
-
-// =====================================
-// HIT EFFECT
-// =====================================
-
-hit_duration = 0.15;
-hit_timer = 0;
-
-normal_sprite = sprite_index;
-hit_sprite = sEnemy_hit;
-
-
-// =====================================
-// KNOCKBACK
+// KNOCKBACK/ GLOBAL OR UNIQUE DPENDING ON YOUR NEEDS
 // =====================================
 
 knockback_duration = 0.2;
@@ -49,27 +30,10 @@ knockback_x = 0;
 knockback_y = 0;
 
 
-// =====================================
-// WALL CLIMBING
-// =====================================
-
-climb_speed = 150;
-climb_wall_check_distance = 2;
-climb_mantle_distance = 12;
-ground_check_distance = 1;
-
-// Prevents an attack from taking control during or immediately
-// after climbing. This gives the enemy time to settle on the floor.
-post_climb_attack_delay = 0.1;
-post_climb_attack_timer = 0;
-
-is_climbing = false;
-climb_direction = 0;
-climb_sprite = sEnemyClimb;
 
 
 // =====================================
-// DAMAGE FUNCTION
+// DAMAGE FUNCTION / GLOBAL
 // =====================================
 
 take_damage = function(
@@ -81,7 +45,8 @@ take_damage = function(
 {
     var final_damage = _damage;
 
-    // Sword hit during the enemy's dash
+    // STUN PROPERTIES, MUST ALSO SOMEHOW BE APPLIED TO MINIBOSS
+	// UNIQUE TO ENEMYTEMP BUT YOU COULD REUSE IT FOR THE MINIBOSS
     if (_is_sword && attack_state == 3)
     {
         final_damage *= parry_damage_multiplier;
@@ -130,7 +95,7 @@ take_damage = function(
 
 
 // =====================================
-// GENERAL ATTACK DISTANCES
+// GENERAL ATTACK DISTANCES / SHARED
 // =====================================
 
 // Maximum feet-level Y difference for attacks.
@@ -141,7 +106,9 @@ attack_trigger_x_distance = 90;
 
 
 // =====================================
-// CLOSE-RANGE ROCKING
+// CLOSE-RANGE ROCKING /UNIQUE TO ENEMYTEMP
+// If I remove this, I'll get error cause I haven't adjusted the step event
+// Keep it, adjust the step for enemytemp and then move it over to temp create
 // =====================================
 
 // Enter rocking when almost directly aligned with the player.
@@ -192,11 +159,12 @@ attack_rock_offset = random_range(
 );
 
 attack_sprite = sEnemyAttack;
-bite_sprite = sEnemyBite;
+bite_sprite = sEnemyBite; //unique to enemytemp, must be renamed for miniboss
 
 
 // =====================================
-// CHARGE ATTACK
+// CHARGE ATTACK/ UNIQUE TO ENEMYTEMP
+// Same Issue as above
 // =====================================
 
 // 0 = chase
@@ -246,7 +214,7 @@ attack_shake_y = 0;
 
 
 // =====================================
-// PARRY / STUN
+// PARRY / STUN / SHARED
 // =====================================
 
 parry_damage_multiplier = 2;
