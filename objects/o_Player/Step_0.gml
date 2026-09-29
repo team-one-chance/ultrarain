@@ -1875,7 +1875,8 @@ if (keyboard_check_pressed(vk_f3))
 
 if (mouse_check_button_pressed(mb_right))
 {
-    if (coin_throw_timer <= 0)
+    // Only throw if we actually have a coin.
+    if (coin_count > 0)
     {
         var coin = instance_create_layer(
             x + 32,
@@ -1902,8 +1903,11 @@ if (mouse_check_button_pressed(mb_right))
         // INHERIT PLAYER MOMENTUM
         // =================================
 
-        coin.phy_speed_x = phy_speed_x;
-        coin.phy_speed_y = phy_speed_y;
+        coin.phy_speed_x =
+            phy_speed_x;
+
+        coin.phy_speed_y =
+            phy_speed_y;
 
 
         // =================================
@@ -1918,15 +1922,12 @@ if (mouse_check_button_pressed(mb_right))
 
         coin.phy_speed_y = -5;
 
-        //coin.phy_speed_y +=
-        //    lengthdir_y(
-        //        5,
-        //        coin_throw_direction
-        //    );
 
+        // =================================
+        // CONSUME COIN
+        // =================================
 
-        // Cooldown
-        coin_throw_timer = coin_cooldown;
+        coin_count -= 1;
     }
 }
 
@@ -1954,15 +1955,33 @@ if (dmg_cooldown < 0)
 // COIN THROW COOLDOWN
 // =====================================
 
-if (coin_throw_timer > 0)
+// =====================================
+// COIN RECHARGE
+// =====================================
+
+if (coin_count < coin_max)
 {
-    coin_throw_timer -=
+    coin_recharge_timer +=
         delta_time / 1000000;
 
-    if (coin_throw_timer < 0)
+
+    // Gain one coin every recharge interval.
+    while (
+        coin_recharge_timer >= coin_recharge_time
+        && coin_count < coin_max
+    )
     {
-        coin_throw_timer = 0;
+        coin_count += 1;
+
+        coin_recharge_timer -=
+            coin_recharge_time;
     }
+}
+else
+{
+    // Fully stocked.
+    coin_count = coin_max;
+    coin_recharge_timer = 0;
 }
 
 

@@ -242,9 +242,9 @@ player_can_stand = function()
 weapon_type = "pistol";
 
 // Pistol properties
-pistol_damage = 20;
+pistol_damage = 10;
 pistol_range = 2000;
-pistol_cooldown = 0.5;
+pistol_cooldown = 0.45;
 pistol_piercing = 0;
 
 // Shooting timer
@@ -331,9 +331,29 @@ coin_throw_up = 4;
 // Small extra forward push
 coin_throw_forward = 1.5;
 
-// Cooldown
-coin_cooldown = 0.5;
-coin_throw_timer = 0;
+// =====================================
+// COIN ALT FIRE
+// =====================================
+
+// Maximum number of coins.
+// Future items can increase this.
+coin_max = 4;
+
+// Start fully stocked.
+coin_count = coin_max;
+
+// Gain one coin every 2 seconds.
+coin_recharge_time = 2;
+coin_recharge_timer = 0;
+
+
+// =====================================
+// COIN SPLITSHOT
+// =====================================
+
+// Coin counts as being near its apex if its
+// vertical speed is within this range.
+coin_split_y_speed_threshold = 0.75;
 
 
 // =====================================

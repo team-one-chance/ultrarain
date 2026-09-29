@@ -243,11 +243,12 @@ var shoot_direction = aim_angle;
 if (instance_exists(inst)
 && inst.object_index == o_Coin)
 {
-    coin_ricochet(
-        inst,
-        _damage * 2,
-        _range
-    );
+	coin_ricochet(
+		inst,
+		_damage,
+		_range,
+		coin_split_y_speed_threshold
+				);
 
     // Original shot ends at the coin
     final_x = check_x;
