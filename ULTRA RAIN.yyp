@@ -12,6 +12,7 @@
   "Folders":[
     {"$GMFolder":"","%Name":"Objects","folderPath":"folders/Objects.yy","name":"Objects","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Enemy&Enemy relevant","folderPath":"folders/Objects/Enemy&Enemy relevant.yy","name":"Enemy&Enemy relevant","resourceType":"GMFolder","resourceVersion":"2.0",},
+    {"$GMFolder":"","%Name":"LE_ITEMSSSSS","folderPath":"folders/Objects/LE_ITEMSSSSS.yy","name":"LE_ITEMSSSSS","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Player&Player relevant","folderPath":"folders/Objects/Player&Player relevant.yy","name":"Player&Player relevant","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Scripts","folderPath":"folders/Scripts.yy","name":"Scripts","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Sprites","folderPath":"folders/Sprites.yy","name":"Sprites","resourceType":"GMFolder","resourceVersion":"2.0",},
@@ -28,10 +29,12 @@
   },
   "name":"ULTRA RAIN",
   "resources":[
+    {"id":{"name":"o_Block_scary","path":"objects/o_Block_scary/o_Block_scary.yy",},},
     {"id":{"name":"o_Block","path":"objects/o_Block/o_Block.yy",},},
     {"id":{"name":"o_CAMERA","path":"objects/o_CAMERA/o_CAMERA.yy",},},
     {"id":{"name":"o_Coin","path":"objects/o_Coin/o_Coin.yy",},},
     {"id":{"name":"o_HitscanVisual","path":"objects/o_HitscanVisual/o_HitscanVisual.yy",},},
+    {"id":{"name":"o_pinhouse","path":"objects/o_pinhouse/o_pinhouse.yy",},},
     {"id":{"name":"o_Player","path":"objects/o_Player/o_Player.yy",},},
     {"id":{"name":"oDrone","path":"objects/oDrone/oDrone.yy",},},
     {"id":{"name":"oEnemy_drone","path":"objects/oEnemy_drone/oEnemy_drone.yy",},},
@@ -53,6 +56,7 @@
     {"id":{"name":"die","path":"sprites/die/die.yy",},},
     {"id":{"name":"DOOR_TEMP","path":"sprites/DOOR_TEMP/DOOR_TEMP.yy",},},
     {"id":{"name":"Flowery_Deltarune","path":"sprites/Flowery_Deltarune/Flowery_Deltarune.yy",},},
+    {"id":{"name":"s_Coin_Apex","path":"sprites/s_Coin_Apex/s_Coin_Apex.yy",},},
     {"id":{"name":"s_Coin","path":"sprites/s_Coin/s_Coin.yy",},},
     {"id":{"name":"s_Pistol","path":"sprites/s_Pistol/s_Pistol.yy",},},
     {"id":{"name":"s_Player_Air","path":"sprites/s_Player_Air/s_Player_Air.yy",},},

@@ -342,10 +342,9 @@ coin_max = 4;
 // Start fully stocked.
 coin_count = coin_max;
 
-// Gain one coin every 2 seconds.
-coin_recharge_time = 2;
+// Gain one coin every # seconds.
+coin_recharge_time = 1.4;
 coin_recharge_timer = 0;
-
 
 // =====================================
 // COIN SPLITSHOT
@@ -440,11 +439,34 @@ dash_chain = 0;
 dash_chain_max = 35;
 
 // Time allowed between dashes
-dash_chain_window = 1.3;
+dash_chain_window = 1.4;
 dash_chain_timer = 0;
 
 // Extra speed each chained dash gets
-dash_chain_speed_per_dash = 0.2;
+dash_chain_speed_per_dash = 0.22;
 
 // Extra speed converted into a jump
 dash_chain_jump_bonus = 0.4;
+
+// =====================================
+// PERFECT APEX FLASH
+// =====================================
+
+perfect_apex_flash_timer = 0;
+perfect_apex_flash_duration = 0.15;
+
+// =====================================
+// COIN ANCHOR ITEM
+// =====================================
+
+// Player does NOT start with the item.
+item_coin_anchor = false;
+
+coin_throw_serial = 0;
+pinned_coin = noone;
+
+pinned_coin_offset_x = 42;
+pinned_coin_offset_y = -48;
+
+coin_anchor_cooldown = 8;
+coin_anchor_cooldown_timer = 0;

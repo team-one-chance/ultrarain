@@ -1,4 +1,29 @@
 // =====================================
+// PERFECT APEX WHITE FLASH
+// =====================================
+
+if (perfect_apex_flash_timer > 0)
+{
+    var _flash_alpha =
+        perfect_apex_flash_timer
+        / perfect_apex_flash_duration;
+
+    draw_set_color(c_white);
+    draw_set_alpha(0.45);
+
+    draw_rectangle(
+        0,
+        0,
+        display_get_gui_width(),
+        display_get_gui_height(),
+        false
+    );
+
+    draw_set_alpha(1);
+    draw_set_color(c_white);
+}
+
+// =====================================
 // PLAYER HP BAR
 // =====================================
 

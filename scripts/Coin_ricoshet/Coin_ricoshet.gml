@@ -49,8 +49,9 @@ function coin_ricochet(
     var _current_damage =
         _damage;
 
-    var _splitshot =
-        false;
+	var _shot_count = 1;
+
+	var _perfect_threshold = 0.05;
 
     var _last_x =
         _coin.x;
@@ -73,17 +74,33 @@ function coin_ricochet(
             _current_coin.y;
 
 
-        // =================================
-        // PERFECT-TIMING SPLITSHOT
-        // =================================
+	// =================================
+	// APEX SHOT MULTIPLIER
+	// =================================
 
-        if (
-            abs(_current_coin.phy_speed_y)
-            <= _split_threshold
-        )
-        {
-            _splitshot = true;
-        }
+	var _coin_y_speed =
+	  abs(_current_coin.phy_speed_y);
+
+
+	// PERFECT APEX
+	// Extremely close to zero vertical speed.
+	if (_coin_y_speed <= _perfect_threshold)
+	{
+		_shot_count =
+		  max(_shot_count, 4);
+
+		// Flash screen for perfect apex.
+		perfect_apex_flash_timer =
+		perfect_apex_flash_duration;
+	}
+
+
+	// NORMAL APEX WINDOW
+	else if (_coin_y_speed <= _split_threshold)
+	{
+	 _shot_count =
+		 max(_shot_count, 2);
+	}
 
 
         // =================================
@@ -219,47 +236,124 @@ function coin_ricochet(
     );
 
 
-    // =====================================
-    // FINAL ENEMY SHOTS
-    // =====================================
+// =====================================
+// FINAL ENEMY SHOTS
+// =====================================
 
-    var _shot_count =
-        1;
-
-    if (_splitshot)
-    {
-        _shot_count = 2;
-    }
+// _shot_count should already be:
+// 1 = normal coin
+// 2 = apex
+// 4 = perfect apex
 
 
-    // Prevent both split shots from
-    // selecting the same enemy.
-    var _used_targets =
-        ds_list_create();
+// =====================================
+// PREPARE SHOTS
+// =====================================
 
+var _shot_targets =
+    array_create(_shot_count, noone);
+
+var _shot_x =
+    array_create(_shot_count, _last_x);
+
+var _shot_y =
+    array_create(_shot_count, _last_y);
+
+
+// Try to spread shots across different enemies first.
+var _used_targets =
+    ds_list_create();
+
+
+// =====================================
+// CHOOSE EVERY TARGET BEFORE DAMAGE
+// =====================================
+
+for (
+    var shot_index = 0;
+    shot_index < _shot_count;
+    shot_index++
+)
+{
+    var _target = noone;
+    var _target_distance = _range + 1;
+
+    var _enemy_count =
+        instance_number(oEnemyParent);
+
+
+    // =================================
+    // FIRST PASS:
+    // FIND UNUSED ENEMY
+    // =================================
 
     for (
-        var shot_index = 0;
-        shot_index < _shot_count;
-        shot_index++
+        var i = 0;
+        i < _enemy_count;
+        i++
     )
     {
-        var _target =
-            noone;
+        var _enemy =
+            instance_find(
+                oEnemyParent,
+                i
+            );
 
-        var _target_distance =
-            _range + 1;
+        if (!instance_exists(_enemy))
+        {
+            continue;
+        }
 
 
-        var _enemy_count =
-            instance_number(
-                oEnemyParent
+        // Prefer an enemy that hasn't
+        // received one of the split rays yet.
+        if (
+            ds_list_find_index(
+                _used_targets,
+                _enemy
+            )
+            != -1
+        )
+        {
+            continue;
+        }
+
+
+        var _distance =
+            point_distance(
+                _last_x,
+                _last_y,
+                _enemy.x,
+                _enemy.y
             );
 
 
-        // =================================
-        // FIND NEAREST UNUSED ENEMY
-        // =================================
+        if (
+            _distance < _target_distance
+            && _distance <= _range
+        )
+        {
+            _target_distance =
+                _distance;
+
+            _target =
+                _enemy;
+        }
+    }
+
+
+    // =================================
+    // SECOND PASS:
+    // ALL ENEMIES ALREADY USED
+    // =================================
+
+    // Not enough enemies for every ray.
+    // Reuse the nearest enemy.
+    if (_target == noone)
+    {
+        _target_distance =
+            _range + 1;
+
 
         for (
             var i = 0;
@@ -273,20 +367,7 @@ function coin_ricochet(
                     i
                 );
 
-
             if (!instance_exists(_enemy))
-            {
-                continue;
-            }
-
-
-            if (
-                ds_list_find_index(
-                    _used_targets,
-                    _enemy
-                )
-                != -1
-            )
             {
                 continue;
             }
@@ -313,60 +394,135 @@ function coin_ricochet(
                     _enemy;
             }
         }
+    }
 
 
-        // No more valid enemies.
-        if (_target == noone)
-        {
-            break;
-        }
+    // No enemies at all.
+    if (_target == noone)
+    {
+        continue;
+    }
 
 
+    // Remember that this enemy received a ray.
+    if (
+        ds_list_find_index(
+            _used_targets,
+            _target
+        )
+        == -1
+    )
+    {
         ds_list_add(
             _used_targets,
             _target
         );
+    }
 
 
-// =================================
-// SAVE TARGET POSITION FIRST
-// =================================
+    // =================================
+    // DIFFERENT VISUAL HIT POSITION
+    // =================================
 
-var _target_x = _target.x;
-var _target_y = _target.y;
+    // Spread rays across different parts
+    // of the enemy's collision box.
 
+    var _fraction_x =
+        (shot_index + 1)
+        / (_shot_count + 1);
 
-// =================================
-// DRAW FINAL RICOCHET
-// =================================
+    var _fraction_y;
 
-var _final_visual =
-    instance_create_layer(
-        0,
-        0,
-        "Instances",
-        o_HitscanVisual
-    );
-
-_final_visual.line_x1 =
-    _last_x;
-
-_final_visual.line_y1 =
-    _last_y;
-
-_final_visual.line_x2 =
-    _target_x;
-
-_final_visual.line_y2 =
-    _target_y;
+    if ((shot_index mod 2) == 0)
+    {
+        _fraction_y = 0.35;
+    }
+    else
+    {
+        _fraction_y = 0.65;
+    }
 
 
-// =================================
-// DAMAGE ENEMY LAST
-// =================================
+    _shot_targets[shot_index] =
+        _target;
 
-_target.take_damage(
-    _current_damage
+    _shot_x[shot_index] =
+        lerp(
+            _target.bbox_left,
+            _target.bbox_right,
+            _fraction_x
+        );
+
+    _shot_y[shot_index] =
+        lerp(
+            _target.bbox_top,
+            _target.bbox_bottom,
+            _fraction_y
+        );
+}
+
+
+// =====================================
+// FIRE ALL PREPARED SHOTS
+// =====================================
+
+for (
+    var shot_index = 0;
+    shot_index < _shot_count;
+    shot_index++
+)
+{
+    var _target =
+        _shot_targets[shot_index];
+
+
+    if (_target == noone)
+    {
+        continue;
+    }
+
+
+    // =================================
+    // VISUAL
+    // =================================
+
+    var _final_visual =
+        instance_create_layer(
+            0,
+            0,
+            "Instances",
+            o_HitscanVisual
+        );
+
+    _final_visual.line_x1 =
+        _last_x;
+
+    _final_visual.line_y1 =
+        _last_y;
+
+    _final_visual.line_x2 =
+        _shot_x[shot_index];
+
+    _final_visual.line_y2 =
+        _shot_y[shot_index];
+
+
+    // =================================
+    // DAMAGE
+    // =================================
+
+    // Target may have died from a previous
+    // ray, but the remaining visuals still fire.
+    if (instance_exists(_target))
+    {
+        _target.take_damage(
+            _current_damage
+        );
+    }
+}
+
+
+ds_list_destroy(
+    _used_targets
 );
-	}
 }

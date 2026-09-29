@@ -1,4 +1,4 @@
-physics_world_draw_debug(phy_debug_render_shapes);
+// physics_world_draw_debug(phy_debug_render_shapes);
 
 var _body_facing = sign(image_xscale);
 
@@ -245,7 +245,7 @@ draw_sprite_ext(
     1
 );
 
-// Glock 50 Quintillion
+// Glock 50 Quintillion (who does bro think he is)
 draw_sprite_ext(
     s_Pistol,
     0,
@@ -296,4 +296,4 @@ else
     }
 }
 
-draw_text(x - 30, y - 80, sprite_get_name(sprite_index));
+// draw_text(x - 30, y - 80, sprite_get_name(sprite_index));

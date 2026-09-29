@@ -1751,26 +1751,34 @@ if (on_ground && is_slamming)
     // PLACEHOLDER SHOCKWAVE VFX
     // =================================
 
+// Tiny slams don't create a shockwave.
+var _ring_size = 0;
+
+if (_slam_radius >= 40)
+{
+    _ring_size = 1;
+
+    if (_slam_radius >= 125)
+    {
+        _ring_size = 2;
+    }
+
+    show_debug_message(
+        "SLAM RING | radius="
+        + string(_slam_radius)
+        + " | size="
+        + string(_ring_size)
+    );
+
     effect_create_depth(
         depth - 1,
         ef_ring,
         _impact_x,
         _impact_y,
-        2,
+        _ring_size,
         c_white
     );
-
-
-    show_debug_message(
-        "SLAM IMPACT | distance="
-        + string(slam_distance)
-        + " | power="
-        + string(slam_power)
-        + " | damage="
-        + string(_slam_damage)
-        + " | radius="
-        + string(_slam_radius)
-    );
+}
 
 
     // =================================
@@ -1821,6 +1829,21 @@ if (weapon_fire_timer > 0)
     }
 }
 
+// =====================================
+// PERFECT APEX FLASH TIMER
+// =====================================
+
+if (perfect_apex_flash_timer > 0)
+{
+    perfect_apex_flash_timer -=
+        delta_time / 1000000;
+
+    if (perfect_apex_flash_timer < 0)
+    {
+        perfect_apex_flash_timer = 0;
+    }
+}
+
 
 // =====================================
 // PRIMARY FIRE - LEFT MOUSE
@@ -1859,6 +1882,9 @@ if (keyboard_check_pressed(vk_f3))
             "Instances",
             o_Coin
         );
+		
+		_coin.split_threshold =
+			coin_split_y_speed_threshold;
 
         var _angle = aim_angle + random_range(-65, 65);
         var _speed = random_range(3, 9);
@@ -1878,12 +1904,32 @@ if (mouse_check_button_pressed(mb_right))
     // Only throw if we actually have a coin.
     if (coin_count > 0)
     {
+		
         var coin = instance_create_layer(
             x + 32,
             y - 64,
             "Instances",
             o_Coin
+			
+			
         );
+		
+		coin.split_threshold =
+			coin_split_y_speed_threshold;
+			
+// =================================
+// COIN AGE / OWNER
+// =================================
+
+coin_throw_serial += 1;
+
+coin.coin_owner = id;
+coin.throw_id = coin_throw_serial;
+
+coin.is_pinned = false;
+coin.pin_owner = noone;
+			
+			
 
 
         // =================================
@@ -1928,6 +1974,21 @@ if (mouse_check_button_pressed(mb_right))
         // =================================
 
         coin_count -= 1;
+    }
+}
+
+// =====================================
+// COIN ANCHOR COOLDOWN
+// =====================================
+
+if (coin_anchor_cooldown_timer > 0)
+{
+    coin_anchor_cooldown_timer -=
+        delta_time / 1000000;
+
+    if (coin_anchor_cooldown_timer < 0)
+    {
+        coin_anchor_cooldown_timer = 0;
     }
 }
 
@@ -1982,6 +2043,114 @@ else
     // Fully stocked.
     coin_count = coin_max;
     coin_recharge_timer = 0;
+}
+
+// =====================================
+// CLEAN PINNED COIN REFERENCE
+// =====================================
+
+if (
+    pinned_coin != noone
+    && !instance_exists(pinned_coin)
+)
+{
+    pinned_coin = noone;
+}
+
+// =====================================
+// COIN ANCHOR ACTIVE ITEM
+// MIDDLE MOUSE
+// =====================================
+
+if (
+    item_coin_anchor
+    && mouse_check_button_pressed(mb_middle)
+    && coin_anchor_cooldown_timer <= 0
+    && pinned_coin == noone
+)
+{
+    var _oldest_coin = noone;
+    var _oldest_id = infinity;
+
+    var _coin_count =
+        instance_number(o_Coin);
+
+
+    // =================================
+    // FIND OLDEST PLAYER-THROWN COIN
+    // =================================
+
+    for (
+        var i = 0;
+        i < _coin_count;
+        i++
+    )
+    {
+        var _candidate =
+            instance_find(
+                o_Coin,
+                i
+            );
+
+        if (!instance_exists(_candidate))
+        {
+            continue;
+        }
+
+
+        // Ignore debug coins / coins without ownership data.
+        if (
+            !variable_instance_exists(
+                _candidate,
+                "coin_owner"
+            )
+        )
+        {
+            continue;
+        }
+
+
+        if (_candidate.coin_owner != id)
+        {
+            continue;
+        }
+
+
+        if (_candidate.is_pinned)
+        {
+            continue;
+        }
+
+
+        // Lowest throw_id = oldest coin.
+        if (_candidate.throw_id < _oldest_id)
+        {
+            _oldest_id =
+                _candidate.throw_id;
+
+            _oldest_coin =
+                _candidate;
+        }
+    }
+
+
+    // =================================
+    // PIN COIN
+    // =================================
+
+    if (_oldest_coin != noone)
+    {
+        pinned_coin =
+            _oldest_coin;
+
+        pinned_coin.is_pinned = true;
+        pinned_coin.pin_owner = id;
+
+
+        // Start 8-second cooldown.
+        coin_anchor_cooldown_timer =
+            coin_anchor_cooldown;
+    }
 }
 
 
