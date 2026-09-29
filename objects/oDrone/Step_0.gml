@@ -301,7 +301,7 @@ if (shoot_player != noone && shoot_timer <= 0)
         x,
         y,
         depth - 1,
-        oEnemyBullet
+        oEnemyDroneBullet
     );
 
     bullet.direction = point_direction(

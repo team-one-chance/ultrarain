@@ -77,10 +77,10 @@ stun_sprite_source_direction = -1;
 
 // Damage dealt to shield HP when struck from the front.
 shield_front_bullet_multiplier = 0.10;
-shield_front_sword_multiplier = 0.50;
+shield_front_sword_multiplier = 5;
 shield_front_beam_multiplier = 1; // Adjust this
 
-phase2_bullet_damage_multiplier = 3.0;
+phase2_bullet_damage_multiplier = 2;
 phase2_sword_damage_multiplier = 1.0;
 phase2_beam_damage_multiplier = 1.0;
 

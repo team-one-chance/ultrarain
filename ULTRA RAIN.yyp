@@ -35,7 +35,7 @@
     {"id":{"name":"o_Player","path":"objects/o_Player/o_Player.yy",},},
     {"id":{"name":"oDrone","path":"objects/oDrone/oDrone.yy",},},
     {"id":{"name":"oEnemy_TEMP","path":"objects/oEnemy_TEMP/oEnemy_TEMP.yy",},},
-    {"id":{"name":"oEnemyBullet","path":"objects/oEnemyBullet/oEnemyBullet.yy",},},
+    {"id":{"name":"oEnemyDroneBullet","path":"objects/oEnemyDroneBullet/oEnemyDroneBullet.yy",},},
     {"id":{"name":"oEnemyParent","path":"objects/oEnemyParent/oEnemyParent.yy",},},
     {"id":{"name":"oHeal","path":"objects/oHeal/oHeal.yy",},},
     {"id":{"name":"oMiniBoss","path":"objects/oMiniBoss/oMiniBoss.yy",},},
