@@ -69,10 +69,10 @@ slam_power = 1;
 slam_power_double_distance = 128;
 
 // Prevent completely absurd values. No lol ezzzzzzzzzzzzz
-slam_power_max = 32;
+slam_power_max = 64;
 
-slam_base_damage = 25;
-slam_base_radius = 48;
+slam_base_damage = 15;
+slam_base_radius = 30;
 
 
 // =====================================

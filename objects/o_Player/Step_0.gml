@@ -813,10 +813,14 @@ if (!on_ground
 && !is_ledge_climbing)
 {
     if (keyboard_check_pressed(ord("S"))
-    || keyboard_check_pressed(vk_down))
-    {
-        is_slamming = true;
-    }
+|| keyboard_check_pressed(vk_down))
+{
+    is_slamming = true;
+
+    slam_distance = 0;
+    slam_last_y = phy_position_y;
+    slam_power = 1;
+}
 }
 
 
@@ -845,6 +849,38 @@ if (is_ledge_climbing)
 
 else if (is_slamming)
 {
+	// =====================================
+// SLAM DISTANCE
+// =====================================
+
+var slam_delta_y =
+    phy_position_y - slam_last_y;
+
+// Only count downward travel.
+if (slam_delta_y > 0)
+{
+    slam_distance += slam_delta_y;
+}
+
+slam_last_y =
+    phy_position_y;
+
+
+// =====================================
+// SLAM POWER
+// =====================================
+
+// Doubles every slam_power_double_distance pixels.
+slam_power =
+    min(
+        slam_power_max,
+        power(
+            2,
+            slam_distance
+            / slam_power_double_distance
+        )
+    );
+	
     phy_speed_x = 0;
 
     phy_speed_y *=
@@ -1468,7 +1504,7 @@ if (slide_double_jump_timer > 0)
     else if (on_ground
     || coyote_timer > 0)
     {
-        if (is_sliding)
+        if (is_sliding && player_can_stand())
         {
             // IMPORTANT:
             // Remember which way we were sliding
@@ -1594,12 +1630,158 @@ else if (!on_ground
 
 
 // =====================================
-// END SLAM WHEN LANDING
+// SLAM IMPACT
 // =====================================
 
-if (on_ground)
+if (on_ground && is_slamming)
 {
+    var _impact_x = x;
+    var _impact_y = y;
+
+    // =================================
+    // SLAM STATS
+    // =================================
+
+    var _slam_damage =
+        slam_base_damage
+        * slam_power;
+
+    // Radius grows slower than damage.
+    var _slam_radius =
+        slam_base_radius
+        * sqrt(slam_power);
+
+    // Knockback grows with power, but not
+    // nearly as violently as damage.
+    var _slam_knockback =
+        4
+        + sqrt(slam_power) * 3;
+
+    // Stronger slams stun longer.
+    var _slam_stun =
+        min(
+            4,
+            0.4
+            + sqrt(slam_power) * 0.18
+        );
+
+
+    // =================================
+    // HIT ALL ENEMIES IN RADIUS
+    // =================================
+
+    with (oEnemyParent)
+    {
+        var _dist =
+            point_distance(
+                x,
+                y,
+                _impact_x,
+                _impact_y
+            );
+
+        if (_dist <= _slam_radius)
+        {
+            // -------------------------
+            // DAMAGE FALLOFF
+            // -------------------------
+
+            var _falloff =
+                1 - (_dist / _slam_radius);
+
+            var _damage =
+                _slam_damage
+                * max(
+                    0.25,
+                    _falloff
+                );
+
+
+            // -------------------------
+            // KNOCKBACK DIRECTION
+            // -------------------------
+
+            var _dir;
+
+            if (x < _impact_x)
+            {
+                // Up + left
+                _dir = 150;
+            }
+            else
+            {
+                // Up + right
+                _dir = 30;
+            }
+
+
+            // -------------------------
+            // DAMAGE + KNOCKBACK
+            // -------------------------
+
+            take_damage(
+                _damage,
+                _dir,
+                _slam_knockback,
+                false
+            );
+
+
+            // -------------------------
+            // STUN
+            // -------------------------
+
+            attack_state = 5;
+
+            stun_timer =
+                max(
+                    stun_timer,
+                    _slam_stun
+                );
+
+            path_end();
+
+            attack_shake_x = 0;
+            attack_shake_y = 0;
+        }
+    }
+
+
+    // =================================
+    // PLACEHOLDER SHOCKWAVE VFX
+    // =================================
+
+    effect_create_depth(
+        depth - 1,
+        ef_ring,
+        _impact_x,
+        _impact_y,
+        2,
+        c_white
+    );
+
+
+    show_debug_message(
+        "SLAM IMPACT | distance="
+        + string(slam_distance)
+        + " | power="
+        + string(slam_power)
+        + " | damage="
+        + string(_slam_damage)
+        + " | radius="
+        + string(_slam_radius)
+    );
+
+
+    // =================================
+    // RESET SLAM
+    // =================================
+
     is_slamming = false;
+
+    slam_distance = 0;
+    slam_power = 1;
+    slam_last_y = phy_position_y;
 }
 
 // =====================================
