@@ -1,3 +1,5 @@
+physics_world_draw_debug(phy_debug_render_shapes);
+
 var _body_facing = sign(image_xscale);
 
 var _rig = player_rig_pose(sprite_index, image_index);

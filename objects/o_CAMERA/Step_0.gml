@@ -1,8 +1,13 @@
+if (!instance_exists(o_Player))
+{
+    exit;
+}
+
 // =====================================
 // GET CAMERA AND VIEW SIZE
 // =====================================
 
-var cam = view_camera[0];
+var cam = camera;
 
 var view_width = camera_get_view_width(cam);
 var view_height = camera_get_view_height(cam);
@@ -56,3 +61,4 @@ cam_y += (target_y - cam_y) * vertical_strength;
 // =====================================
 
 camera_set_view_pos(cam, cam_x, cam_y);
+
