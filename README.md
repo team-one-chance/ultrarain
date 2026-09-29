@@ -1,66 +1,61 @@
 # ULTRARAIN
 
-ULTRARAIN ist ein schnelles 2D-Sidescroller-Shooter-Spiel, das mit GameMaker entwickelt wird.
+ULTRARAIN ist ein schneller 2D-Sidescroller-Shooter, der mit GameMaker entwickelt wird. Bewegung und Kampf stehen im Mittelpunkt: Der Spieler weicht Gegnern aus, zielt mit der Maus und kombiniert später Waffen, Aufsätze und Körper-Items zu unterschiedlichen Builds.
 
-Der Fokus liegt auf schneller Bewegung, Maussteuerung beim Zielen, aggressivem Kampf und dem Zusammenstellen verschiedener Builds mit Waffen, Aufsätzen und Körper-Items.
+## Aktueller Stand
 
-## Gameplay
+Das Projekt ist ein spielbarer Prototyp mit einem Testraum (`Room1`). Bereits im Projekt vorhanden sind:
 
-Der Spieler bewegt sich durch verschiedene Stages, bekämpft Gegner und sammelt Upgrades.
+- Bewegung mit Sprung, Walljump, Wandslide, automatischem Hochziehen an Kanten, Slide, Dash und Slam
+- Mausgesteuerte Pistole mit gelbem Hitscan-Effekt; Schüsse starten an der Mündung des gezeichneten Modells
+- Münzwurf als alternative Pistolenaktion mit Abpralltreffern
+- Nahkampfangriff und Gegner mit Verfolgungs- und Angriffsverhalten
+- Ein aus Kopf, Armen, Körper und Waffe zusammengesetztes Spieler-Modell: Der Körper folgt der Bewegung, Kopf und Waffe folgen dem Ziel
+- Ein Testraum mit Tiles und separaten Kollisionsobjekten
 
-Das Kampfsystem basiert auf:
+Einige Assets und Gegner tragen noch temporäre Namen. Der Prototyp wird laufend verändert; einzelne Mechaniken können sich daher noch ändern.
 
-* Bewegung mit der Tastatur und Zielen mit der Maus
-* Mehreren Waffen mit unterschiedlichen Rollen
-* Waffenspezifischen Aufsätzen und Upgrades
-* Körper-Items, die den gesamten Build beeinflussen
-* Parieren
-* Umgebungselementen wie explosiven Fässern
-* Minibossen und Bossen
+## Steuerung
 
-Waffen und Items sollen miteinander interagieren, damit verschiedene Builds entstehen können, anstatt nur einfache Statusverbesserungen zu sammeln.
+| Eingabe | Aktion |
+| --- | --- |
+| `A` / `D` oder Pfeiltasten links/rechts | Bewegen |
+| `W`, Pfeiltaste hoch oder Leertaste | Springen |
+| `Strg` beim Laufen | Sliden |
+| `Shift` | Dash |
+| `S` oder Pfeiltaste runter in der Luft | Slam |
+| Maus | Zielen |
+| Linke Maustaste | Pistole abfeuern |
+| Rechte Maustaste | Münze werfen |
+| `Q` | Nahkampfangriff |
 
-## Ausrüstung
+An Wänden sind Walljumps möglich. Beim Bewegen gegen eine passende Kante zieht sich der Spieler automatisch hoch.
 
-Die Ausrüstung ist in zwei Hauptkategorien aufgeteilt.
+## Geplante Richtung
 
-**Körper-Items** beeinflussen den Spieler als Ganzes und können die Funktionsweise eines Builds stark verändern.
+Für den eigentlichen Gameplay-Loop sind mehrere Waffen, waffenspezifische Aufsätze und Körper-Items vorgesehen. Die Ausrüstung soll sich gegenseitig beeinflussen und dadurch verschiedene Builds ermöglichen. Weitere Stages, Gegner, Umgebungselemente sowie Mini- und Endbosse gehören zur längerfristigen Planung. Diese Systeme sind noch kein fertiger Teil des Prototyps.
 
-**Waffenaufsätze** gehören zu bestimmten Waffen und verändern oder erweitern deren Funktionen. Jede Waffe besitzt deshalb ihren eigenen Pool an möglichen Aufsätzen.
+Die visuelle Richtung ist industriell und kontrastreich: überwiegend Schwarz und Weiss mit gezielten hellen Akzenten, etwa dem Gelb der Schüsse. Klare Silhouetten und einfache Formen halten die Assets lesbar und den Zeichenaufwand überschaubar.
 
-Geplante Waffen sind unter anderem eine Pistole, ein Sturmgewehr und ein Scharfschützengewehr. Weitere Waffen und Ausrüstung werden im Verlauf der Entwicklung ergänzt.
-
-## Projektstatus
-
-ULTRARAIN befindet sich aktuell in einer frühen Entwicklungsphase.
-
-Der derzeitige Fokus liegt auf dem **MVP**. Damit soll zuerst der grundlegende Gameplay-Loop umgesetzt werden, um zu testen, ob Kampf, Bewegung und Item-System gut miteinander funktionieren.
-
-Ideen und Features ausserhalb des MVP werden im Backlog für eine spätere Entwicklung festgehalten.
-
-## Entwicklung
-
-Das Projekt wird mit **GameMaker** entwickelt.
-
-So kann das Projekt geöffnet werden:
+## Projekt starten
 
 1. Repository klonen.
-2. GameMaker öffnen.
-3. `ULTRA RAIN.yyp` öffnen.
-4. Das Projekt über die GameMaker-IDE starten.
+2. `ULTRA RAIN.yyp` in GameMaker öffnen.
+3. Das Projekt in der GameMaker-IDE starten.
 
-Aufgaben, Bugs und Ideen werden über GitHub Issues und das GitHub Project Board verwaltet.
+Das Projekt wurde mit GameMaker IDE `2026.0.0.16` gespeichert. Bei Problemen mit einer anderen Version zuerst die Projektkompatibilität prüfen.
 
-## Repository-Struktur
+## Projektstruktur
 
-```text
-ultrarain/
-├── docs/       # Design-Dokumente und Entwicklungsnotizen
-├── options/    # GameMaker-Projektoptionen
-├── rooms/      # GameMaker-Räume
-├── sprites/    # Game-Sprites
-└── ULTRA RAIN.yyp
-```
+| Pfad | Inhalt |
+| --- | --- |
+| `objects/` | Spieler, Gegner, Treffer-Effekte und andere Spielobjekte |
+| `scripts/` | Unter anderem Aim-Rig, Armzeichnung, Hitscan und Münzabpraller |
+| `sprites/` | Spieleranimationen, Waffen, Gegner und Effekte |
+| `tilesets/` und `rooms/` | Tilesets und Testraum |
+| `options/` | GameMaker-Projektoptionen |
+
+Aufgaben, Bugs und Ideen werden über GitHub Issues und das Project Board verwaltet.
 
 ## Team One Chance
 
