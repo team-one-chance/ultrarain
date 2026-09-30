@@ -43,6 +43,11 @@ if (_body_facing == 0)
     _body_facing = 1;
 }
 
+if (weapon_type == "sword")
+{
+    _part_facing = _body_facing;
+}
+
 // Neck
 var _neck_x =
     x + (_rig.neck_x - _origin_x) * _body_facing;
@@ -108,6 +113,94 @@ else
         (_back_socket_y + _front_socket_y) * 0.5;
 }
 
+var _sword_angle = 0;
+var _sword_forward_angle = 0;
+var _sword_grip_reach = 0;
+
+if (weapon_type == "sword")
+{
+    // Use cursor height on either side of the player; moving the cursor
+    // across the body should not flip the sword from up to down.
+    var _pitch_angle = point_direction(
+        0, 0,
+        max(1, abs(mouse_x - _aim_origin_x)),
+        mouse_y - _aim_origin_y
+    );
+
+    if (_pitch_angle > 180)
+    {
+        _pitch_angle -= 360;
+    }
+
+    var _sword_pitch = clamp(
+        _pitch_angle,
+        -sword_config.aim_pitch_limit,
+        sword_config.aim_pitch_limit
+    );
+
+    var _sword_pose_angle = sword_config.rest_angle;
+
+    if (sword_swing_timer > 0)
+    {
+        var _swing_progress = 1 - sword_swing_timer / max(0.001, sword_config.swing_duration);
+        var _windup_end = clamp(sword_config.windup_phase, 0.001, 0.998);
+        var _strike_end = clamp(sword_config.follow_through_phase, _windup_end + 0.001, 0.999);
+        var _follow_angle = sword_config.windup_angle - sword_config.swing_arc;
+
+        if (_swing_progress < _windup_end)
+        {
+            _sword_pose_angle = lerp(
+                sword_config.rest_angle,
+                sword_config.windup_angle,
+                _swing_progress / _windup_end
+            );
+        }
+        else if (_swing_progress < _strike_end)
+        {
+            _sword_pose_angle = lerp(
+                sword_config.windup_angle,
+                _follow_angle,
+                (_swing_progress - _windup_end) / (_strike_end - _windup_end)
+            );
+        }
+        else
+        {
+            _sword_pose_angle = lerp(
+                _follow_angle,
+                sword_config.rest_angle,
+                (_swing_progress - _strike_end) / (1 - _strike_end)
+            );
+        }
+    }
+
+    // The hilt sweeps around the shoulders while the blade rotates.
+    var _hand_pitch = clamp(
+        _sword_pitch
+            + (_sword_pose_angle - sword_config.rest_angle) * sword_config.swing_hand_follow,
+        -sword_config.swing_hand_pitch_limit,
+        sword_config.swing_hand_pitch_limit
+    );
+    _sword_forward_angle = (_part_facing == 1)
+        ? _hand_pitch
+        : 180 - _hand_pitch;
+    var _full_swing_offset = max(
+        1,
+        max(
+            abs(sword_config.windup_angle - sword_config.rest_angle),
+            abs(sword_config.windup_angle - sword_config.swing_arc - sword_config.rest_angle)
+        )
+    );
+    _sword_grip_reach = max(
+        0,
+        sword_config.grip_forward
+            - sword_config.swing_grip_retract
+                * abs(_sword_pose_angle - sword_config.rest_angle) / _full_swing_offset
+    );
+    _sword_angle = (
+        _sword_pose_angle + _sword_pitch * sword_config.aim_blade_follow
+    ) * _part_facing;
+}
+
 var _weapon_x =
     _aim_origin_x
     + lengthdir_x(rig_weapon_distance, aim_angle);
@@ -115,6 +208,15 @@ var _weapon_x =
 var _weapon_y =
     _aim_origin_y
     + lengthdir_y(rig_weapon_distance, aim_angle);
+
+if (weapon_type == "sword")
+{
+    // Move the hilt through an arc that both arms can follow.
+    _weapon_x = _aim_origin_x
+        + lengthdir_x(_sword_grip_reach, _sword_forward_angle);
+    _weapon_y = _aim_origin_y + sword_config.grip_down
+        + lengthdir_y(sword_config.aim_vertical_reach, _sword_forward_angle);
+}
 
 // Support-hand point relative to pistol origin
 var _support_dx =
@@ -138,9 +240,28 @@ var _support_y =
     - _support_dx * dsin(aim_angle)
     + _support_dy * dcos(aim_angle);
 
-// Right hand always operates the trigger
+if (weapon_type == "sword")
+{
+    // Rotate the support grip with the blade through the whole swing.
+    var _grip_dx = -sword_config.support_hand_back * _part_facing;
+    var _grip_dy = sword_config.support_hand_down;
+    _support_x = _weapon_x
+        + _grip_dx * dcos(_sword_angle)
+        + _grip_dy * dsin(_sword_angle);
+    _support_y = _weapon_y
+        - _grip_dx * dsin(_sword_angle)
+        + _grip_dy * dcos(_sword_angle);
+}
+
+// Primary hand target
 var _right_target_x = _weapon_x;
 var _right_target_y = _weapon_y;
+
+if (weapon_type == "sword")
+{
+    _right_target_x -= sword_config.main_hand_up * dsin(_sword_angle);
+    _right_target_y -= sword_config.main_hand_up * dcos(_sword_angle);
+}
 
 var _left_target_x;
 var _left_target_y;
@@ -203,7 +324,7 @@ if (_arm_layer_facing == 1)
 }
 else
 {
-    // Right arm holds the pistol
+    // Right arm holds the equipped weapon
     draw_ik_arm(
         s_Player_Arm_Upper_R,
         s_Player_Arm_Lower_R,
@@ -245,24 +366,27 @@ draw_sprite_ext(
     1
 );
 
-// Glock 50 Quintillion (who does bro think he is)
-draw_sprite_ext(
-    s_Pistol,
-    0,
-    _weapon_x,
-    _weapon_y,
-    1,
-    _part_facing,
-    aim_angle,
-    c_white,
-    1
-);
+if (weapon_type == "sword")
+{
+    draw_sprite_ext(
+        sDarkRepulsor, 0, _weapon_x, _weapon_y,
+        1, 1, _sword_angle, c_white, 1
+    );
+}
+else if (weapon_type == "pistol")
+{
+    // Glock 50 Quintillion (who does bro think he is)
+    draw_sprite_ext(
+        s_Pistol, 0, _weapon_x, _weapon_y,
+        1, _part_facing, aim_angle, c_white, 1
+    );
+}
 
 // Draw front arm
 // Draw front arm
 if (_arm_layer_facing == 1)
 {
-    // Right arm holds the pistol
+    // Right arm holds the equipped weapon
     draw_ik_arm(
         s_Player_Arm_Upper_R,
         s_Player_Arm_Lower_R,

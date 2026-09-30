@@ -51,6 +51,8 @@
     {"name":"inst_6448BFCB","path":"rooms/LE_TUTORIAL_WIP/LE_TUTORIAL_WIP.yy",},
     {"name":"inst_35B40D8","path":"rooms/LE_TUTORIAL_WIP/LE_TUTORIAL_WIP.yy",},
     {"name":"inst_6A444894","path":"rooms/LE_TUTORIAL_WIP/LE_TUTORIAL_WIP.yy",},
+    {"name":"inst_57E4FC97","path":"rooms/LE_TUTORIAL_WIP/LE_TUTORIAL_WIP.yy",},
+    {"name":"inst_3F6F3D72","path":"rooms/LE_TUTORIAL_WIP/LE_TUTORIAL_WIP.yy",},
   ],
   "isDnd":false,
   "layers":[
@@ -296,6 +298,8 @@
         {"$GMRInstance":"v4","%Name":"inst_196DCCC8","colour":4294967295,"frozen":false,"hasCreationCode":false,"ignore":false,"imageIndex":0,"imageSpeed":1.0,"inheritCode":false,"inheritedItemId":null,"inheritItemSettings":false,"isDnd":false,"name":"inst_196DCCC8","objectId":{"name":"o_Block","path":"objects/o_Block/o_Block.yy",},"properties":[],"resourceType":"GMRInstance","resourceVersion":"2.0","rotation":0.0,"scaleX":11.0,"scaleY":1.0,"x":576.0,"y":1312.0,},
         {"$GMRInstance":"v4","%Name":"inst_6448BFCB","colour":4294967295,"frozen":false,"hasCreationCode":false,"ignore":false,"imageIndex":0,"imageSpeed":1.0,"inheritCode":false,"inheritedItemId":null,"inheritItemSettings":false,"isDnd":false,"name":"inst_6448BFCB","objectId":{"name":"o_Block","path":"objects/o_Block/o_Block.yy",},"properties":[],"resourceType":"GMRInstance","resourceVersion":"2.0","rotation":0.0,"scaleX":1.0294119,"scaleY":4.023897,"x":576.0,"y":1344.0,},
         {"$GMRInstance":"v4","%Name":"inst_6A444894","colour":4294967295,"frozen":false,"hasCreationCode":false,"ignore":false,"imageIndex":0,"imageSpeed":1.0,"inheritCode":false,"inheritedItemId":null,"inheritItemSettings":false,"isDnd":false,"name":"inst_6A444894","objectId":{"name":"o_Block_scary","path":"objects/o_Block_scary/o_Block_scary.yy",},"properties":[],"resourceType":"GMRInstance","resourceVersion":"2.0","rotation":0.0,"scaleX":19.0,"scaleY":1.0,"x":2016.0,"y":832.0,},
+        {"$GMRInstance":"v4","%Name":"inst_57E4FC97","colour":4294967295,"frozen":false,"hasCreationCode":false,"ignore":false,"imageIndex":0,"imageSpeed":1.0,"inheritCode":false,"inheritedItemId":null,"inheritItemSettings":false,"isDnd":false,"name":"inst_57E4FC97","objectId":{"name":"o_Block_scary","path":"objects/o_Block_scary/o_Block_scary.yy",},"properties":[],"resourceType":"GMRInstance","resourceVersion":"2.0","rotation":0.0,"scaleX":1.0,"scaleY":2.0,"x":2016.0,"y":768.0,},
+        {"$GMRInstance":"v4","%Name":"inst_3F6F3D72","colour":4294967295,"frozen":false,"hasCreationCode":false,"ignore":false,"imageIndex":0,"imageSpeed":1.0,"inheritCode":false,"inheritedItemId":null,"inheritItemSettings":false,"isDnd":false,"name":"inst_3F6F3D72","objectId":{"name":"o_Block_scary","path":"objects/o_Block_scary/o_Block_scary.yy",},"properties":[],"resourceType":"GMRInstance","resourceVersion":"2.0","rotation":0.0,"scaleX":1.0,"scaleY":2.0,"x":2592.0,"y":768.0,},
       ],"layers":[],"name":"Instances_1","properties":[],"resourceType":"GMRInstanceLayer","resourceVersion":"2.0","userdefinedDepth":false,"visible":true,},
     {"$GMRAssetLayer":"","%Name":"Assets_2","assets":[
         {"$GMRSpriteGraphic":"v1","%Name":"graphic_26D4861A","animationSpeed":1.0,"colour":83886079,"frozen":false,"headPosition":0.0,"ignore":false,"inheritedItemId":null,"inheritItemSettings":false,"name":"graphic_26D4861A","resourceType":"GMRSpriteGraphic","resourceVersion":"2.0","rotation":0.0,"scaleX":1.0,"scaleY":1.0,"spriteId":{"name":"Flowery_Deltarune","path":"sprites/Flowery_Deltarune/Flowery_Deltarune.yy",},"x":9376.0,"y":3744.0,},
