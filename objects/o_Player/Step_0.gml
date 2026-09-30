@@ -1421,8 +1421,11 @@ var jump_pressed =
     || keyboard_check_pressed(vk_space);
 
 
+// A slide jump changes to the standing collider, so keep sliding
+// if the standing shape cannot fit under the ceiling.
 if (jump_pressed
-&& !is_ledge_climbing)
+&& !is_ledge_climbing
+&& (!is_sliding || player_can_stand()))
 {
 // =================================
 // SLIDE DOUBLE JUMP
