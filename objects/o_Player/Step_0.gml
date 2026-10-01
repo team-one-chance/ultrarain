@@ -1,8 +1,19 @@
+
 // =====================================
 // KEEP PLAYER UPRIGHT
 // =====================================
 
 phy_fixed_rotation = true;
+
+// =====================================
+// o_Door exit
+// =====================================
+if (hacking_controller != noone)
+{
+    phy_speed_x = 0;
+    phy_speed_y = 0;
+    exit;
+}
 
 // =====================================
 // ACTIVE SPEED BOOST
@@ -89,7 +100,7 @@ var left_wall_mid =
 var left_wall_upper =
     collision_point(
         x - 15,
-        y - 58,
+        y - 59,
         o_Block,
         false,
         true
@@ -120,7 +131,7 @@ var right_wall_mid =
 var right_wall_upper =
     collision_point(
         x + 15,
-        y - 58,
+        y - 59,
         o_Block,
         false,
         true
@@ -131,23 +142,23 @@ var right_wall_upper =
 // NORMAL WALL DETECTION
 // =====================================
 
-var touching_left_wall =
-    (left_wall_lower != noone && left_wall_upper != noone)
+var touching_left_wall = (left_wall_lower || left_wall_mid || left_wall_upper );
+    /*(left_wall_lower != noone && left_wall_upper != noone)
     ||
     (left_wall_lower != noone && left_wall_mid != noone)
     ||
     (left_wall_upper != noone && left_wall_mid != noone)
 	||
-	(left_wall_upper != noone);
+	(left_wall_upper != noone);*/
 
-var touching_right_wall =
-    (right_wall_lower != noone && right_wall_upper != noone)
+var touching_right_wall = (right_wall_lower || right_wall_mid || right_wall_upper );
+    /*(right_wall_lower != noone && right_wall_upper != noone)
     ||
     (right_wall_lower != noone && right_wall_mid != noone)
     ||
     (right_wall_upper != noone && right_wall_mid != noone)
 	||
-	(right_wall_upper != noone);
+	(right_wall_upper != noone);*/
 
 var touching_wall =
     touching_left_wall
@@ -1422,7 +1433,8 @@ var jump_pressed =
 
 
 if (jump_pressed
-&& !is_ledge_climbing)
+&& !is_ledge_climbing
+&& (!is_sliding || player_can_stand()))
 {
 // =================================
 // SLIDE DOUBLE JUMP
@@ -1871,31 +1883,82 @@ if (mouse_check_button(mb_left))
 // =====================================
 // ALT FIRE - RIGHT MOUSE / THROW COIN
 // =====================================
-
-if (keyboard_check_pressed(vk_f3))
-{
-    repeat (100)
+timerf3 = timerf3 - delta_time / 1000000
+if (keyboard_check_pressed(vk_f3)) 
+{ 
+    // Only throw if we actually have a coin.
+    if (coin_count > 0)
     {
-        var _coin = instance_create_layer(
-            x + 12 * aim_facing + random_range(-3, 3),
-            y - 48 + random_range(-3, 3),
+		repeat(100)
+		if (timerf3 <=0) {
+        var coin = instance_create_layer(
+            x = x + 32,
+            y - 64,
             "Instances",
-            o_Coin
-        );
+            o_Coin, 
+			timerf3 = 0.001
+										);
 		
-		_coin.split_threshold =
+		coin.split_threshold =
 			coin_split_y_speed_threshold;
+			
+// =================================
+// COIN AGE / OWNER
+// =================================
 
-        var _angle = aim_angle + random_range(-65, 65);
-        var _speed = random_range(3, 9);
+coin_throw_serial += 1;
 
-        _coin.phy_speed_x =
-            phy_speed_x + lengthdir_x(_speed, _angle);
+coin.coin_owner = id;
+coin.throw_id = coin_throw_serial;
 
-        _coin.phy_speed_y =
-            phy_speed_y
-            + lengthdir_y(_speed, _angle)
-            - random_range(2, 5);
+coin.is_pinned = false;
+coin.pin_owner = noone;
+			
+			
+
+
+        // =================================
+        // AIM AT MOUSE
+        // =================================
+
+        var coin_throw_direction =
+            point_direction(
+                coin.x,
+                coin.y,
+                mouse_x,
+                mouse_y
+            );
+
+
+        // =================================
+        // INHERIT PLAYER MOMENTUM
+        // =================================
+
+        coin.phy_speed_x =
+            phy_speed_x;
+
+        coin.phy_speed_y =
+            phy_speed_y;
+
+
+        // =================================
+        // ADD THROW FORCE
+        // =================================
+
+        coin.phy_speed_x +=
+            lengthdir_x(
+                3,
+                coin_throw_direction
+            );
+
+        coin.phy_speed_y = -5;
+
+
+        // =================================
+        // CONSUME COIN
+        // =================================
+
+        coin_count -= 1;}
     }
 }
 

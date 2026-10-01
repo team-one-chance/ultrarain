@@ -1,3 +1,5 @@
+timerf3 = 0;
+
 // =====================================
 // MOVEMENT
 // =====================================
@@ -343,7 +345,7 @@ coin_max = 4;
 coin_count = coin_max;
 
 // Gain one coin every # seconds.
-coin_recharge_time = 1.4;
+coin_recharge_time = 1.6;
 coin_recharge_timer = 0;
 
 // =====================================
@@ -470,3 +472,5 @@ pinned_coin_offset_y = -48;
 
 coin_anchor_cooldown = 8;
 coin_anchor_cooldown_timer = 0;
+
+hacking_controller = noone;
