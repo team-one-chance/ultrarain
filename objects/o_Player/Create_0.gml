@@ -251,6 +251,40 @@ pistol_piercing = 0;
 
 // Shooting timer
 weapon_fire_timer = 0;
+sword_swing_timer = 0;
+sword_swing_pending_hit = false;
+sword_swing_facing = 1;
+
+// Dark Repulsor tuning. Angles are degrees; distances are pixels;
+// durations are seconds. Smaller swing_duration means a faster swing.
+sword_config = {
+    swing_duration: 0.30,
+    hit_phase: 0.25, // 0 = swing start, 1 = swing end
+    windup_phase: 0.18,
+    follow_through_phase: 0.35, // how long it takes for the sword to go back up; lower is slower B)
+    rest_angle: -15,
+    windup_angle: 70,
+    swing_arc: 200, // degrees swept toward the enemy
+    swing_hand_follow: 0.55, // fraction of blade arc followed by the hilt
+    swing_hand_pitch_limit: 80,
+    swing_grip_retract: 8, // pull the hilt inward at the arc's ends
+
+    grip_forward: 24,
+    grip_down: 9,
+    aim_pitch_limit: 60, // maximum upward/downward cursor angle
+    aim_vertical_reach: 18, // vertical hilt travel in pixels
+    aim_blade_follow: 0.8, // how much the blade tilts with the cursor
+    support_hand_back: 2,
+    support_hand_down: 6,
+    main_hand_up: 3,
+
+    slash_forward: 80, // distance from player to slash hitbox
+    slash_down: 0,
+    slash_scale: 1, // scales slash art and hitbox
+    slash_duration: 0.15,
+    slash_damage: 10,
+    slash_knockback: 100
+};
 
 // Primary and alternate fire
 primary_fire = false;

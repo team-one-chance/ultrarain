@@ -1820,6 +1820,8 @@ if (_slam_radius >= 40)
 if (keyboard_check_pressed(ord("1")))
 {
     weapon_type = "pistol";
+    sword_swing_timer = 0;
+    sword_swing_pending_hit = false;
 }
 
 if (keyboard_check_pressed(ord("2")))
@@ -1827,7 +1829,19 @@ if (keyboard_check_pressed(ord("2")))
     weapon_type = "sword";
 }
 
+aim_rig_mode = (weapon_type == "sword")
+    ? AimRigMode.TWO_HANDED
+    : AimRigMode.ONE_HANDED;
+
 if (weapon_fire_timer > 0)
+{
+    weapon_fire_timer = max(0, weapon_fire_timer - delta_time / 1000000);
+}
+
+if (sword_swing_timer > 0)
+{
+    sword_swing_timer = max(0, sword_swing_timer - delta_time / 1000000);
+}
 
 // =====================================
 // PERFECT APEX FLASH TIMER
@@ -1849,7 +1863,6 @@ if (perfect_apex_flash_timer > 0)
 // PRIMARY FIRE - LEFT MOUSE
 // =====================================
 
-if (mouse_check_button(mb_left))
 if (weapon_type == "pistol")
 {
     // Keep the existing hold-to-fire behaviour.
@@ -1866,24 +1879,37 @@ if (weapon_type == "pistol")
 }
 else if (weapon_type == "sword")
 {
-    // One slash for each left click, like the old Q press.
-    if (mouse_check_button_pressed(mb_left))
+    // Start one swing per click; release its hit at hit_phase.
+    if (mouse_check_button_pressed(mb_left) && sword_swing_timer <= 0)
     {
-        var slash_dir = sign(image_xscale);
+        sword_swing_timer = max(0.001, sword_config.swing_duration);
+        sword_swing_pending_hit = true;
+        sword_swing_facing = sign(image_xscale);
 
-        if (slash_dir == 0)
+        if (sword_swing_facing == 0)
         {
-            slash_dir = 1;
+            sword_swing_facing = 1;
         }
+    }
+
+    if (sword_swing_pending_hit
+        && 1 - sword_swing_timer / max(0.001, sword_config.swing_duration)
+            >= clamp(sword_config.hit_phase, 0, 1))
+    {
+        sword_swing_pending_hit = false;
 
         var slash = instance_create_depth(
-            x + (40 * slash_dir),
-            y,
+            x + sword_config.slash_forward * sword_swing_facing,
+            y + sword_config.slash_down,
             depth - 1,
             oSlashEffect
         );
 
-        slash.image_xscale = slash_dir;
+        slash.image_xscale = sword_swing_facing * sword_config.slash_scale;
+        slash.image_yscale = sword_config.slash_scale;
+        slash.duration = sword_config.slash_duration;
+        slash.slash_damage = sword_config.slash_damage;
+        slash.knockback_force = sword_config.slash_knockback;
     }
 }
 
