@@ -1808,38 +1808,26 @@ if (_slam_radius >= 40)
 // MELEE ATTACK - RIGHT MOUSE
 // =====================================
 
-if (keyboard_check_pressed(ord("Q")))
-{
-    var slash_dir = sign(image_xscale);
 
-    if (slash_dir == 0)
-    {
-        slash_dir = 1;
-    }
-
-    var slash = instance_create_depth(
-        x + (40 * slash_dir),
-        y,
-        depth - 1,
-        oSlashEffect
-    );
-
-    slash.image_xscale = slash_dir;
-}
 // =====================================
 // WEAPON SYSTEM
 // =====================================
 
-if (weapon_fire_timer > 0)
-{
-    weapon_fire_timer -=
-        delta_time / 1000000;
+// =====================================
+// WEAPON SYSTEM
+// =====================================
 
-    if (weapon_fire_timer < 0)
-    {
-        weapon_fire_timer = 0;
-    }
+if (keyboard_check_pressed(ord("1")))
+{
+    weapon_type = "pistol";
 }
+
+if (keyboard_check_pressed(ord("2")))
+{
+    weapon_type = "sword";
+}
+
+if (weapon_fire_timer > 0)
 
 // =====================================
 // PERFECT APEX FLASH TIMER
@@ -1862,20 +1850,40 @@ if (perfect_apex_flash_timer > 0)
 // =====================================
 
 if (mouse_check_button(mb_left))
+if (weapon_type == "pistol")
 {
-    if (weapon_fire_timer <= 0)
+    // Keep the existing hold-to-fire behaviour.
+    if (mouse_check_button(mb_left) && weapon_fire_timer <= 0)
     {
-        if (weapon_type == "pistol")
-        {
-            weapon_hitscan(
-                pistol_damage,
-                pistol_range,
-                pistol_piercing
-            );
+        weapon_hitscan(
+            pistol_damage,
+            pistol_range,
+            pistol_piercing
+        );
 
-            weapon_fire_timer =
-                pistol_cooldown;
+        weapon_fire_timer = pistol_cooldown;
+    }
+}
+else if (weapon_type == "sword")
+{
+    // One slash for each left click, like the old Q press.
+    if (mouse_check_button_pressed(mb_left))
+    {
+        var slash_dir = sign(image_xscale);
+
+        if (slash_dir == 0)
+        {
+            slash_dir = 1;
         }
+
+        var slash = instance_create_depth(
+            x + (40 * slash_dir),
+            y,
+            depth - 1,
+            oSlashEffect
+        );
+
+        slash.image_xscale = slash_dir;
     }
 }
 
@@ -2234,4 +2242,29 @@ if (place_meeting(x, y, oEnemyParent)  && dmg_cooldown =0)
 }
 if(pHP <= 0)
 {instance_destroy();
+}
+// =====================================
+//TRAP KNOCKBACK 
+// =====================================
+
+if (variable_instance_exists(id, "trap_bounce_pending"))
+{
+    if (trap_bounce_pending)
+    {
+        is_slamming = false;
+        phy_speed_y = -trap_bounce_speed;
+        trap_bounce_pending = false;
+    }
+}
+
+if (variable_instance_exists(id, "trap_knockback_timer"))
+{
+    if (trap_knockback_timer > 0)
+    {
+        phy_speed_x = trap_knockback_speed_x;
+        trap_knockback_timer = max(
+            0,
+            trap_knockback_timer - delta_time / 1000000
+        );
+    }
 }
