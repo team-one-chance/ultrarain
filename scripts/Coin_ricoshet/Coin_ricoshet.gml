@@ -49,15 +49,8 @@ function coin_ricochet(
     var _current_damage =
         _damage;
 
-	var _shot_count = 1;
-
-	var _perfect_threshold = 0.05;
-
-    var _last_x =
-        _coin.x;
-
-    var _last_y =
-        _coin.y;
+    var _perfect_threshold =
+        0.05;
 
 
     // =====================================
@@ -66,41 +59,37 @@ function coin_ricochet(
 
     while (instance_exists(_current_coin))
     {
-        // Remember this coin's position.
-        _last_x =
+        var _last_x =
             _current_coin.x;
 
-        _last_y =
+        var _last_y =
             _current_coin.y;
 
 
-	// =================================
-	// APEX SHOT MULTIPLIER
-	// =================================
+        // =================================
+        // THIS COIN'S SHOT COUNT
+        // =================================
 
-	var _coin_y_speed =
-	  abs(_current_coin.phy_speed_y);
+        var _coin_shot_count = 1;
 
-
-	// PERFECT APEX
-	// Extremely close to zero vertical speed.
-	if (_coin_y_speed <= _perfect_threshold)
-	{
-		_shot_count =
-		  max(_shot_count, 4);
-
-		// Flash screen for perfect apex.
-		perfect_apex_flash_timer =
-		perfect_apex_flash_duration;
-	}
+        var _coin_y_speed =
+            abs(_current_coin.phy_speed_y);
 
 
-	// NORMAL APEX WINDOW
-	else if (_coin_y_speed <= _split_threshold)
-	{
-	 _shot_count =
-		 max(_shot_count, 2);
-	}
+        // PERFECT APEX
+        if (_coin_y_speed <= _perfect_threshold)
+        {
+            _coin_shot_count = 4;
+
+            perfect_apex_flash_timer =
+                perfect_apex_flash_duration;
+        }
+
+        // NORMAL APEX
+        else if (_coin_y_speed <= _split_threshold)
+        {
+            _coin_shot_count = 2;
+        }
 
 
         // =================================
@@ -113,10 +102,15 @@ function coin_ricochet(
         show_debug_message(
             "COIN CHAIN | damage="
             + string(_current_damage)
+            + " | shots="
+            + string(_coin_shot_count)
         );
 
 
-        // Remove current coin from available list.
+        // =================================
+        // REMOVE CURRENT COIN FROM LIST
+        // =================================
+
         var _current_index =
             ds_list_find_index(
                 _coins,
@@ -181,15 +175,345 @@ function coin_ricochet(
         }
 
 
-        // Current coin has been consumed.
+        // =================================
+        // DECIDE HOW MANY SHOTS HIT ENEMIES
+        // =================================
+
+        var _enemy_shot_count =
+            _coin_shot_count;
+
+
+        // One shot is reserved for continuing
+        // the chain into the next coin.
+        if (_next_coin != noone)
+        {
+            _enemy_shot_count -= 1;
+        }
+
+
+        // =====================================
+        // FIRE THIS COIN'S ENEMY SHOTS
+        // =====================================
+
+        if (_enemy_shot_count > 0)
+        {
+            var _shot_targets =
+                array_create(
+                    _enemy_shot_count,
+                    noone
+                );
+
+            var _shot_x =
+                array_create(
+                    _enemy_shot_count,
+                    _last_x
+                );
+
+            var _shot_y =
+                array_create(
+                    _enemy_shot_count,
+                    _last_y
+                );
+
+
+            var _used_targets =
+                ds_list_create();
+
+
+            // =================================
+            // CHOOSE ALL TARGETS FIRST
+            // =================================
+
+            for (
+                var shot_index = 0;
+                shot_index < _enemy_shot_count;
+                shot_index++
+            )
+            {
+                var _target =
+                    noone;
+
+                var _target_distance =
+                    _range + 1;
+
+                var _enemy_count =
+                    instance_number(
+                        oEnemyParent
+                    );
+
+
+                // =============================
+                // FIRST PASS:
+                // UNUSED ENEMIES
+                // =============================
+
+                for (
+                    var i = 0;
+                    i < _enemy_count;
+                    i++
+                )
+                {
+                    var _enemy =
+                        instance_find(
+                            oEnemyParent,
+                            i
+                        );
+
+                    if (!instance_exists(_enemy))
+                    {
+                        continue;
+                    }
+
+
+                    if (
+                        ds_list_find_index(
+                            _used_targets,
+                            _enemy
+                        )
+                        != -1
+                    )
+                    {
+                        continue;
+                    }
+
+
+                    var _distance =
+                        point_distance(
+                            _last_x,
+                            _last_y,
+                            _enemy.x,
+                            _enemy.y
+                        );
+
+
+                    if (
+                        _distance < _target_distance
+                        && _distance <= _range
+                    )
+                    {
+                        _target_distance =
+                            _distance;
+
+                        _target =
+                            _enemy;
+                    }
+                }
+
+
+                // =============================
+                // SECOND PASS:
+                // REUSE NEAREST ENEMY
+                // =============================
+
+                if (_target == noone)
+                {
+                    _target_distance =
+                        _range + 1;
+
+
+                    for (
+                        var i = 0;
+                        i < _enemy_count;
+                        i++
+                    )
+                    {
+                        var _enemy =
+                            instance_find(
+                                oEnemyParent,
+                                i
+                            );
+
+                        if (!instance_exists(_enemy))
+                        {
+                            continue;
+                        }
+
+
+                        var _distance =
+                            point_distance(
+                                _last_x,
+                                _last_y,
+                                _enemy.x,
+                                _enemy.y
+                            );
+
+
+                        if (
+                            _distance < _target_distance
+                            && _distance <= _range
+                        )
+                        {
+                            _target_distance =
+                                _distance;
+
+                            _target =
+                                _enemy;
+                        }
+                    }
+                }
+
+
+                if (_target == noone)
+                {
+                    continue;
+                }
+
+
+                if (
+                    ds_list_find_index(
+                        _used_targets,
+                        _target
+                    )
+                    == -1
+                )
+                {
+                    ds_list_add(
+                        _used_targets,
+                        _target
+                    );
+                }
+
+
+                // =============================
+                // DIFFERENT VISUAL HIT POINTS
+                // =============================
+
+                var _fraction_x =
+                    (shot_index + 1)
+                    / (_enemy_shot_count + 1);
+
+                var _fraction_y;
+
+                if ((shot_index mod 2) == 0)
+                {
+                    _fraction_y = 0.35;
+                }
+                else
+                {
+                    _fraction_y = 0.65;
+                }
+
+
+                _shot_targets[shot_index] =
+                    _target;
+
+                _shot_x[shot_index] =
+                    lerp(
+                        _target.bbox_left,
+                        _target.bbox_right,
+                        _fraction_x
+                    );
+
+                _shot_y[shot_index] =
+                    lerp(
+                        _target.bbox_top,
+                        _target.bbox_bottom,
+                        _fraction_y
+                    );
+            }
+
+
+            // =================================
+            // FIRE PREPARED ENEMY SHOTS
+            // =================================
+
+            for (
+                var shot_index = 0;
+                shot_index < _enemy_shot_count;
+                shot_index++
+            )
+            {
+                var _target =
+                    _shot_targets[shot_index];
+
+                if (_target == noone)
+                {
+                    continue;
+                }
+
+
+                var _enemy_visual =
+                    instance_create_layer(
+                        0,
+                        0,
+                        "Instances",
+                        o_HitscanVisual
+                    );
+
+                _enemy_visual.line_x1 =
+                    _last_x;
+
+                _enemy_visual.line_y1 =
+                    _last_y;
+
+                _enemy_visual.line_x2 =
+                    _shot_x[shot_index];
+
+                _enemy_visual.line_y2 =
+                    _shot_y[shot_index];
+
+
+                // Target may already have died from
+                // one of the other split shots.
+                if (instance_exists(_target))
+                {
+                    _target.take_damage(
+                        _current_damage
+                    );
+                }
+            }
+
+
+            ds_list_destroy(
+                _used_targets
+            );
+        }
+
+
+        // =====================================
+        // CONTINUE INTO NEXT COIN
+        // =====================================
+
+        if (_next_coin != noone)
+        {
+            var _next_x =
+                _next_coin.x;
+
+            var _next_y =
+                _next_coin.y;
+
+
+            var _chain_visual =
+                instance_create_layer(
+                    0,
+                    0,
+                    "Instances",
+                    o_HitscanVisual
+                );
+
+            _chain_visual.line_x1 =
+                _last_x;
+
+            _chain_visual.line_y1 =
+                _last_y;
+
+            _chain_visual.line_x2 =
+                _next_x;
+
+            _chain_visual.line_y2 =
+                _next_y;
+        }
+
+
+        // Current coin has now been consumed.
         instance_destroy(
             _current_coin
         );
 
 
-        // =================================
-        // NO MORE COINS
-        // =================================
+        // =====================================
+        // END OR CONTINUE CHAIN
+        // =====================================
 
         if (_next_coin == noone)
         {
@@ -200,32 +524,6 @@ function coin_ricochet(
         }
 
 
-        // =================================
-        // DRAW COIN -> COIN SHOT
-        // =================================
-
-        var _chain_visual =
-            instance_create_layer(
-                0,
-                0,
-                "Instances",
-                o_HitscanVisual
-            );
-
-        _chain_visual.line_x1 =
-            _last_x;
-
-        _chain_visual.line_y1 =
-            _last_y;
-
-        _chain_visual.line_x2 =
-            _next_coin.x;
-
-        _chain_visual.line_y2 =
-            _next_coin.y;
-
-
-        // Continue through next coin.
         _current_coin =
             _next_coin;
     }
@@ -234,295 +532,4 @@ function coin_ricochet(
     ds_list_destroy(
         _coins
     );
-
-
-// =====================================
-// FINAL ENEMY SHOTS
-// =====================================
-
-// _shot_count should already be:
-// 1 = normal coin
-// 2 = apex
-// 4 = perfect apex
-
-
-// =====================================
-// PREPARE SHOTS
-// =====================================
-
-var _shot_targets =
-    array_create(_shot_count, noone);
-
-var _shot_x =
-    array_create(_shot_count, _last_x);
-
-var _shot_y =
-    array_create(_shot_count, _last_y);
-
-
-// Try to spread shots across different enemies first.
-var _used_targets =
-    ds_list_create();
-
-
-// =====================================
-// CHOOSE EVERY TARGET BEFORE DAMAGE
-// =====================================
-
-for (
-    var shot_index = 0;
-    shot_index < _shot_count;
-    shot_index++
-)
-{
-    var _target = noone;
-    var _target_distance = _range + 1;
-
-    var _enemy_count =
-        instance_number(oEnemyParent);
-
-
-    // =================================
-    // FIRST PASS:
-    // FIND UNUSED ENEMY
-    // =================================
-
-    for (
-        var i = 0;
-        i < _enemy_count;
-        i++
-    )
-    {
-        var _enemy =
-            instance_find(
-                oEnemyParent,
-                i
-            );
-
-        if (!instance_exists(_enemy))
-        {
-            continue;
-        }
-
-
-        // Prefer an enemy that hasn't
-        // received one of the split rays yet.
-        if (
-            ds_list_find_index(
-                _used_targets,
-                _enemy
-            )
-            != -1
-        )
-        {
-            continue;
-        }
-
-
-        var _distance =
-            point_distance(
-                _last_x,
-                _last_y,
-                _enemy.x,
-                _enemy.y
-            );
-
-
-        if (
-            _distance < _target_distance
-            && _distance <= _range
-        )
-        {
-            _target_distance =
-                _distance;
-
-            _target =
-                _enemy;
-        }
-    }
-
-
-    // =================================
-    // SECOND PASS:
-    // ALL ENEMIES ALREADY USED
-    // =================================
-
-    // Not enough enemies for every ray.
-    // Reuse the nearest enemy.
-    if (_target == noone)
-    {
-        _target_distance =
-            _range + 1;
-
-
-        for (
-            var i = 0;
-            i < _enemy_count;
-            i++
-        )
-        {
-            var _enemy =
-                instance_find(
-                    oEnemyParent,
-                    i
-                );
-
-            if (!instance_exists(_enemy))
-            {
-                continue;
-            }
-
-
-            var _distance =
-                point_distance(
-                    _last_x,
-                    _last_y,
-                    _enemy.x,
-                    _enemy.y
-                );
-
-
-            if (
-                _distance < _target_distance
-                && _distance <= _range
-            )
-            {
-                _target_distance =
-                    _distance;
-
-                _target =
-                    _enemy;
-            }
-        }
-    }
-
-
-    // No enemies at all.
-    if (_target == noone)
-    {
-        continue;
-    }
-
-
-    // Remember that this enemy received a ray.
-    if (
-        ds_list_find_index(
-            _used_targets,
-            _target
-        )
-        == -1
-    )
-    {
-        ds_list_add(
-            _used_targets,
-            _target
-        );
-    }
-
-
-    // =================================
-    // DIFFERENT VISUAL HIT POSITION
-    // =================================
-
-    // Spread rays across different parts
-    // of the enemy's collision box.
-
-    var _fraction_x =
-        (shot_index + 1)
-        / (_shot_count + 1);
-
-    var _fraction_y;
-
-    if ((shot_index mod 2) == 0)
-    {
-        _fraction_y = 0.35;
-    }
-    else
-    {
-        _fraction_y = 0.65;
-    }
-
-
-    _shot_targets[shot_index] =
-        _target;
-
-    _shot_x[shot_index] =
-        lerp(
-            _target.bbox_left,
-            _target.bbox_right,
-            _fraction_x
-        );
-
-    _shot_y[shot_index] =
-        lerp(
-            _target.bbox_top,
-            _target.bbox_bottom,
-            _fraction_y
-        );
-}
-
-
-// =====================================
-// FIRE ALL PREPARED SHOTS
-// =====================================
-
-for (
-    var shot_index = 0;
-    shot_index < _shot_count;
-    shot_index++
-)
-{
-    var _target =
-        _shot_targets[shot_index];
-
-
-    if (_target == noone)
-    {
-        continue;
-    }
-
-
-    // =================================
-    // VISUAL
-    // =================================
-
-    var _final_visual =
-        instance_create_layer(
-            0,
-            0,
-            "Instances",
-            o_HitscanVisual
-        );
-
-    _final_visual.line_x1 =
-        _last_x;
-
-    _final_visual.line_y1 =
-        _last_y;
-
-    _final_visual.line_x2 =
-        _shot_x[shot_index];
-
-    _final_visual.line_y2 =
-        _shot_y[shot_index];
-
-
-    // =================================
-    // DAMAGE
-    // =================================
-
-    // Target may have died from a previous
-    // ray, but the remaining visuals still fire.
-    if (instance_exists(_target))
-    {
-        _target.take_damage(
-            _current_damage
-        );
-    }
-}
-
-
-ds_list_destroy(
-    _used_targets
-);
 }

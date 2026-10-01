@@ -10,8 +10,8 @@
   "name":"o_Block_scary",
   "overriddenProperties":[],
   "parent":{
-    "name":"Player&Player relevant",
-    "path":"folders/Objects/Player&Player relevant.yy",
+    "name":"Walls_und_Doors",
+    "path":"folders/Objects/Walls_und_Doors.yy",
   },
   "parentObjectId":null,
   "persistent":false,
