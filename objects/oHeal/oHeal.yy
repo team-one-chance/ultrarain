@@ -10,8 +10,8 @@
   "name":"oHeal",
   "overriddenProperties":[],
   "parent":{
-    "name":"Player&Player relevant",
-    "path":"folders/Objects/Player&Player relevant.yy",
+    "name":"LE_ITEMSSSSS",
+    "path":"folders/Objects/LE_ITEMSSSSS.yy",
   },
   "parentObjectId":null,
   "persistent":false,
