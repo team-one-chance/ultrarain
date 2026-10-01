@@ -1,3 +1,4 @@
+left_order = [0, 1, 2, 3];
 controller_state = 0;
 // 0 = intact, 1 = broken, 2 = hacking
 

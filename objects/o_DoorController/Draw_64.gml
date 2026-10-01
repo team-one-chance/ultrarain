@@ -74,11 +74,11 @@ if (controller_state == 2)
         var _left_color = c_gray;
         var _right_color = c_gray;
 
-        if (wire_flash_time > 0)
-        {
-            _left_color = wire_colors[i];
-            _right_color = wire_colors[right_order[i]];
-        }
+if (wire_flash_time > 0)
+{
+    _left_color = wire_colors[left_order[i]];
+    _right_color = wire_colors[right_order[i]];
+}
 
         draw_set_color(_left_color);
         draw_circle(_left_x, _left_y, 8, false);
