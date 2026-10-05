@@ -326,3 +326,57 @@ miniboss_damage_player = function(_target, _damage)
         miniboss_player_damage_warning_shown = true;
     }
 };
+
+// =====================================
+// SLAM TUNING AND SHIELD RESPONSE
+// =====================================
+slam_knockback_multiplier = 0.35;
+slam_knockback_duration = 0.16;
+slam_stun_duration = 0.2;
+slam_shield_damage_multiplier = 1;
+phase2_slam_damage_multiplier = 1;
+
+slam_interrupt = function()
+{
+    path_end();
+    miniboss_state = 0;
+    miniboss_timer = 0;
+    leap_horizontal_speed = 0;
+    leap_aim_locked = false;
+    leap_left_ground = false;
+    stand_pacing = false;
+    vertical_speed = 0;
+    if (attack_state != 5) attack_state = 0;
+};
+
+// Slam is its own hit type: no bullet/sword/beam multiplier or sword parry.
+// Crowd control is independent of shield absorption.
+slam_damage = function(_damage, _impact_x, _source)
+{
+    if (_damage <= 0) return;
+
+    var centre_x = (bbox_left + bbox_right) * 0.5;
+    var side = sign(_impact_x - centre_x);
+    var back_hit = side == -facing_direction;
+
+    if (shield_hp > 0 && !back_hit)
+    {
+        var shield_damage = _damage * slam_shield_damage_multiplier;
+        shield_hp = max(0, shield_hp - shield_damage);
+        defend_sprite_timer = 0;
+        hit_timer = hit_duration;
+
+        if (shield_hp <= 0)
+        {
+            stand_sprite = stand_sprite_no_shield;
+            normal_attack = normal_attack_no_shield;
+        }
+        show_debug_message("MiniBoss slam | Shield HP: " + string(shield_hp));
+        return; // The breaking hit is absorbed by the shield, like weapon hits.
+    }
+
+    if (shield_hp <= 0) _damage *= phase2_slam_damage_multiplier;
+    if (back_hit) _damage *= back_damage_multiplier;
+    defend_sprite_timer = 0;
+    miniboss_parent_take_damage(_damage, 0, 0, false);
+};

@@ -1,3 +1,8 @@
+slam_cooldown_timer = max(
+    0,
+    slam_cooldown_timer - delta_time / 1000000
+);
+
 // =====================================
 // KEEP PLAYER UPRIGHT
 // =====================================
@@ -810,7 +815,8 @@ if (!facing_locked)
 // Slam only while airborne and not mantling
 if (!on_ground
 && !is_slamming
-&& !is_ledge_climbing)
+&& !is_ledge_climbing
+&& slam_cooldown_timer <= 0)
 {
     if (keyboard_check_pressed(ord("S"))
 || keyboard_check_pressed(vk_down))
@@ -1632,174 +1638,36 @@ else if (!on_ground
 // =====================================
 // SLAM IMPACT
 // =====================================
-
 if (on_ground && is_slamming)
 {
-    var _impact_x = x;
-    var _impact_y = y;
+    var impact_power = clamp(slam_power, 1, slam_power_max);
 
-    // =================================
-    // SLAM STATS
-    // =================================
-
-    var _slam_damage =
-        slam_base_damage
-        * slam_power;
-
-    // Radius grows slower than damage.
-    var _slam_radius =
-        slam_base_radius
-        * sqrt(slam_power);
-
-    // Knockback grows with power, but not
-    // nearly as violently as damage.
-    var _slam_knockback =
-        4
-        + sqrt(slam_power) * 3;
-
-    // Stronger slams stun longer.
-    var _slam_stun =
-        min(
-            4,
-            0.4
-            + sqrt(slam_power) * 0.18
-        );
-
-
-    // =================================
-    // HIT ALL ENEMIES IN RADIUS
-    // =================================
-
-    with (oEnemyParent)
-    {
-        var _dist =
-            point_distance(
-                x,
-                y,
-                _impact_x,
-                _impact_y
-            );
-
-        if (_dist <= _slam_radius)
-        {
-            // -------------------------
-            // DAMAGE FALLOFF
-            // -------------------------
-
-            var _falloff =
-                1 - (_dist / _slam_radius);
-
-            var _damage =
-                _slam_damage
-                * max(
-                    0.25,
-                    _falloff
-                );
-
-
-            // -------------------------
-            // KNOCKBACK DIRECTION
-            // -------------------------
-
-            var _dir;
-
-            if (x < _impact_x)
-            {
-                // Up + left
-                _dir = 150;
-            }
-            else
-            {
-                // Up + right
-                _dir = 30;
-            }
-
-
-            // -------------------------
-            // DAMAGE + KNOCKBACK
-            // -------------------------
-
-            take_damage(
-                _damage,
-                _dir,
-                _slam_knockback,
-                false
-            );
-
-
-            // -------------------------
-            // STUN
-            // -------------------------
-
-            attack_state = 5;
-
-            stun_timer =
-                max(
-                    stun_timer,
-                    _slam_stun
-                );
-
-            path_end();
-
-            attack_shake_x = 0;
-            attack_shake_y = 0;
-        }
-    }
-
-
-    // =================================
-    // PLACEHOLDER SHOCKWAVE VFX
-    // =================================
-
-// Tiny slams don't create a shockwave.
-var _ring_size = 0;
-
-if (_slam_radius >= 40)
-{
-    _ring_size = 1;
-
-    if (_slam_radius >= 125)
-    {
-        _ring_size = 2;
-    }
-
-    show_debug_message(
-        "SLAM RING | radius="
-        + string(_slam_radius)
-        + " | size="
-        + string(_ring_size)
+    var impact_damage = min(
+        slam_max_damage,
+        slam_base_damage * power(impact_power, slam_damage_power_exponent)
     );
 
-    effect_create_depth(
-        depth - 1,
-        ef_ring,
-        _impact_x,
-        _impact_y,
-        _ring_size,
-        c_white
+    var impact_radius = min(
+        slam_max_radius,
+        slam_base_radius * power(impact_power, slam_radius_power_exponent)
     );
-}
 
-
-    // =================================
-    // RESET SLAM
-    // =================================
+    var impact_speed = min(
+        slam_max_knockback_speed,
+        slam_base_knockback_speed * power(impact_power, slam_knockback_power_exponent)
+    );
 
     is_slamming = false;
+	slam_cooldown_timer = slam_cooldown;
+    slam_apply(x, y, impact_radius, impact_damage, impact_speed, id);
+
+    var slam_fx = instance_create_depth(x, y, depth - 10, oSlamVFX);
+    slam_fx.start_slam_vfx(impact_radius, impact_power);
 
     slam_distance = 0;
     slam_power = 1;
     slam_last_y = phy_position_y;
 }
-
-// =====================================
-// MELEE ATTACK - RIGHT MOUSE
-// =====================================
-
-
-// =====================================
-// WEAPON SYSTEM
-// =====================================
 
 // =====================================
 // WEAPON SYSTEM
@@ -1816,6 +1684,14 @@ if (keyboard_check_pressed(ord("2")))
 }
 
 if (weapon_fire_timer > 0)
+{
+    weapon_fire_timer -= delta_time / 1000000;
+
+    if (weapon_fire_timer < 0)
+    {
+        weapon_fire_timer = 0;
+    }
+}
 
 // =====================================
 // PERFECT APEX FLASH TIMER
