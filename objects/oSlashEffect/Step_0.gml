@@ -60,6 +60,31 @@ enemy.take_damage(
 
 ds_list_destroy(hits);
 
+var _blocks = ds_list_create();
+
+collision_rectangle_list(
+    bbox_left,
+    bbox_top,
+    bbox_right,
+    bbox_bottom,
+    o_Block_Breakable,
+    false,
+    true,
+    _blocks,
+    false
+);
+
+for (var b = 0; b < ds_list_size(_blocks); b++)
+{
+    var _block = _blocks[| b];
+
+    if (instance_exists(_block))
+    {
+        _block.take_damage(slash_damage);
+    }
+}
+
+ds_list_destroy(_blocks);
 
 // =====================================
 // DESTROY SLASH

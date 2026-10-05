@@ -208,7 +208,7 @@ var shoot_direction = aim_angle;
             check_x,
             check_y,
 
-            [oEnemyParent, o_Block, o_Coin, o_SecurityCamera, o_Door_Brekable, o_Chute_Brekable],
+            [oEnemyParent, o_Block, o_Coin, o_SecurityCamera, o_Door_Breakable, o_Chute_Breakable],
 
             false,
             true,
@@ -253,6 +253,12 @@ if (instance_exists(inst)
 
             // First time encountering this object
             ds_list_add(already_hit, inst);
+			// Breakable blocks are already detected through parent o_Block.
+if (instance_exists(inst)
+&& inst.object_index == o_Block_Breakable)
+{
+    inst.take_damage(_damage);
+}
 
 // =================================
 // COIN

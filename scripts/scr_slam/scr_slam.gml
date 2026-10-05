@@ -1,4 +1,3 @@
-/// Call once when the player's slam lands. Radius is measured to enemy masks' bounding boxes.
 function slam_apply(_x, _y, _radius, _damage, _speed, _source)
 {
     with (oEnemyParent)
@@ -9,6 +8,17 @@ function slam_apply(_x, _y, _radius, _damage, _speed, _source)
         if (point_distance(_x, _y, nearest_x, nearest_y) <= _radius)
         {
             take_slam(_damage, _speed, _x, _y, _source);
+        }
+    }
+
+    with (o_Block_Breakable)
+    {
+        var nearest_x = clamp(_x, bbox_left, bbox_right);
+        var nearest_y = clamp(_y, bbox_top, bbox_bottom);
+
+        if (point_distance(_x, _y, nearest_x, nearest_y) <= _radius)
+        {
+            take_damage(_damage);
         }
     }
 }

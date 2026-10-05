@@ -30,6 +30,42 @@ var sweep_right  = max(old_right,  old_right  + move_x);
 var sweep_bottom = max(old_bottom, old_bottom + move_y);
 
 
+
+var _blocks = ds_list_create();
+
+collision_rectangle_list(
+    sweep_left,
+    sweep_top,
+    sweep_right,
+    sweep_bottom,
+    o_Block_Breakable,
+    false,
+    true,
+    _blocks,
+    false
+);
+
+var _hit_block = false;
+
+for (var b = 0; b < ds_list_size(_blocks); b++)
+{
+    var _block = _blocks[| b];
+
+    if (instance_exists(_block) && beam_damage > 0)
+    {
+        _hit_block = true;
+        _block.take_damage(beam_damage);
+    }
+}
+
+ds_list_destroy(_blocks);
+
+if (_hit_block)
+{
+    instance_destroy();
+    exit;
+}
+
 // =====================================
 // STOP AT WALLS
 // =====================================
