@@ -6,14 +6,14 @@
 // =====================================
 
 var dt = delta_time / 1000000;
-
+var slam_locked = enemy_slam_step(dt);
 var player = instance_nearest(
     x,
     y,
     o_Player
 );
 
-if (player != noone)
+if (player != noone && !slam_locked)
 {
     // Position the drone initially approaches
     var approach_x = player.x;
@@ -295,7 +295,7 @@ if (shoot_timer > 0)
 
 var shoot_player = instance_nearest(x, y, o_Player);
 
-if (shoot_player != noone && shoot_timer <= 0)
+if (shoot_player != noone && shoot_timer <= 0 && !slam_locked)
 {
     var bullet = instance_create_depth(
         x,

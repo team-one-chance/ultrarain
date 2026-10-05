@@ -1,5 +1,6 @@
 
 var dt = delta_time / 1000000;
+var slam_locked = enemy_slam_step(dt);
 
 if (post_climb_attack_timer > 0)
 {
@@ -14,7 +15,11 @@ if (post_climb_attack_timer > 0)
 // KNOCKBACK
 // =====================================
 
-if (knockback_timer > 0)
+if (slam_locked)
+{
+    // Slam movement already ran. Skip normal AI this frame.
+}
+else if (knockback_timer > 0)
 {
     path_end();
     is_climbing = false;
@@ -785,6 +790,10 @@ if (hit_timer > 0)
 {
     hit_timer -= dt;
     sprite_index = hit_sprite;
+}
+else if (slam_locked)
+{
+    sprite_index = stun_sprite;
 }
 else if (attack_state == 5)
 {
