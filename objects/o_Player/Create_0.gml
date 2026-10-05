@@ -8,6 +8,12 @@ pHP = pHP_max;
 dmg_cooldown = 0;
 
 // =====================================
+// COIN GUI
+// =====================================
+coin_max = 4;
+coin_count = coin_max;
+
+// =====================================
 // MOVEMENT
 // =====================================
 move_speed = 4.4;
@@ -94,7 +100,7 @@ slam_knockback_power_exponent = 0.5;
 // =====================================
 // SLAM COOLDOWN
 // =====================================
-slam_cooldown = 1.0; // Seconds between slams.
+slam_cooldown = 1; // Seconds between slams.
 slam_cooldown_timer = 0;
 
 // =====================================
@@ -200,7 +206,7 @@ knockback_apply = enemy_knock;
 // Pistol properties
 pistol_damage = 10;
 pistol_range = 2000;
-pistol_cooldown = 0.45;
+pistol_cooldown = 0.2;
 pistol_piercing = 0;
 
 // Shooting timer

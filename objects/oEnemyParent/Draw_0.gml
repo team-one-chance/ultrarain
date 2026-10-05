@@ -24,14 +24,17 @@ draw_sprite_ext(
 
 var bar_width = 40;
 var bar_height = 5;
+var bar_gap = 8;
 
-var bar_x = x - (bar_width / 2);
-var bar_y = y - 35;
+// Centre horizontally over the enemy.
+var bar_x = (bbox_left + bbox_right) * 0.5
+    - bar_width * 0.5;
 
-var hp_percent = ehp / ehp_max;
+// Position above the enemy.
+var bar_y = bbox_top - bar_height - bar_gap;
 
-hp_percent = clamp(hp_percent, 0, 1);
-
+var hp_percent = clamp(ehp / ehp_max, 0, 1);
+var old_colour = draw_get_color();
 
 // Background
 draw_set_color(c_black);
@@ -44,18 +47,18 @@ draw_rectangle(
     false
 );
 
-
-// HP
+// Remaining HP
 draw_set_color(c_red);
 
 draw_rectangle(
     bar_x,
     bar_y,
-    bar_x + (bar_width * hp_percent),
+    bar_x + bar_width * hp_percent,
     bar_y + bar_height,
     false
 );
 
+draw_set_color(old_colour);
 
 // Reset
 draw_set_color(c_white);
