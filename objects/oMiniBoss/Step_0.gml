@@ -1,4 +1,8 @@
 var dt = delta_time / 1000000;
+// Capture this before inherited Step decrements the timers.
+var slam_locked = slam_stun_timer > 0 || slam_knockback_timer > 0;
+// Parent Step has no hit-sprite/timer processing in the supplied version.
+hit_timer = max(0, hit_timer - dt);
 
 if (defend_sprite_timer > 0)
 {
@@ -19,7 +23,7 @@ leap_cooldown = max(
 );
 
 // Knockback and the parent's stun cancel a mini-boss attack.
-if (knockback_timer > 0 || attack_state == 5)
+if (slam_locked || knockback_timer > 0 || attack_state == 5)
 {
     miniboss_state = 0;
     miniboss_timer = 0;
@@ -33,7 +37,8 @@ if (knockback_timer > 0 || attack_state == 5)
 var nearby_player = instance_nearest(x, y, o_Player);
 var nearby_body_center_x = (bbox_left + bbox_right) * 0.5;
 var ready_to_pace =
-    miniboss_state == 0
+    !slam_locked
+    && miniboss_state == 0
     && nearby_player != noone
     && attack_state != 5
     && knockback_timer <= 0
@@ -94,7 +99,7 @@ normal_sprite = vertical_speed >= 0
 
 // Follow the player's X while rising. Commit to the last observed X
 // once descent begins, leaving a chance to dodge the slam.
-if (miniboss_state == 3 && attack_state != 5)
+if (!slam_locked && miniboss_state == 3 && attack_state != 5)
 {
     if (!leap_aim_locked)
     {
@@ -193,7 +198,7 @@ else
     stand_attack_turn_timer = stand_attack_turn_delay;
 }
 
-if (attack_state == 5 || knockback_timer > 0)
+if (slam_locked || attack_state == 5 || knockback_timer > 0)
 {
     // Parent stun and knockback keep control this frame.
 }
@@ -464,9 +469,9 @@ else
 
 // The parent's Step event chooses hit/stun/normal sprites.
 // Set the sprite once when an attack starts in this frame.
-if (attack_state == 5)
+if (slam_locked || attack_state == 5)
 {
-    // Keep the parent's stunned sprite selection.
+    sprite_index = stun_sprite;
 }
 else if (defend_sprite_timer > 0)
 {
@@ -474,7 +479,7 @@ else if (defend_sprite_timer > 0)
 }
 else if (hit_timer > 0)
 {
-    // Keep the parent's hit sprite selection.
+    sprite_index = hit_sprite;
 }
 else if (miniboss_state == 1 || miniboss_state == 2)
 {

@@ -47,3 +47,13 @@ ehp = ehp_max;
 //knockback_timer = 0;
 //knockback_x = 0;
 //knockback_y = 0;
+// SLAM TUNING
+slam_knockback_multiplier = 0.75;
+slam_knockback_duration = 0.18;
+slam_stun_duration = 0.4;
+
+slam_interrupt = function()
+{
+    path_end();
+    repath_timer = 0;
+};
