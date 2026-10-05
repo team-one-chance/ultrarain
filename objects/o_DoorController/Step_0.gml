@@ -233,7 +233,7 @@ if (controller_state == 2)
                 if (wire_connections[i] == -1
                 && point_distance(
                     _mx, _my, _left_x, _left_y
-                ) <= 10)
+                ) <= 26)
                 {
                     drag_wire = i;
                     break;
@@ -251,7 +251,7 @@ if (controller_state == 2)
 
                 if (point_distance(
                     _mx, _my, _right_x, _right_y
-                ) <= 12)
+                ) <= 26)
                 {
 // A right socket can only accept one wire.
 var _occupied = false;
