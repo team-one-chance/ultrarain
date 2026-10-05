@@ -39,11 +39,7 @@ var dt = delta_time / 1000000;
 var horizontal_follow_speed = 8;
 var vertical_follow_speed = 18;
 
-// Make the camera react faster during a slam
-if (o_Player.is_slamming)
-{
-    vertical_follow_speed = 40;
-}
+
 
 // Convert follow speeds into frame-independent smoothing
 var horizontal_strength = 1 - exp(-horizontal_follow_speed * dt);

@@ -1,11 +1,15 @@
 var dt = delta_time / 1000000;
-
+var parent_slam_locked = enemy_slam_step(dt);
 
 // =====================================
-// KNOCKBACK
+// KNOCKBACK //UNIQUE TO ENEMYTEMP
 // =====================================
 
-if (knockback_timer > 0)
+if (parent_slam_locked)
+{
+    // Slam movement already ran. Skip normal movement this frame.
+}
+else if (knockback_timer > 0)
 {
     path_end();
 
@@ -33,7 +37,7 @@ if (knockback_timer > 0)
 
 
 // =====================================
-// STUN
+// STUN //UNIQUE TO ENEMYTEMP
 // =====================================
 
 else if (attack_state == 5)
@@ -51,7 +55,7 @@ else if (attack_state == 5)
 
 
 // =====================================
-// NORMAL GROUND CHASE
+// NORMAL GROUND CHASE //VERY LIKELY GLOBAL 
 // =====================================
 
 else
@@ -98,7 +102,7 @@ else
 
 
 // =====================================
-// GRAVITY AND VERTICAL COLLISION
+// GRAVITY AND VERTICAL COLLISION //LIKELY UNIQUE TO ENEMYTEMP
 // =====================================
 
 is_grounded = place_meeting(
@@ -153,20 +157,3 @@ if (vertical_move != 0)
 }
 
 
-// =====================================
-// SPRITE STATE
-// =====================================
-
-if (hit_timer > 0)
-{
-    hit_timer -= dt;
-    sprite_index = hit_sprite;
-}
-else if (attack_state == 5)
-{
-    sprite_index = stun_sprite;
-}
-else
-{
-    sprite_index = normal_sprite;
-}
