@@ -10,6 +10,16 @@ slam_cooldown_timer = max(
 phy_fixed_rotation = true;
 
 // =====================================
+// o_Door exit
+// =====================================
+if (hacking_controller != noone)
+{
+    phy_speed_x = 0;
+    phy_speed_y = 0;
+    exit;
+}
+
+// =====================================
 // ACTIVE SPEED BOOST
 // =====================================
 
@@ -94,7 +104,7 @@ var left_wall_mid =
 var left_wall_upper =
     collision_point(
         x - 15,
-        y - 58,
+        y - 59,
         o_Block,
         false,
         true
@@ -125,7 +135,7 @@ var right_wall_mid =
 var right_wall_upper =
     collision_point(
         x + 15,
-        y - 58,
+        y - 59,
         o_Block,
         false,
         true
@@ -136,23 +146,23 @@ var right_wall_upper =
 // NORMAL WALL DETECTION
 // =====================================
 
-var touching_left_wall =
-    (left_wall_lower != noone && left_wall_upper != noone)
+var touching_left_wall = (left_wall_lower || left_wall_mid || left_wall_upper );
+    /*(left_wall_lower != noone && left_wall_upper != noone)
     ||
     (left_wall_lower != noone && left_wall_mid != noone)
     ||
     (left_wall_upper != noone && left_wall_mid != noone)
 	||
-	(left_wall_upper != noone);
+	(left_wall_upper != noone);*/
 
-var touching_right_wall =
-    (right_wall_lower != noone && right_wall_upper != noone)
+var touching_right_wall = (right_wall_lower || right_wall_mid || right_wall_upper );
+    /*(right_wall_lower != noone && right_wall_upper != noone)
     ||
     (right_wall_lower != noone && right_wall_mid != noone)
     ||
     (right_wall_upper != noone && right_wall_mid != noone)
 	||
-	(right_wall_upper != noone);
+	(right_wall_upper != noone);*/
 
 var touching_wall =
     touching_left_wall
@@ -1428,7 +1438,8 @@ var jump_pressed =
 
 
 if (jump_pressed
-&& !is_ledge_climbing)
+&& !is_ledge_climbing
+&& (!is_sliding || player_can_stand()))
 {
 // =================================
 // SLIDE DOUBLE JUMP
@@ -1676,12 +1687,18 @@ if (on_ground && is_slamming)
 if (keyboard_check_pressed(ord("1")))
 {
     weapon_type = "pistol";
+    sword_swing_timer = 0;
+    sword_swing_pending_hit = false;
 }
 
 if (keyboard_check_pressed(ord("2")))
 {
     weapon_type = "sword";
 }
+
+aim_rig_mode = (weapon_type == "sword")
+    ? AimRigMode.TWO_HANDED
+    : AimRigMode.ONE_HANDED;
 
 if (weapon_fire_timer > 0)
 {
@@ -1713,7 +1730,6 @@ if (perfect_apex_flash_timer > 0)
 // PRIMARY FIRE - LEFT MOUSE
 // =====================================
 
-if (mouse_check_button(mb_left))
 if (weapon_type == "pistol")
 {
     // Keep the existing hold-to-fire behaviour.
@@ -1730,24 +1746,37 @@ if (weapon_type == "pistol")
 }
 else if (weapon_type == "sword")
 {
-    // One slash for each left click, like the old Q press.
-    if (mouse_check_button_pressed(mb_left))
+    // Start one swing per click; release its hit at hit_phase.
+    if (mouse_check_button_pressed(mb_left) && sword_swing_timer <= 0)
     {
-        var slash_dir = sign(image_xscale);
+        sword_swing_timer = max(0.001, sword_config.swing_duration);
+        sword_swing_pending_hit = true;
+        sword_swing_facing = sign(image_xscale);
 
-        if (slash_dir == 0)
+        if (sword_swing_facing == 0)
         {
-            slash_dir = 1;
+            sword_swing_facing = 1;
         }
+    }
+
+    if (sword_swing_pending_hit
+        && 1 - sword_swing_timer / max(0.001, sword_config.swing_duration)
+            >= clamp(sword_config.hit_phase, 0, 1))
+    {
+        sword_swing_pending_hit = false;
 
         var slash = instance_create_depth(
-            x + (40 * slash_dir),
-            y,
+            x + sword_config.slash_forward * sword_swing_facing,
+            y + sword_config.slash_down,
             depth - 1,
             oSlashEffect
         );
 
-        slash.image_xscale = slash_dir;
+        slash.image_xscale = sword_swing_facing * sword_config.slash_scale;
+        slash.image_yscale = sword_config.slash_scale;
+        slash.duration = sword_config.slash_duration;
+        slash.slash_damage = sword_config.slash_damage;
+        slash.knockback_force = sword_config.slash_knockback;
     }
 }
 
@@ -1755,31 +1784,82 @@ else if (weapon_type == "sword")
 // =====================================
 // ALT FIRE - RIGHT MOUSE / THROW COIN
 // =====================================
-
-if (keyboard_check_pressed(vk_f3))
-{
-    repeat (100)
+timerf3 = timerf3 - delta_time / 1000000
+if (keyboard_check_pressed(vk_f3)) 
+{ 
+    // Only throw if we actually have a coin.
+    if (coin_count > 0)
     {
-        var _coin = instance_create_layer(
-            x + 12 * aim_facing + random_range(-3, 3),
-            y - 48 + random_range(-3, 3),
+		repeat(100)
+		if (timerf3 <=0) {
+        var coin = instance_create_layer(
+            x = x + 32,
+            y - 64,
             "Instances",
-            o_Coin
-        );
+            o_Coin, 
+			timerf3 = 0.001
+										);
 		
-		_coin.split_threshold =
+		coin.split_threshold =
 			coin_split_y_speed_threshold;
+			
+// =================================
+// COIN AGE / OWNER
+// =================================
 
-        var _angle = aim_angle + random_range(-65, 65);
-        var _speed = random_range(3, 9);
+coin_throw_serial += 1;
 
-        _coin.phy_speed_x =
-            phy_speed_x + lengthdir_x(_speed, _angle);
+coin.coin_owner = id;
+coin.throw_id = coin_throw_serial;
 
-        _coin.phy_speed_y =
-            phy_speed_y
-            + lengthdir_y(_speed, _angle)
-            - random_range(2, 5);
+coin.is_pinned = false;
+coin.pin_owner = noone;
+			
+			
+
+
+        // =================================
+        // AIM AT MOUSE
+        // =================================
+
+        var coin_throw_direction =
+            point_direction(
+                coin.x,
+                coin.y,
+                mouse_x,
+                mouse_y
+            );
+
+
+        // =================================
+        // INHERIT PLAYER MOMENTUM
+        // =================================
+
+        coin.phy_speed_x =
+            phy_speed_x;
+
+        coin.phy_speed_y =
+            phy_speed_y;
+
+
+        // =================================
+        // ADD THROW FORCE
+        // =================================
+
+        coin.phy_speed_x +=
+            lengthdir_x(
+                3,
+                coin_throw_direction
+            );
+
+        coin.phy_speed_y = -5;
+
+
+        // =================================
+        // CONSUME COIN
+        // =================================
+
+        coin_count -= 1;}
     }
 }
 

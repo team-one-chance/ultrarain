@@ -208,7 +208,7 @@ var shoot_direction = aim_angle;
             check_x,
             check_y,
 
-            [oEnemyParent, o_Block, o_Coin],
+            [oEnemyParent, o_Block, o_Coin, o_SecurityCamera],
 
             false,
             true,
@@ -224,6 +224,14 @@ var shoot_direction = aim_angle;
         for (var i = 0; i < ds_list_size(point_hits); i++)
         {
             var inst = point_hits[| i];
+			
+			// Broken cameras no longer stop bullets.
+			if (instance_exists(inst)
+			&& inst.object_index == o_SecurityCamera
+			&& inst.broken)
+			{
+			    continue;
+			}
 
 
             // Already passed through this object
@@ -257,6 +265,16 @@ if (instance_exists(inst)
     stopped = true;
 
     break;
+}
+
+// =================================
+// SECURITY CAMERA
+// =================================
+
+if (instance_exists(inst)
+&& inst.object_index == o_SecurityCamera)
+{
+    inst.camera_break();
 }
 
             // =================================
