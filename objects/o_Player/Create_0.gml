@@ -4,7 +4,7 @@ timerf3 = 0;
 // MOVEMENT
 // =====================================
 pHP= 100;
-pHP_max = 1000;
+pHP_max = 100;
 pHP = pHP_max;
 dmg_cooldown = 0;
 
@@ -14,6 +14,33 @@ dmg_cooldown = 0;
 
 slide_exit_timer = 0;
 slide_exit_delay = 0;
+
+medkit_owned = false;
+syringe_count = 0;
+syringe_max = 3;
+
+use_syringe = function(_revive)
+{
+    if (syringe_count <= 0) return false;
+    if (!_revive && (pHP <= 0 || pHP >= pHP_max)) return false;
+
+    syringe_count -= 1;
+
+    if (_revive)
+    {
+        pHP = pHP_max / 3;
+
+        // Brief protection after revival.
+        dmg_cooldown = max(dmg_cooldown, 1);
+    }
+    else
+    {
+        pHP = min(pHP_max, pHP + pHP_max / 3);
+    }
+
+    return true;
+};
+
 // =====================================
 // NORMAL JUMP
 // =====================================
@@ -245,7 +272,7 @@ weapon_type = "pistol";
 
 // Pistol properties
 pistol_damage = 10;
-pistol_range = 2000;
+pistol_range = 1111;
 pistol_cooldown = 0.45;
 pistol_piercing = 0;
 

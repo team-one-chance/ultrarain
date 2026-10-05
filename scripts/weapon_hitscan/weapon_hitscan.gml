@@ -208,7 +208,7 @@ var shoot_direction = aim_angle;
             check_x,
             check_y,
 
-            [oEnemyParent, o_Block, o_Coin, o_SecurityCamera],
+            [oEnemyParent, o_Block, o_Coin, o_SecurityCamera, o_Door_Brekable, o_Chute_Brekable],
 
             false,
             true,
@@ -224,6 +224,16 @@ var shoot_direction = aim_angle;
         for (var i = 0; i < ds_list_size(point_hits); i++)
         {
             var inst = point_hits[| i];
+			
+			// Broken doors no longer stop shots.
+if (instance_exists(inst)
+&& variable_instance_exists(inst, "door_take_damage"))
+{
+    if (inst.broken || inst.break_requested)
+    {
+        continue;
+    }
+}
 			
 			// Broken cameras no longer stop bullets.
 			if (instance_exists(inst)
@@ -275,6 +285,12 @@ if (instance_exists(inst)
 && inst.object_index == o_SecurityCamera)
 {
     inst.camera_break();
+}
+// Damage breakable doors and chutes once per shot.
+if (instance_exists(inst)
+&& variable_instance_exists(inst, "door_take_damage"))
+{
+    inst.door_take_damage(_damage);
 }
 
             // =================================

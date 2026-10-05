@@ -71,3 +71,24 @@ draw_text(
 
 // Reset
 draw_set_color(c_white);
+
+if (medkit_owned)
+{
+    draw_set_alpha(1);
+
+    for (var i = 0; i < syringe_max; i++)
+    {
+        var _sx = bar_x + 8 + i * 24;
+        var _sy = bar_y + bar_height + 36;
+
+        draw_set_color(i < syringe_count ? c_lime : c_dkgray);
+
+        // Plunger, body and needle.
+        draw_rectangle(_sx - 4, _sy, _sx + 4, _sy + 2, false);
+        draw_line(_sx, _sy + 2, _sx, _sy + 5);
+        draw_rectangle(_sx - 3, _sy + 5, _sx + 3, _sy + 17, false);
+        draw_line(_sx, _sy + 18, _sx, _sy + 24);
+    }
+
+    draw_set_color(c_white);
+}
