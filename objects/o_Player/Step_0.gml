@@ -1706,8 +1706,16 @@ if (weapon_fire_timer > 0)
 
     if (weapon_fire_timer < 0)
     {
-        weapon_fire_timer = 0;
+        perfe = 0;
     }
+}
+
+if (sword_swing_timer > 0)
+{
+    sword_swing_timer = max(
+        0,
+        sword_swing_timer - delta_time / 1000000
+    );
 }
 
 // =====================================

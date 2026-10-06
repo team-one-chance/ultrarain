@@ -70,8 +70,8 @@ hit_sprite = sEnemy_hit;
 // Keep it, adjust the step for enemytemp and then move it over to temp create
 // =====================================
 
-// Enter rocking when almost directly aligned with the player.
-attack_rock_enter_x_distance = 1;
+// Begin the bite approach within this distance.
+attack_rock_enter_x_distance = 48;
 
 // Leave rocking when the player moves this far away.
 attack_rock_exit_x_distance = 90;
@@ -171,7 +171,12 @@ attack_target_x = x;
 attack_shake_x = 0;
 attack_shake_y = 0;
 
+attack_shake_x = 0;
+attack_shake_y = 0;
+
+// =====================================
 // SLAM TUNING
+// =====================================
 slam_knockback_multiplier = 1;
 slam_knockback_duration = 0.22;
 slam_stun_duration = 0.5;
@@ -186,4 +191,62 @@ slam_interrupt = function()
     if (attack_state != 5) attack_state = 0;
     // Give the enemy a short pause before trying another charge.
     attack_cooldown = max(attack_cooldown, slam_stun_duration);
+};
+
+// =====================================
+// CROWD SPACING
+// =====================================
+crowd_spacing_enabled = true;
+
+// Minimum centre spacing; collision-box widths also set a lower limit.
+crowd_min_spacing = 1;
+
+// Extra space between enemy collision boxes.
+crowd_body_gap = 1;
+
+// Pixels per second. Keep above normal chase speed (currently 210).
+crowd_separation_speed = 420;
+
+// Compare feet so enemies on different floors do not repel each other.
+crowd_floor_tolerance = 12;
+crowd_spacing_paused = false;
+
+// Shared by the moving enemy and every neighbour it considers.
+// Attack states, bite movement, climbing and knockback have priority.
+crowd_can_separate = function()
+{
+    return crowd_spacing_enabled
+        && attack_state == 0
+        && !attack_rocking
+        && !is_climbing
+        && knockback_timer <= 0
+        && slam_knockback_timer <= 0
+        && slam_stun_timer <= 0
+        && post_climb_attack_timer <= 0
+        && place_meeting(
+            x,
+            y + ground_check_distance,
+            o_Block
+        );
+};
+
+// =====================================
+// CHARGE: HIT CONTINUATION
+// =====================================
+attack_hit_player = false;
+
+// Extra travel in pixels after first contact.
+attack_hit_overshoot = 96;
+
+attack_register_dash_hit = function(_player)
+{
+    if (
+        !attack_hit_player
+        && instance_exists(_player)
+        && place_meeting(x, y, _player)
+    )
+    {
+        attack_hit_player = true;
+        attack_target_x = x + attack_side * attack_hit_overshoot;
+    }
 };

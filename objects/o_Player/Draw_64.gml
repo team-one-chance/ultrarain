@@ -37,7 +37,18 @@ var hp_percent = pHP / pHP_max;
 
 // Keep value between 0 and 1
 hp_percent = clamp(hp_percent, 0, 1);
+// White outline
+var bar_outline = 2;
 
+draw_set_color(c_white);
+
+draw_rectangle(
+    bar_x - bar_outline,
+    bar_y - bar_outline,
+    bar_x + bar_width + bar_outline,
+    bar_y + bar_height + bar_outline,
+    false
+);
 // Background
 draw_set_color(c_black);
 
@@ -49,8 +60,23 @@ draw_rectangle(
     false
 );
 
-// HP
-draw_set_color(c_lime);
+// HP colour
+var hp_colour = c_lime;
+
+if (hp_percent < 0.25)
+{
+    hp_colour = c_red;
+}
+else if (hp_percent < 0.50)
+{
+    hp_colour = make_colour_rgb(255, 100, 0);
+}
+else if (hp_percent < 0.75)
+{
+    hp_colour = c_yellow;
+}
+
+draw_set_color(hp_colour);
 
 draw_rectangle(
     bar_x,
