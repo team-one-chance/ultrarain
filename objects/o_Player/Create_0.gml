@@ -8,6 +8,26 @@ pHP_max = 100;
 pHP = pHP_max;
 dmg_cooldown = 0;
 
+// Reset on a fresh tutorial run, but preserve across the train trip.
+if (room == LE_TUTORIAL_WIP)
+{
+    global.demo_took_damage = false;
+    global.demo_used_healing = false;
+}
+else
+{
+    // Also support testing the train or ending room directly.
+    if (!variable_global_exists("demo_took_damage"))
+    {
+        global.demo_took_damage = false;
+    }
+
+    if (!variable_global_exists("demo_used_healing"))
+    {
+        global.demo_used_healing = false;
+    }
+}
+
 // =====================================
 // COIN GUI
 // =====================================
@@ -43,6 +63,7 @@ use_syringe = function(_revive)
     else
     {
         pHP = min(pHP_max, pHP + pHP_max / 3);
+		        global.demo_used_healing = true;
     }
 
     return true;
@@ -515,3 +536,28 @@ coin_anchor_cooldown = 8;
 coin_anchor_cooldown_timer = 0;
 
 hacking_controller = noone;
+
+// Restore inventory when arriving from the tutorial or train.
+if (variable_global_exists("demo_travel_state"))
+{
+    if (is_struct(global.demo_travel_state))
+    {
+        var _travel = global.demo_travel_state;
+
+        pHP_max = _travel.hp_max;
+        pHP = _travel.hp;
+
+        medkit_owned = _travel.medkit_owned;
+        syringe_max = _travel.syringe_max;
+        syringe_count = _travel.syringe_count;
+
+        coin_max = _travel.coin_max;
+        coin_count = _travel.coin_count;
+
+        weapon_type = _travel.weapon_type;
+        item_coin_anchor = _travel.item_coin_anchor;
+
+        // Consume the transfer so ordinary restarts do not reuse it.
+        global.demo_travel_state = undefined;
+    }
+}

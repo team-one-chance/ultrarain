@@ -2173,6 +2173,7 @@ if (place_meeting(x, y, oEnemyParent)
 && dmg_cooldown <= 0) 
 {
 	pHP -=10;
+	global.demo_took_damage = true;
 	show_debug_message(pHP);
 	dmg_cooldown = 1; 
 	show_debug_message("PLAYER COLLIDED WITH ENEMY! and it is on CD");
