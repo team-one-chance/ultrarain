@@ -1,0 +1,4 @@
+interface:
+  display_name: "ULTRARAIN dokumentieren"
+  short_description: "IPERKA-Dokumentation mit gründlichen Rückfragen"
+  default_prompt: "Nutze $document-ultrarain, um den nächsten Abschnitt unserer Projektdokumentation mit gezielten Rückfragen auszuarbeiten."
