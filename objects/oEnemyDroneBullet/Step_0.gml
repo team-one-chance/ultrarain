@@ -22,11 +22,14 @@ var player_hit = collision_line(
 
 if (player_hit != noone)
 {
-    player_hit.pHP -= bullet_damage;
+    if (!player_hit.dash_blocks_damage())
+    {
+        player_hit.pHP -= bullet_damage;
 
-    show_debug_message(
-        "PLAYER HIT! HP: " + string(player_hit.pHP)
-    );
+        show_debug_message(
+            "PLAYER HIT! HP: " + string(player_hit.pHP)
+        );
+    }
 
     instance_destroy();
     exit;
