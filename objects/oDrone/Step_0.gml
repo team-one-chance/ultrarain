@@ -284,7 +284,7 @@ else
     sprite_index = normal_sprite;
 }
 
-// =====================================
+/*// =====================================
 // UNIQUE SHOOT SYSTEM MUST BE KEPT
 // =====================================
 
@@ -314,4 +314,213 @@ if (shoot_player != noone && shoot_timer <= 0 && !slam_locked)
     shoot_timer = shoot_cooldown;
 
     show_debug_message("ENEMY FIRED BULLET");
+}*/
+// =====================================
+// CHARGED, COORDINATED HITSCAN BURST
+// =====================================
+
+drone_attack_cooldown = max(
+    0, drone_attack_cooldown - dt
+);
+
+drone_turn_wait = max(
+    0, drone_turn_wait - dt
+);
+
+var _can_attack = false;
+
+if (player != noone && !slam_locked)
+{
+    var _cx = (bbox_left + bbox_right) * 0.5;
+    var _cy = (bbox_top + bbox_bottom) * 0.5;
+
+    var _px = (player.bbox_left + player.bbox_right) * 0.5;
+    var _py = (player.bbox_top + player.bbox_bottom) * 0.5;
+
+    var _distance = point_distance(_cx, _cy, _px, _py);
+
+    if (_distance <= drone_attack_distance)
+    {
+        var _angle = point_direction(_cx, _cy, _px, _py);
+
+        var _sight = drone_trace(
+            _cx, _cy, _angle, _distance, false
+        );
+
+        _can_attack = (_sight.hit == noone);
+    }
+}
+
+drone_ready =
+    _can_attack
+    && drone_fire_state == 0
+    && drone_attack_cooldown <= 0
+    && drone_turn_wait <= 0;
+
+// Losing sight or getting slammed interrupts the attack.
+if (drone_fire_state != 0 && !_can_attack)
+{
+    drone_fire_state = 0;
+    drone_ready = false;
+
+    drone_attack_cooldown = random_range(
+        drone_recovery_min,
+        drone_recovery_max
+    );
+
+    var _cancel_gap = drone_turn_gap;
+
+    with (oDrone)
+    {
+        drone_turn_wait = max(
+            drone_turn_wait, _cancel_gap
+        );
+    }
+}
+
+// Randomly give one eligible drone the next turn.
+if (drone_ready)
+{
+    var _busy = false;
+    var _candidates = [];
+
+    for (var _i = 0; _i < instance_number(oDrone); _i++)
+    {
+        var _drone = instance_find(oDrone, _i);
+
+        if (_drone.drone_fire_state != 0)
+        {
+            _busy = true;
+            break;
+        }
+
+        if (_drone.drone_ready
+        && _drone.drone_turn_wait <= 0
+        && _drone.slam_knockback_timer <= 0
+        && _drone.slam_stun_timer <= 0)
+        {
+            array_push(_candidates, _drone);
+        }
+    }
+
+    if (!_busy && array_length(_candidates) > 0)
+    {
+        var _chosen = _candidates[
+            irandom(array_length(_candidates) - 1)
+        ];
+
+        _chosen.drone_fire_state = 1;
+        _chosen.drone_ready = false;
+
+        _chosen.drone_charge_timer =
+            _chosen.drone_charge_duration;
+    }
+}
+
+
+// =====================================
+// AIM ROTATION
+// =====================================
+
+// Track during movement, charging, and firing.
+// Freeze aim during the final dodge window before each shot.
+var _aim_frozen =
+    (drone_fire_state == 1
+        && drone_charge_timer <= drone_aim_lock_duration)
+    ||
+    (drone_fire_state == 2
+        && drone_shot_timer <= drone_aim_lock_duration);
+
+if (player != noone && !slam_locked && !_aim_frozen)
+{
+    var _desired_angle = point_direction(
+        (bbox_left + bbox_right) * 0.5,
+        (bbox_top + bbox_bottom) * 0.5,
+        (player.bbox_left + player.bbox_right) * 0.5,
+        (player.bbox_top + player.bbox_bottom) * 0.5
+    );
+
+    // Shortest signed turn, including across 0/360 degrees.
+    var _angle_difference =
+        ((_desired_angle - drone_shot_angle + 540) mod 360) - 180;
+
+    var _maximum_turn = drone_aim_turn_speed * dt;
+
+    drone_shot_angle = (
+        drone_shot_angle
+        + clamp(
+            _angle_difference,
+            -_maximum_turn,
+            _maximum_turn
+        )
+        + 360
+    ) mod 360;
+}
+
+// Only the unpaused portion of this frame advances attack timers.
+var _paused_time = min(dt, drone_shot_pause_timer);
+var _attack_dt = dt - _paused_time;
+
+drone_shot_pause_timer = max(
+    0, drone_shot_pause_timer - dt
+);
+
+// =====================================
+// INITIAL CHARGE
+// =====================================
+
+if (drone_fire_state == 1)
+{
+    drone_charge_timer = max(
+        0, drone_charge_timer - _attack_dt
+    );
+
+    if (drone_charge_timer <= 0)
+    {
+        drone_fire_state = 2;
+        drone_shots_left = drone_burst_count;
+        drone_shot_timer = 0;
+    }
+}
+
+// =====================================
+// THREE-SHOT BURST
+// =====================================
+
+if (drone_fire_state == 2)
+{
+    drone_shot_timer = max(
+        0, drone_shot_timer - _attack_dt
+    );
+
+    if (drone_shot_timer <= 0 && _attack_dt > 0)
+    {
+        // Fire along the current aim, even if it hasn't caught up.
+        drone_fire_shot();
+        drone_shots_left -= 1;
+
+        if (drone_shots_left > 0)
+        {
+            drone_shot_timer = drone_shot_interval;
+        }
+        else
+        {
+            drone_fire_state = 0;
+            drone_ready = false;
+
+            drone_attack_cooldown = random_range(
+                drone_recovery_min,
+                drone_recovery_max
+            );
+
+            var _finished_gap = drone_turn_gap;
+
+            with (oDrone)
+            {
+                drone_turn_wait = max(
+                    drone_turn_wait, _finished_gap
+                );
+            }
+        }
+    }
 }
