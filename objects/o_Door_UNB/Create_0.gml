@@ -1,5 +1,7 @@
 door_state = 0; // 0 = closed, 1 = opening, 2 = open
 
+//train_exit = true;
+
 image_index = 0;
 image_speed = 0;
 

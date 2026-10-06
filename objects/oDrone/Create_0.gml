@@ -81,9 +81,13 @@ drone_fire_shot = function()
         {
             var _player = _trace.hit;
 
-            if (!_player.dash_blocks_damage())
+            if (!_player.dash_blocks_damage)
             {
                 _player.pHP -= drone_shot_damage;
+				if (drone_shot_damage > 0)
+				{
+					global.demo_took_damage = true;	
+				}
             }
         }
     }

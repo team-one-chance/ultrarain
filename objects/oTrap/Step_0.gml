@@ -17,6 +17,8 @@ if (player != noone
 {
     player.pHP -= trap_damage;
     trap_hit_timer = trap_hit_cooldown;
+	
+	if (trap_damage > 0)	{ global.demo_took_damage = true;}
 
    player.trap_knockback_speed_x = clamp(
     player.phy_speed_x * trap_horizontal_retention,
