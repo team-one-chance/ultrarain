@@ -70,11 +70,11 @@ var _front_socket_y =
     - _origin_y;
 
 
-// Find the firing/right shoulder
+// Match the anatomical firing shoulder used by Draw.
 var _shoulder_r_x;
 var _shoulder_r_y;
 
-if (_part_facing == 1)
+if (_body_facing == 1)
 {
     _shoulder_r_x = _front_socket_x;
     _shoulder_r_y = _front_socket_y;
