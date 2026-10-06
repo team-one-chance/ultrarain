@@ -37,12 +37,18 @@ if (player_hit != noone)
 // CHECK WALL
 // =====================================
 
+var wall_objects = [
+    o_Block,
+	o_Door_UNB,
+	o_Block_scary
+];
+
 if (collision_line(
     x,
     y,
     next_x,
     next_y,
-    o_Block,
+    wall_objects,
     false,
     true
 ) != noone)
