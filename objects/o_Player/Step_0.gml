@@ -1738,10 +1738,25 @@ if (perfect_apex_flash_timer > 0)
 // PRIMARY FIRE - LEFT MOUSE
 // =====================================
 
+// Both buttons reserve the input for syringe use.
+var _syringe_combo =
+    mouse_check_button(mb_left)
+    && mouse_check_button(mb_right);
+
+if (_syringe_combo
+&& (mouse_check_button_pressed(mb_left)
+    || mouse_check_button_pressed(mb_right)))
+{
+    use_syringe(false);
+}
+
+
 if (weapon_type == "pistol")
 {
     // Keep the existing hold-to-fire behaviour.
-    if (mouse_check_button(mb_left) && weapon_fire_timer <= 0)
+    if (!_syringe_combo
+	&& mouse_check_button(mb_left)
+	&& weapon_fire_timer <= 0)
     {
         weapon_hitscan(
             pistol_damage,
@@ -1755,7 +1770,9 @@ if (weapon_type == "pistol")
 else if (weapon_type == "sword")
 {
     // Start one swing per click; release its hit at hit_phase.
-    if (mouse_check_button_pressed(mb_left) && sword_swing_timer <= 0)
+    if (!_syringe_combo
+	&& mouse_check_button_pressed(mb_left)
+	&& sword_swing_timer <= 0)
     {
         sword_swing_timer = max(0.001, sword_config.swing_duration);
         sword_swing_pending_hit = true;
@@ -1871,7 +1888,8 @@ coin.pin_owner = noone;
     }
 }
 
-if (mouse_check_button_pressed(mb_right))
+if (!_syringe_combo
+&& mouse_check_button_pressed(mb_right))
 {
     // Only throw if we actually have a coin.
     if (coin_count > 0)
@@ -2141,8 +2159,10 @@ if (place_meeting(x, y, oEnemyParent)  && dmg_cooldown =0)
 	dmg_cooldown = 1; 
 	show_debug_message("PLAYER COLLIDED WITH ENEMY! and it is on CD");
 }
-if(pHP <= 0)
-{instance_destroy();
+if (pHP <= 0)
+{
+    instance_destroy();
+    exit;
 }
 // =====================================
 //TRAP KNOCKBACK 
