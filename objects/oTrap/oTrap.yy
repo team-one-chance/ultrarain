@@ -9,8 +9,8 @@
   "name":"oTrap",
   "overriddenProperties":[],
   "parent":{
-    "name":"ULTRA RAIN",
-    "path":"ULTRA RAIN.yyp",
+    "name":"Walls_und_Doors",
+    "path":"folders/Objects/Walls_und_Doors.yy",
   },
   "parentObjectId":null,
   "persistent":false,

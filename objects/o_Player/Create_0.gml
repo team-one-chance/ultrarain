@@ -423,6 +423,36 @@ dash_speed = 6;
 air_dash_speed = 3;
 dash_decay = 0.1;
 
+dash_iframe_timer = 0;
+ground_dash_iframe_duration = 0.2;
+air_dash_iframe_duration = 0.38;
+dash_iframe_is_ground = false;
+
+// Call whenever an attack attempts to damage the player.
+// Returns true when dash protection blocks it.
+dash_blocks_damage = function()
+{
+    if (dash_iframe_is_ground && !dash_active)
+    {
+        dash_iframe_timer = 0;
+        dash_iframe_is_ground = false;
+    }
+
+    // Once expired, attacks cannot restart the protection.
+    if (dash_iframe_timer <= 0)
+    {
+        return false;
+    }
+
+    if (dash_iframe_is_ground)
+    {
+        // Refresh, rather than add more time.
+        dash_iframe_timer = ground_dash_iframe_duration;
+    }
+
+    return true;
+};
+
 dash_active = false;
 dash_direction = 0;
 

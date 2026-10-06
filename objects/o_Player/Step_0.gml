@@ -3,6 +3,11 @@ slam_cooldown_timer = max(
     slam_cooldown_timer - delta_time / 1000000
 );
 
+dash_iframe_timer = max(
+    0,
+    dash_iframe_timer - delta_time / 1000000
+);
+
 // =====================================
 // KEEP PLAYER UPRIGHT
 // =====================================
@@ -1204,6 +1209,13 @@ if (dash_active)
     }
 }
 
+// End ground protection when the boost finishes or is cancelled.
+if (dash_iframe_is_ground && !dash_active)
+{
+    dash_iframe_timer = 0;
+    dash_iframe_is_ground = false;
+}
+
 // =====================================
 // DASH INPUT
 // =====================================
@@ -1229,7 +1241,9 @@ if (dash_pressed && !is_sliding)
     if (on_ground
     && move != 0
     && ground_dash_cooldown_timer <= 0)
-    {
+    {	
+		dash_iframe_timer = ground_dash_iframe_duration;
+        dash_iframe_is_ground = true;
         // Cancel wall-jump control lock
         wall_jump_lock_time = 0;
         wall_jump_forced_direction = 0;
@@ -1281,6 +1295,8 @@ phy_speed_x =
     else if (!on_ground
     && air_dash_cooldown_timer <= 0)
     {
+		dash_iframe_timer = air_dash_iframe_duration;
+        dash_iframe_is_ground = false;
         // Cancel wall-jump control lock
         wall_jump_lock_time = 0;
         wall_jump_forced_direction = 0;
@@ -2152,7 +2168,9 @@ dmg_cooldown -= delta_time / 1000000;
 	if (dmg_cooldown < 0){
 		dmg_cooldown = 0;
 	}
-if (place_meeting(x, y, oEnemyParent)  && dmg_cooldown =0) 
+if (place_meeting(x, y, oEnemyParent)
+&& !dash_blocks_damage()
+&& dmg_cooldown <= 0) 
 {
 	pHP -=10;
 	show_debug_message(pHP);

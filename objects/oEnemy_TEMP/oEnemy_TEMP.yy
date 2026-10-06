@@ -13,8 +13,8 @@
   "name":"oEnemy_TEMP",
   "overriddenProperties":[],
   "parent":{
-    "name":"ULTRA RAIN",
-    "path":"ULTRA RAIN.yyp",
+    "name":"Enemy&Enemy relevant",
+    "path":"folders/Objects/Enemy&Enemy relevant.yy",
   },
   "parentObjectId":{
     "name":"oEnemyParent",
