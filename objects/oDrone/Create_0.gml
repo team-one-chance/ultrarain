@@ -45,7 +45,7 @@ drone_aim_turn_speed = 110;
 
 drone_burst_count = 2;
 drone_shots_left = 0;
-drone_shot_interval = 0.4;
+drone_shot_interval = 0.45;
 drone_shot_timer = 0;
 
 drone_shot_damage = 10;
@@ -81,7 +81,7 @@ drone_fire_shot = function()
         {
             var _player = _trace.hit;
 
-            if (!_player.dash_blocks_damage)
+            if (!_player.dash_blocks_damage())
             {
                 _player.pHP -= drone_shot_damage;
 				if (drone_shot_damage > 0)
@@ -101,7 +101,7 @@ drone_fire_shot = function()
     _visual.line_x2 = _trace.end_x;
     _visual.line_y2 = _trace.end_y;
     _visual.line_color = c_red;
-    _visual.life = 0.015;
+    _visual.life = 0.025;
 };
 
 // =====================================
