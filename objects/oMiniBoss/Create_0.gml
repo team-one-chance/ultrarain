@@ -316,7 +316,7 @@ miniboss_damage_player = function(_target, _damage)
 
     if (variable_instance_exists(_target, "take_damage"))
     {
-        _target.take_damage(_damage);
+        _target.take_damage(_damage, x);
     }
     else if (!miniboss_player_damage_warning_shown)
     {
