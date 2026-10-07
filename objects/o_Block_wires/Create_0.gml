@@ -1,5 +1,13 @@
 player = noone;
 
+// Electrical bursts. Distances are in room pixels; times are in seconds.
+wire_arc_reach = 27;
+wire_arc_count = random_range(3, 10); // Simultaneous arcs per burst; 0 disables arcs.
+wire_burst_interval_min = 0.15;
+wire_burst_interval_max = 0.5;
+wire_burst_timer = random_range(wire_burst_interval_min, wire_burst_interval_max);
+wire_arcs = [];
+
 
 // =====================================
 // GET STRETCHED SIZE

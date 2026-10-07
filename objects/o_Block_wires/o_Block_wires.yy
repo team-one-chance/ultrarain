@@ -2,6 +2,7 @@
   "$GMObject":"",
   "%Name":"o_Block_wires",
   "eventList":[
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":8,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
     {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
     {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":3,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
     {"$GMEvent":"v1","%Name":"","collisionObjectId":{"name":"o_Player","path":"objects/o_Player/o_Player.yy",},"eventNum":0,"eventType":4,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
@@ -37,8 +38,8 @@
   "resourceVersion":"2.0",
   "solid":true,
   "spriteId":{
-    "name":"Sprite9",
-    "path":"sprites/Sprite9/Sprite9.yy",
+    "name":"exposedwires_up",
+    "path":"sprites/exposedwires_up/exposedwires_up.yy",
   },
   "spriteMaskId":null,
   "visible":true,
