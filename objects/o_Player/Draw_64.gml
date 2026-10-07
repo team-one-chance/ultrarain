@@ -104,8 +104,8 @@ if (medkit_owned)
 
     for (var i = 0; i < syringe_max; i++)
     {
-        var _sx = bar_x + 8 + i * 24;
-        var _sy = bar_y + bar_height + 36;
+        var _sx = bar_x + bar_width + 20 + i * 24;
+		var _sy = bar_y - 2;
 
         draw_set_color(i < syringe_count ? c_lime : c_dkgray);
 

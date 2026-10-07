@@ -12,21 +12,11 @@ var player = collision_rectangle(
 );
 
 if (player != noone
-&& !player.dash_blocks_damage()
-&& trap_hit_timer <= 0)
+&& trap_hit_timer <= 0
+&& player.take_damage(trap_damage, x))
 {
-    player.pHP -= trap_damage;
     trap_hit_timer = trap_hit_cooldown;
-	
-	if (trap_damage > 0)	{ global.demo_took_damage = true;}
-
-   player.trap_knockback_speed_x = clamp(
-    player.phy_speed_x * trap_horizontal_retention,
-    -trap_horizontal_speed_limit,
-    trap_horizontal_speed_limit
-);
 
 player.trap_bounce_speed = trap_bounce_speed;
 player.trap_bounce_pending = true;
-player.trap_knockback_timer = trap_knockback_duration;
 }

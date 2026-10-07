@@ -1,3 +1,12 @@
+// Resolve lethal hits before interaction locks or healing can skip death.
+if (pHP <= 0)
+{
+    instance_destroy();
+    exit;
+}
+
+slam_iframe_timer = max(0, slam_iframe_timer - delta_time / 1000000);
+
 slam_cooldown_timer = max(
     0,
     slam_cooldown_timer - delta_time / 1000000
@@ -837,6 +846,12 @@ if (!on_ground
 || keyboard_check_pressed(vk_down))
 {
     is_slamming = true;
+
+    // A hit from before the slam must not interrupt the protected descent.
+    damage_knockback_timer = 0;
+    damage_knockback_pending = false;
+    trap_bounce_pending = false;
+    trap_knockback_timer = 0;
 
     slam_distance = 0;
     slam_last_y = phy_position_y;
@@ -1684,6 +1699,8 @@ if (on_ground && is_slamming)
         slam_base_knockback_speed * power(impact_power, slam_knockback_power_exponent)
     );
 
+    // Keep protection through impact and damage checks later this frame.
+    slam_iframe_timer = slam_impact_iframe_duration;
     is_slamming = false;
 	slam_cooldown_timer = slam_cooldown;
     slam_apply(x, y, impact_radius, impact_damage, impact_speed, id);
@@ -1785,14 +1802,17 @@ if (weapon_type == "pistol")
 }
 else if (weapon_type == "sword")
 {
-    // Start one swing per click; release its hit at hit_phase.
+    // Start one swing per click; show its trail during the downward strike.
     if (!_syringe_combo
 	&& mouse_check_button_pressed(mb_left)
 	&& sword_swing_timer <= 0)
     {
         sword_swing_timer = max(0.001, sword_config.swing_duration);
         sword_swing_pending_hit = true;
-        sword_swing_facing = sign(image_xscale);
+        // Aim independently of the slide's movement/body direction.
+        sword_swing_facing = is_sliding
+            ? sign(aim_facing)
+            : sign(image_xscale);
 
         if (sword_swing_facing == 0)
         {
@@ -1802,7 +1822,7 @@ else if (weapon_type == "sword")
 
     if (sword_swing_pending_hit
         && 1 - sword_swing_timer / max(0.001, sword_config.swing_duration)
-            >= clamp(sword_config.hit_phase, 0, 1))
+            >= clamp(sword_config.windup_phase, 0.001, 0.998))
     {
         sword_swing_pending_hit = false;
 
@@ -1815,7 +1835,8 @@ else if (weapon_type == "sword")
 
         slash.image_xscale = sword_swing_facing * sword_config.slash_scale;
         slash.image_yscale = sword_config.slash_scale;
-        slash.duration = sword_config.slash_duration;
+        slash.slash_owner = id;
+        slash.sync_sword_swing();
         slash.slash_damage = sword_config.slash_damage;
         slash.knockback_force = sword_config.slash_knockback;
     }
@@ -2001,10 +2022,6 @@ if (coin_anchor_cooldown_timer > 0)
 
 
 
-if (place_meeting(x, y, oEnemyParent)
-&& dmg_cooldown = 0)
-
-
 // =====================================
 // DAMAGE COOLDOWN
 // =====================================
@@ -2161,23 +2178,18 @@ if (
 
 
 // =====================================
-// ENEMY CONTACT DAMAGE, DO NOT TOUCH OR CHANGE!!!!!!!!!!!!
+// MINIBOSS CONTACT DAMAGE (other enemy bodies are harmless)
 // =====================================
 
-dmg_cooldown -= delta_time / 1000000;
-	if (dmg_cooldown < 0){
-		dmg_cooldown = 0;
-	}
-if (place_meeting(x, y, oEnemyParent)
-&& !dash_blocks_damage()
-&& dmg_cooldown <= 0) 
+if (dmg_cooldown <= 0)
 {
-	pHP -=10;
-	global.demo_took_damage = true;
-	show_debug_message(pHP);
-	dmg_cooldown = 1; 
-	show_debug_message("PLAYER COLLIDED WITH ENEMY! and it is on CD");
+    var contact_boss = instance_place(x, y, oMiniBoss);
+    if (contact_boss != noone && take_damage(10, contact_boss.x))
+    {
+        dmg_cooldown = 1;
+    }
 }
+
 if (pHP <= 0)
 {
     instance_destroy();
@@ -2207,4 +2219,19 @@ if (variable_instance_exists(id, "trap_knockback_timer"))
             trap_knockback_timer - delta_time / 1000000
         );
     }
+}
+
+// Apply after movement so held movement keys cannot erase the recoil.
+if (damage_knockback_pending)
+{
+    is_slamming = false;
+    phy_speed_y = min(phy_speed_y, -damage_knockback_lift);
+    damage_knockback_pending = false;
+}
+if (damage_knockback_timer > 0)
+{
+    phy_speed_x = damage_knockback_speed_x;
+    damage_knockback_timer = max(
+        0, damage_knockback_timer - delta_time / 1000000
+    );
 }

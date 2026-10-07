@@ -19,7 +19,7 @@ var timer_text =
 
 
 draw_text(
-    32,
-    32,
+    220,
+    64,
     timer_text
 );

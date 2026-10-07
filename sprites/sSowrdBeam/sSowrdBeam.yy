@@ -1,7 +1,7 @@
 {
   "$GMSprite":"v2",
   "%Name":"sSowrdBeam",
-  "bboxMode":0,
+  "bboxMode":2,
   "bbox_bottom":64,
   "bbox_left":0,
   "bbox_right":34,

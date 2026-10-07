@@ -234,6 +234,10 @@ crowd_can_separate = function()
 // CHARGE: HIT CONTINUATION
 // =====================================
 attack_hit_player = false;
+attack_dash_damage = 10;
+attack_bite_damage = 10;
+attack_bite_damage_delay = 0.4; // harmless windup at the start of each bite
+attack_bite_damage_timer = 0;
 
 // Extra travel in pixels after first contact.
 attack_hit_overshoot = 96;
@@ -241,12 +245,16 @@ attack_hit_overshoot = 96;
 attack_register_dash_hit = function(_player)
 {
     if (
-        !attack_hit_player
+        attack_state == 3
+        && !attack_hit_player
         && instance_exists(_player)
         && place_meeting(x, y, _player)
     )
     {
         attack_hit_player = true;
+        // Damage only on the first contact during the active charge attack.
+        // Player protection rejects damage and recoil during dash/slam.
+        _player.take_damage(attack_dash_damage, x);
         attack_target_x = x + attack_side * attack_hit_overshoot;
     }
 };
