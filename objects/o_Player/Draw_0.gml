@@ -274,6 +274,7 @@ if (weapon_type == "sword")
 
 var _left_target_x;
 var _left_target_y;
+var _rest_arm_facing = _body_facing;
 
 if (aim_rig_mode == AimRigMode.TWO_HANDED)
 {
@@ -285,6 +286,19 @@ else
 {
     // Default: arm hanging downward
     var _free_arm_angle = 270;
+
+    // Slide sprites are already drawn facing left/right, both at xscale 1.
+    // Raise the free hand behind the torso and mirror the elbow with the slide.
+    if (sprite_index == s_Player_Slide_Right)
+    {
+        _rest_arm_facing = 1;
+        _free_arm_angle = rig_free_arm_slide_angle;
+    }
+    else if (sprite_index == s_Player_Slide_Left)
+    {
+        _rest_arm_facing = -1;
+        _free_arm_angle = 180 - rig_free_arm_slide_angle;
+    }
 
     // Swing the free arm while running
 	if (sprite_index == s_Player_Run)
@@ -326,8 +340,8 @@ if (_arm_layer_facing == 1)
             _left_target_y,
             rig_upper_arm_length,
             rig_lower_arm_length,
-            _body_facing,
-            _body_facing
+            _rest_arm_facing,
+            _rest_arm_facing
         );
     }
 }
@@ -423,11 +437,10 @@ else
             _left_target_y,
             rig_upper_arm_length,
             rig_lower_arm_length,
-            _body_facing,
-            _body_facing
+            _rest_arm_facing,
+            _rest_arm_facing
         );
     }
 }
 
 // draw_text(x - 30, y - 80, sprite_get_name(sprite_index));
-

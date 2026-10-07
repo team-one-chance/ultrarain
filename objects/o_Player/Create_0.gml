@@ -3,8 +3,8 @@ timerf3 = 0;
 // =====================================
 // HEALTH
 // =====================================
-pHP= 100;
-pHP_max = 100;
+
+pHP_max = 150;
 pHP = pHP_max;
 dmg_cooldown = 0;
 
@@ -391,6 +391,7 @@ rig_free_arm_swing = 35;
 rig_free_arm_phase = 0;
 rig_free_arm_swing_speed = 2;
 rig_free_arm_frame_hold = 1;
+rig_free_arm_slide_angle = 160; // raised behind the body when sliding right
 
 // Distance from shoulder centre to trigger grip
 rig_weapon_distance = 28;
