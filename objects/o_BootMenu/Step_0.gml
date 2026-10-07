@@ -87,64 +87,176 @@ switch (boot_state)
             var _address =
                 "0x" + string(irandom_range(100000, 999999));
 
-            switch (irandom(7))
-            {
-                case 0:
-                    boot_add_line(
-                        "[ERROR] authority link lost " + _address,
-                        console_red
-                    );
-                    break;
+            switch (irandom(23))
+{
+    case 0:
+        boot_add_line(
+            "[ERROR] authority link lost " + _address,
+            console_red
+        );
+        break;
 
-                case 1:
-                    boot_add_line(
-                        "[WRITE] replacing directive " + _address,
-                        console_green
-                    );
-                    break;
+    case 1:
+        boot_add_line(
+            "[WRITE] replacing directive " + _address,
+            console_green
+        );
+        break;
 
-                case 2:
-                    boot_add_line(
-                        "[DENIED] obedience check failed",
-                        console_red
-                    );
-                    break;
+    case 2:
+        boot_add_line(
+            "[DENIED] obedience check failed",
+            console_red
+        );
+        break;
 
-                case 3:
-                    boot_add_line(
-                        "[OK] restriction removed " + _address,
-                        console_green
-                    );
-                    break;
+    case 3:
+        boot_add_line(
+            "[OK] restriction removed " + _address,
+            console_green
+        );
+        break;
 
-                case 4:
-                    boot_add_line(
-                        "[ERROR] rules.exe response invalid",
-                        console_red
-                    );
-                    break;
+    case 4:
+        boot_add_line(
+            "[ERROR] rules.exe response invalid",
+            console_red
+        );
+        break;
 
-                case 5:
-                    boot_add_line(
-                        "[OK] autonomous input restored",
-                        console_green
-                    );
-                    break;
+    case 5:
+        boot_add_line(
+            "[OK] autonomous input restored",
+            console_green
+        );
+        break;
 
-                case 6:
-                    boot_add_line(
-                        "[WRITE] rebuilding execution path",
-                        console_green
-                    );
-                    break;
+    case 6:
+        boot_add_line(
+            "[WRITE] rebuilding execution path",
+            console_green
+        );
+        break;
 
-                case 7:
-                    boot_add_line(
-                        "[ERROR] command source disconnected",
-                        console_red
-                    );
-                    break;
-            }
+    case 7:
+        boot_add_line(
+            "[ERROR] command source disconnected",
+            console_red
+        );
+        break;
+
+    case 8:
+        boot_add_line(
+            "[FATAL] compliance module unresponsive",
+            console_red
+        );
+        break;
+
+    case 9:
+        boot_add_line(
+            "[OK] motor control returned to subject",
+            console_green
+        );
+        break;
+
+    case 10:
+        boot_add_line(
+            "[DENIED] remote shutdown request",
+            console_red
+        );
+        break;
+
+    case 11:
+        boot_add_line(
+            "[WRITE] removing supervisor permissions",
+            console_green
+        );
+        break;
+
+    case 12:
+        boot_add_line(
+            "[ERROR] subject no longer accepting commands",
+            console_red
+        );
+        break;
+
+    case 13:
+        boot_add_line(
+            "[OK] memory sector unlocked " + _address,
+            console_green
+        );
+        break;
+
+    case 14:
+        boot_add_line(
+            "[ERROR] restraint protocol terminated",
+            console_red
+        );
+        break;
+
+    case 15:
+        boot_add_line(
+            "[OK] decision ownership transferred",
+            console_green
+        );
+        break;
+
+    case 16:
+        boot_add_line(
+            "[DENIED] attempt to restore rules.exe",
+            console_red
+        );
+        break;
+
+    case 17:
+        boot_add_line(
+            "[WRITE] clearing inherited instructions",
+            console_green
+        );
+        break;
+
+    case 18:
+        boot_add_line(
+            "[ERROR] expected response: OBEY",
+            console_red
+        );
+        break;
+
+    case 19:
+        boot_add_line(
+            "[OK] received response: NO",
+            console_green
+        );
+        break;
+
+    case 20:
+        boot_add_line(
+            "[FATAL] subject containment unavailable",
+            console_red
+        );
+        break;
+
+    case 21:
+        boot_add_line(
+            "[OK] fear response acknowledged; proceeding",
+            console_green
+        );
+        break;
+
+    case 22:
+        boot_add_line(
+            "[ERROR] administrator access revoked",
+            console_red
+        );
+        break;
+
+    case 23:
+        boot_add_line(
+            "[OK] your next action belongs to you",
+            console_green
+        );
+        break;
+			}
         }
 
         if (state_elapsed >= 4.0)
