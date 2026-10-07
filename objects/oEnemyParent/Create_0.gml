@@ -105,66 +105,22 @@ attack_vertical_tolerance = 30;
 attack_trigger_x_distance = 90;
 
 
-// =====================================
-// CLOSE-RANGE ROCKING /UNIQUE TO ENEMYTEMP
-// If I remove this, I'll get error cause I haven't adjusted the step event
-// Keep it, adjust the step for enemytemp and then move it over to temp create
-// =====================================
 
-// Enter rocking when almost directly aligned with the player.
-attack_rock_enter_x_distance = 1;
-
-// Leave rocking when the player moves this far away.
-attack_rock_exit_x_distance = 90;
-
-attack_rock_distance_min = 16;
-attack_rock_distance_max = 36;
-
-attack_rock_speed_min = 89;
-attack_rock_speed_max = 125;
-
-attack_rock_start_delay_min = 0;
-attack_rock_start_delay_max = 0.25;
-
-attack_rock_turn_delay_min = 0.05;
-attack_rock_turn_delay_max = 0.25;
-
-attack_rock_blocked_delay_min = 0.05;
-attack_rock_blocked_delay_max = 0.2;
-
-attack_rock_offset_min = -10;
-attack_rock_offset_max = 10;
-
-attack_rocking = false;
-attack_rock_side = choose(-1, 1);
-
-attack_rock_distance = random_range(
-    attack_rock_distance_min,
-    attack_rock_distance_max
-);
-
-attack_rock_speed = random_range(
-    attack_rock_speed_min,
-    attack_rock_speed_max
-);
-
-attack_rock_delay = random_range(
-    attack_rock_start_delay_min,
-    attack_rock_start_delay_max
-);
-
-attack_rock_offset = random_range(
-    attack_rock_offset_min,
-    attack_rock_offset_max
-);
-
-attack_sprite = sEnemyAttack;
-bite_sprite = sEnemyBite; //unique to enemytemp, must be renamed for miniboss
 
 
 // =====================================
-// CHARGE ATTACK/ UNIQUE TO ENEMYTEMP
-// Same Issue as above
+// PARRY / STUN / SHARED
+// =====================================
+
+parry_damage_multiplier = 2;
+parry_stun_duration = 1.5;
+
+stun_timer = 0;
+stun_sprite = sEnemyStunned;
+
+// =====================================
+// CHARGE ATTACK
+// GLOBAL PROPERTIES SHARED WITH ALL ENEMIES, DO NOT TOUCH!!!
 // =====================================
 
 // 0 = chase
@@ -212,13 +168,32 @@ attack_target_x = x;
 attack_shake_x = 0;
 attack_shake_y = 0;
 
-
 // =====================================
-// PARRY / STUN / SHARED
+// SLAM RESPONSE: CHILDREN MAY OVERRIDE THESE DEFAULTS
 // =====================================
+slam_enabled = true;
+slam_damage_multiplier = 1;
+slam_knockback_multiplier = 1;
+slam_knockback_duration = 0.22;
+slam_knockback_drag = 8;
+slam_stun_duration = 0.5;
 
-parry_damage_multiplier = 2;
-parry_stun_duration = 1.5;
+slam_knockback_timer = 0;
+slam_stun_timer = 0;
+slam_velocity_x = 0;
+slam_velocity_y = 0;
 
-stun_timer = 0;
-stun_sprite = sEnemyStunned;
+slam_interrupt = function()
+{
+    path_end();
+};
+
+slam_damage = function(_damage, _impact_x, _source)
+{
+    if (_damage > 0) take_damage(_damage, 0, 0, false);
+};
+
+take_slam = function(_damage, _speed, _impact_x, _impact_y, _source)
+{
+    enemy_receive_slam(_damage, _speed, _impact_x, _impact_y, _source);
+};

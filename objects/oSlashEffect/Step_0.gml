@@ -1,127 +1,139 @@
 // =====================================
 // DURATION
 // =====================================
-
 duration -= delta_time / 1000000;
 
+if (duration <= 0)
+{
+    instance_destroy();
+    exit;
+}
 
 // =====================================
-// FIND ENEMIES TOUCHING SLASH
+// DAMAGE ENEMIES TOUCHING THE SLASH
 // =====================================
-
 var hits = ds_list_create();
 
 collision_rectangle_list(
-    bbox_left,
-    bbox_top,
-    bbox_right,
-    bbox_bottom,
-    oEnemyParent,
-    false,
-    true,
-    hits,
-    false
+    bbox_left, bbox_top, bbox_right, bbox_bottom,
+    oEnemyParent, false, true, hits, false
 );
 
+var _facing = sign(image_xscale);
+if (_facing == 0) _facing = 1;
 
-// =====================================
-// DAMAGE ENEMIES
-// =====================================
+var _beam_dir = (_facing > 0) ? 0 : 180;
 
 for (var i = 0; i < ds_list_size(hits); i++)
 {
     var enemy = hits[| i];
 
-    // Don't hit the same enemy multiple times
-    // during one slash
-    if (ds_list_find_index(hit_enemies, enemy) == -1)
+    if (
+        instance_exists(enemy)
+        && ds_list_find_index(hit_enemies, enemy) == -1
+    )
     {
         ds_list_add(hit_enemies, enemy);
-
-       var knockback_dir;
-
-if (image_xscale > 0)
-{
-    knockback_dir = 0;
-}
-else
-{
-    knockback_dir = 180;
-}
-
-enemy.take_damage(
-    slash_damage,
-    knockback_dir,
-    knockback_force,
-	true
-);
+        enemy.take_damage(
+            slash_damage,
+            _beam_dir,
+            knockback_force,
+            true
+        );
     }
 }
 
 ds_list_destroy(hits);
 
-
-// =====================================
-// DESTROY SLASH
-// =====================================
-
-if (duration <= 0)
-{
-    instance_destroy();
-}
-
-
-// =====================================
-// HIT COINS
-// =====================================
-
-var coins = ds_list_create();
+var _blocks = ds_list_create();
 
 collision_rectangle_list(
     bbox_left,
     bbox_top,
     bbox_right,
     bbox_bottom,
-    o_Coin,
+    o_Block_Breakable,
     false,
     true,
-    coins,
+    _blocks,
     false
 );
 
-for (var c = 0; c < ds_list_size(coins); c++)
+for (var b = 0; b < ds_list_size(_blocks); b++)
 {
-    var coin = coins[| c];
+    var _block = _blocks[| b];
 
-    if (instance_exists(coin))
+    if (instance_exists(_block))
     {
-        var beam_dir;
-
-        if (image_xscale > 0)
-        {
-            beam_dir = 0;
-        }
-        else
-        {
-            beam_dir = 180;
-        }
-
-        var beam = instance_create_layer(
-    coin.x,
-    y,
-    "Instances",
-    oSwordBeam
-);
-
-        beam.move_dir = beam_dir;
-        beam.image_xscale = sign(image_xscale);
-
-        // Copy this slash's damage and knockback
-       beam.move_dir = beam_dir;
-beam.image_xscale = sign(image_xscale);
-
-        instance_destroy(coin);
+        _block.take_damage(slash_damage);
     }
 }
 
-ds_list_destroy(coins);
+ds_list_destroy(_blocks);
+
+// =====================================
+// ONE COIN CONTACT CONSUMES ALL FIELD COINS
+// =====================================
+if (!coin_beam_released)
+{
+    var coins = ds_list_create();
+
+    collision_rectangle_list(
+        bbox_left, bbox_top, bbox_right, bbox_bottom,
+        o_Coin, false, true, coins, false
+    );
+
+    var _hit_coin = noone;
+
+    for (var c = 0; c < ds_list_size(coins); c++)
+    {
+        var _candidate = coins[| c];
+        if (instance_exists(_candidate))
+        {
+            _hit_coin = _candidate;
+            break;
+        }
+    }
+
+    if (_hit_coin != noone)
+    {
+        // Snapshot live room coins before destroying any of them.
+        // This includes pinned coins and coins outside the slash.
+        var _field_coins = ds_list_create();
+
+        with (o_Coin)
+        {
+            ds_list_add(_field_coins, id);
+        }
+
+        var _coins_used = ds_list_size(_field_coins);
+        var _beam_x = _hit_coin.x;
+
+        // Lock this slash before releasing the beam.
+        coin_beam_released = true;
+
+        // Keep your original single-coin beam spawn height.
+        var beam = instance_create_layer(
+            _beam_x,
+            y,
+            "Instances",
+            oSwordBeam
+        );
+
+        beam.configure_coin_beam(_coins_used, _beam_dir);
+
+        for (var k = 0; k < _coins_used; k++)
+        {
+            var _consumed_coin = _field_coins[| k];
+
+            if (instance_exists(_consumed_coin))
+            {
+                instance_destroy(_consumed_coin);
+            }
+        }
+
+        ds_list_destroy(_field_coins);
+    }
+
+    ds_list_destroy(coins);
+}

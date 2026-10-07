@@ -54,13 +54,13 @@ if (controller_state >= 1)
 
 repeat (3)
 {
-    var _spark_x =
+    _spark_x =
         x + (
             irandom(sprite_get_width(sprite_index) - 1)
             - sprite_get_xoffset(sprite_index)
         ) * image_xscale;
 
-    var _spark_y =
+    _spark_y =
         y + (
             irandom(sprite_get_height(sprite_index) - 1)
             - sprite_get_yoffset(sprite_index)
@@ -79,7 +79,7 @@ repeat (3)
 }
 
 var _dt = delta_time / 1000000;
-var _player = instance_nearest(x, y, o_Player);
+_player = instance_nearest(x, y, o_Player);
 
 player_near = false;
 
@@ -114,7 +114,22 @@ if (player_near && keyboard_check_pressed(ord("E")))
         linked_door = instance_nearest(x, y, o_Door_UNB);
 
         wire_connections = [-1, -1, -1, -1];
-        right_order = [0, 1, 2, 3];
+// Each wire independently gets a random color.
+// 0 = green, 1 = yellow, 2 = blue, 3 = red.
+left_order = [
+    irandom(3),
+    irandom(3),
+    irandom(3),
+    irandom(3)
+];
+
+// Same colors on the right, shuffled by the existing code.
+right_order = [
+    left_order[0],
+    left_order[1],
+    left_order[2],
+    left_order[3]
+];
         drag_wire = -1;
 
         // Shuffle the four right-side sockets.
@@ -218,7 +233,7 @@ if (controller_state == 2)
                 if (wire_connections[i] == -1
                 && point_distance(
                     _mx, _my, _left_x, _left_y
-                ) <= 10)
+                ) <= 26)
                 {
                     drag_wire = i;
                     break;
@@ -236,12 +251,25 @@ if (controller_state == 2)
 
                 if (point_distance(
                     _mx, _my, _right_x, _right_y
-                ) <= 12)
+                ) <= 26)
                 {
-                    if (right_order[row] == drag_wire)
-                    {
-                        wire_connections[drag_wire] = row;
-                    }
+// A right socket can only accept one wire.
+var _occupied = false;
+
+for (var k = 0; k < 4; k++)
+{
+    if (wire_connections[k] == row)
+    {
+        _occupied = true;
+        break;
+    }
+}
+
+if (!_occupied
+&& right_order[row] == left_order[drag_wire])
+{
+    wire_connections[drag_wire] = row;
+}
 
                     break;
                 }

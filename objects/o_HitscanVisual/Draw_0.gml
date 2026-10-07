@@ -11,7 +11,7 @@ draw_line_width(
 );
 
 // Yellow center
-draw_set_color(c_yellow);
+draw_set_color(line_color);
 draw_line_width(
     line_x1,
     line_y1,

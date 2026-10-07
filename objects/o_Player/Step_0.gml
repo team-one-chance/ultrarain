@@ -1,3 +1,12 @@
+slam_cooldown_timer = max(
+    0,
+    slam_cooldown_timer - delta_time / 1000000
+);
+
+dash_iframe_timer = max(
+    0,
+    dash_iframe_timer - delta_time / 1000000
+);
 
 // =====================================
 // KEEP PLAYER UPRIGHT
@@ -821,7 +830,8 @@ if (!facing_locked)
 // Slam only while airborne and not mantling
 if (!on_ground
 && !is_slamming
-&& !is_ledge_climbing)
+&& !is_ledge_climbing
+&& slam_cooldown_timer <= 0)
 {
     if (keyboard_check_pressed(ord("S"))
 || keyboard_check_pressed(vk_down))
@@ -1199,6 +1209,13 @@ if (dash_active)
     }
 }
 
+// End ground protection when the boost finishes or is cancelled.
+if (dash_iframe_is_ground && !dash_active)
+{
+    dash_iframe_timer = 0;
+    dash_iframe_is_ground = false;
+}
+
 // =====================================
 // DASH INPUT
 // =====================================
@@ -1224,7 +1241,9 @@ if (dash_pressed && !is_sliding)
     if (on_ground
     && move != 0
     && ground_dash_cooldown_timer <= 0)
-    {
+    {	
+		dash_iframe_timer = ground_dash_iframe_duration;
+        dash_iframe_is_ground = true;
         // Cancel wall-jump control lock
         wall_jump_lock_time = 0;
         wall_jump_forced_direction = 0;
@@ -1276,6 +1295,8 @@ phy_speed_x =
     else if (!on_ground
     && air_dash_cooldown_timer <= 0)
     {
+		dash_iframe_timer = air_dash_iframe_duration;
+        dash_iframe_is_ground = false;
         // Cancel wall-jump control lock
         wall_jump_lock_time = 0;
         wall_jump_forced_direction = 0;
@@ -1644,174 +1665,36 @@ else if (!on_ground
 // =====================================
 // SLAM IMPACT
 // =====================================
-
 if (on_ground && is_slamming)
 {
-    var _impact_x = x;
-    var _impact_y = y;
+    var impact_power = clamp(slam_power, 1, slam_power_max);
 
-    // =================================
-    // SLAM STATS
-    // =================================
-
-    var _slam_damage =
-        slam_base_damage
-        * slam_power;
-
-    // Radius grows slower than damage.
-    var _slam_radius =
-        slam_base_radius
-        * sqrt(slam_power);
-
-    // Knockback grows with power, but not
-    // nearly as violently as damage.
-    var _slam_knockback =
-        4
-        + sqrt(slam_power) * 3;
-
-    // Stronger slams stun longer.
-    var _slam_stun =
-        min(
-            4,
-            0.4
-            + sqrt(slam_power) * 0.18
-        );
-
-
-    // =================================
-    // HIT ALL ENEMIES IN RADIUS
-    // =================================
-
-    with (oEnemyParent)
-    {
-        var _dist =
-            point_distance(
-                x,
-                y,
-                _impact_x,
-                _impact_y
-            );
-
-        if (_dist <= _slam_radius)
-        {
-            // -------------------------
-            // DAMAGE FALLOFF
-            // -------------------------
-
-            var _falloff =
-                1 - (_dist / _slam_radius);
-
-            var _damage =
-                _slam_damage
-                * max(
-                    0.25,
-                    _falloff
-                );
-
-
-            // -------------------------
-            // KNOCKBACK DIRECTION
-            // -------------------------
-
-            var _dir;
-
-            if (x < _impact_x)
-            {
-                // Up + left
-                _dir = 150;
-            }
-            else
-            {
-                // Up + right
-                _dir = 30;
-            }
-
-
-            // -------------------------
-            // DAMAGE + KNOCKBACK
-            // -------------------------
-
-            take_damage(
-                _damage,
-                _dir,
-                _slam_knockback,
-                false
-            );
-
-
-            // -------------------------
-            // STUN
-            // -------------------------
-
-            attack_state = 5;
-
-            stun_timer =
-                max(
-                    stun_timer,
-                    _slam_stun
-                );
-
-            path_end();
-
-            attack_shake_x = 0;
-            attack_shake_y = 0;
-        }
-    }
-
-
-    // =================================
-    // PLACEHOLDER SHOCKWAVE VFX
-    // =================================
-
-// Tiny slams don't create a shockwave.
-var _ring_size = 0;
-
-if (_slam_radius >= 40)
-{
-    _ring_size = 1;
-
-    if (_slam_radius >= 125)
-    {
-        _ring_size = 2;
-    }
-
-    show_debug_message(
-        "SLAM RING | radius="
-        + string(_slam_radius)
-        + " | size="
-        + string(_ring_size)
+    var impact_damage = min(
+        slam_max_damage,
+        slam_base_damage * power(impact_power, slam_damage_power_exponent)
     );
 
-    effect_create_depth(
-        depth - 1,
-        ef_ring,
-        _impact_x,
-        _impact_y,
-        _ring_size,
-        c_white
+    var impact_radius = min(
+        slam_max_radius,
+        slam_base_radius * power(impact_power, slam_radius_power_exponent)
     );
-}
 
-
-    // =================================
-    // RESET SLAM
-    // =================================
+    var impact_speed = min(
+        slam_max_knockback_speed,
+        slam_base_knockback_speed * power(impact_power, slam_knockback_power_exponent)
+    );
 
     is_slamming = false;
+	slam_cooldown_timer = slam_cooldown;
+    slam_apply(x, y, impact_radius, impact_damage, impact_speed, id);
+
+    var slam_fx = instance_create_depth(x, y, depth - 10, oSlamVFX);
+    slam_fx.start_slam_vfx(impact_radius, impact_power);
 
     slam_distance = 0;
     slam_power = 1;
     slam_last_y = phy_position_y;
 }
-
-// =====================================
-// MELEE ATTACK - RIGHT MOUSE
-// =====================================
-
-
-// =====================================
-// WEAPON SYSTEM
-// =====================================
 
 // =====================================
 // WEAPON SYSTEM
@@ -1835,12 +1718,20 @@ aim_rig_mode = (weapon_type == "sword")
 
 if (weapon_fire_timer > 0)
 {
-    weapon_fire_timer = max(0, weapon_fire_timer - delta_time / 1000000);
+    weapon_fire_timer -= delta_time / 1000000;
+
+    if (weapon_fire_timer < 0)
+    {
+        perfe = 0;
+    }
 }
 
 if (sword_swing_timer > 0)
 {
-    sword_swing_timer = max(0, sword_swing_timer - delta_time / 1000000);
+    sword_swing_timer = max(
+        0,
+        sword_swing_timer - delta_time / 1000000
+    );
 }
 
 // =====================================
@@ -1863,10 +1754,25 @@ if (perfect_apex_flash_timer > 0)
 // PRIMARY FIRE - LEFT MOUSE
 // =====================================
 
+// Both buttons reserve the input for syringe use.
+var _syringe_combo =
+    mouse_check_button(mb_left)
+    && mouse_check_button(mb_right);
+
+if (_syringe_combo
+&& (mouse_check_button_pressed(mb_left)
+    || mouse_check_button_pressed(mb_right)))
+{
+    use_syringe(false);
+}
+
+
 if (weapon_type == "pistol")
 {
     // Keep the existing hold-to-fire behaviour.
-    if (mouse_check_button(mb_left) && weapon_fire_timer <= 0)
+    if (!_syringe_combo
+	&& mouse_check_button(mb_left)
+	&& weapon_fire_timer <= 0)
     {
         weapon_hitscan(
             pistol_damage,
@@ -1880,7 +1786,9 @@ if (weapon_type == "pistol")
 else if (weapon_type == "sword")
 {
     // Start one swing per click; release its hit at hit_phase.
-    if (mouse_check_button_pressed(mb_left) && sword_swing_timer <= 0)
+    if (!_syringe_combo
+	&& mouse_check_button_pressed(mb_left)
+	&& sword_swing_timer <= 0)
     {
         sword_swing_timer = max(0.001, sword_config.swing_duration);
         sword_swing_pending_hit = true;
@@ -1996,7 +1904,8 @@ coin.pin_owner = noone;
     }
 }
 
-if (mouse_check_button_pressed(mb_right))
+if (!_syringe_combo
+&& mouse_check_button_pressed(mb_right))
 {
     // Only throw if we actually have a coin.
     if (coin_count > 0)
@@ -2259,15 +2168,20 @@ dmg_cooldown -= delta_time / 1000000;
 	if (dmg_cooldown < 0){
 		dmg_cooldown = 0;
 	}
-if (place_meeting(x, y, oEnemyParent)  && dmg_cooldown =0) 
+if (place_meeting(x, y, oEnemyParent)
+&& !dash_blocks_damage()
+&& dmg_cooldown <= 0) 
 {
 	pHP -=10;
+	global.demo_took_damage = true;
 	show_debug_message(pHP);
 	dmg_cooldown = 1; 
 	show_debug_message("PLAYER COLLIDED WITH ENEMY! and it is on CD");
 }
-if(pHP <= 0)
-{instance_destroy();
+if (pHP <= 0)
+{
+    instance_destroy();
+    exit;
 }
 // =====================================
 //TRAP KNOCKBACK 

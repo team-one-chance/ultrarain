@@ -1,5 +1,9 @@
-
 var dt = delta_time / 1000000;
+
+// Capture the state BEFORE movement/timers update this frame.
+crowd_spacing_paused = !crowd_can_separate();
+	
+var slam_locked = enemy_slam_step(dt);
 
 if (post_climb_attack_timer > 0)
 {
@@ -14,7 +18,11 @@ if (post_climb_attack_timer > 0)
 // KNOCKBACK
 // =====================================
 
-if (knockback_timer > 0)
+if (slam_locked)
+{
+    // Slam movement already ran. Skip normal AI this frame.
+}
+else if (knockback_timer > 0)
 {
     path_end();
     is_climbing = false;
@@ -251,11 +259,17 @@ else
                             chase_direction = attack_side;
                         }
 
-                        var chase_move =
-                            chase_direction
-                            * ground_move_speed
-                            * dt;
+                        var chase_step = ground_move_speed * dt;
+var chase_move = chase_direction * chase_step;
 
+// On the same floor, don't overshoot the player's X position.
+if (player_y_distance <= attack_vertical_tolerance)
+{
+    chase_move = chase_direction * min(
+        chase_step,
+        abs(player.x - x)
+    );
+}
                         if (!is_climbing)
                         {
                             if (!place_meeting(
@@ -570,7 +584,8 @@ else
                         player.x
                         + dash_direction
                         * attack_dash_overshoot;
-
+						
+						attack_hit_player = false;
                     attack_state = 3;
                 }
 
@@ -578,41 +593,79 @@ else
             }
 
 
+           // =====================================
+            // DASH: RETURN ONLY ON A MISS
             // =====================================
-            // DASH
-            // =====================================
-
             case 3:
             {
-                var dash_move =
-                    attack_side
-                    * attack_dash_speed
-                    * dt;
+                var _dash_finished = false;
+                var _dash_distance = max(0, attack_dash_speed * dt);
 
-                var reached_target =
-                    (attack_side > 0
-                    && x + dash_move >= attack_target_x)
-                    ||
-                    (attack_side < 0
-                    && x + dash_move <= attack_target_x);
+                attack_register_dash_hit(player);
 
-                if (reached_target)
+                // Sweep in <=1px increments to detect contact and walls.
+                var _dash_steps = ceil(_dash_distance);
+
+                if (_dash_steps > 0)
                 {
-                    x = attack_target_x;
-                    attack_state = 4;
+                    var _dash_step = _dash_distance / _dash_steps;
+
+                    repeat (_dash_steps)
+                    {
+                        var _target_distance =
+                            (attack_target_x - x) * attack_side;
+
+                        if (_target_distance <= 0)
+                        {
+                            _dash_finished = true;
+                            break;
+                        }
+
+                        var _move_x = attack_side
+                            * min(_dash_step, _target_distance);
+
+                        if (place_meeting(x + _move_x, y, o_Block))
+                        {
+                            _dash_finished = true;
+                            break;
+                        }
+
+                        x += _move_x;
+
+                        // First contact extends the destination once.
+                        attack_register_dash_hit(player);
+
+                        if ((attack_target_x - x) * attack_side <= 0)
+                        {
+                            _dash_finished = true;
+                            break;
+                        }
+                    }
                 }
-                else if (!place_meeting(
-                    x + dash_move,
-                    y,
-                    o_Block
-                ))
+
+                if (_dash_finished)
                 {
-                    x += dash_move;
-                }
-                else
-                {
-                    // Hit a wall
-                    attack_state = 4;
+                    attack_shake_x = 0;
+                    attack_shake_y = 0;
+
+                    if (attack_hit_player)
+                    {
+                        // Successful hit: stay at the new position.
+                        // Resume normal AI with the usual cooldown.
+                        attack_rocking = false;
+                        attack_state = 0;
+                        repath_timer = 0;
+
+                        attack_cooldown = random_range(
+                            attack_cooldown_min,
+                            attack_cooldown_max
+                        );
+                    }
+                    else
+                    {
+                        // Miss: keep the existing fly-back sequence.
+                        attack_state = 4;
+                    }
                 }
 
                 break;
@@ -785,6 +838,10 @@ if (hit_timer > 0)
 {
     hit_timer -= dt;
     sprite_index = hit_sprite;
+}
+else if (slam_locked)
+{
+    sprite_index = stun_sprite;
 }
 else if (attack_state == 5)
 {

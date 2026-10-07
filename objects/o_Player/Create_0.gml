@@ -1,25 +1,79 @@
 timerf3 = 0;
 
 // =====================================
-// MOVEMENT
+// HEALTH
 // =====================================
-pHP = 100;
-pHP_max = 1000;
+pHP= 100;
+pHP_max = 100;
 pHP = pHP_max;
 dmg_cooldown = 0;
 
-move_speed = 4.4;
+// Reset on a fresh tutorial run, but preserve across the train trip.
+if (room == LE_TUTORIAL_WIP)
+{
+    global.demo_took_damage = false;
+    global.demo_used_healing = false;
+}
+else
+{
+    // Also support testing the train or ending room directly.
+    if (!variable_global_exists("demo_took_damage"))
+    {
+        global.demo_took_damage = false;
+    }
 
-dmg_cooldown = 0;
+    if (!variable_global_exists("demo_used_healing"))
+    {
+        global.demo_used_healing = false;
+    }
+}
+
+// =====================================
+// COIN GUI
+// =====================================
+coin_max = 4;
+coin_count = coin_max;
+
+// =====================================
+// MOVEMENT
+// =====================================
+move_speed = 4.4;
 
 slide_exit_timer = 0;
 slide_exit_delay = 0;
+
+medkit_owned = false;
+syringe_count = 0;
+syringe_max = 3;
+
+use_syringe = function(_revive)
+{
+    if (syringe_count <= 0) return false;
+    if (!_revive && (pHP <= 0 || pHP >= pHP_max)) return false;
+
+    syringe_count -= 1;
+
+    if (_revive)
+    {
+        pHP = pHP_max / 3;
+
+        // Brief protection after revival.
+        dmg_cooldown = max(dmg_cooldown, 1);
+    }
+    else
+    {
+        pHP = min(pHP_max, pHP + pHP_max / 3);
+		        global.demo_used_healing = true;
+    }
+
+    return true;
+};
+
 // =====================================
 // NORMAL JUMP
 // =====================================
 
 jump_speed = -5.2;
-
 
 // =====================================
 // WALL JUMP
@@ -33,7 +87,6 @@ right_wall_jumps_used = 0;
 
 max_wall_jumps_per_side = 2;
 
-
 // =====================================
 // WALL-JUMP CONTROL LOCK
 // =====================================
@@ -42,7 +95,6 @@ wall_jump_lock_time = 0;
 wall_jump_lock_duration = 0.3;
 
 wall_jump_forced_direction = 0;
-
 
 // =====================================
 // COYOTE TIME
@@ -53,29 +105,51 @@ coyote_duration = 0.15;
 
 movement_boost_multiplier = 1;
 // =====================================
-// SLAM
+// SLAM STATE
 // =====================================
+is_slamming = false;
+slam_distance = 0;
+slam_last_y = 0;
+slam_power = 1;
 
+// =====================================
+// SLAM MOVEMENT
+// =====================================
 slam_speed = 8;
 slam_max_speed = 40;
 slam_acceleration = 1.1;
 
-is_slamming = false;
-
-slam_distance = 0;
-slam_last_y = 0;
-
-slam_power = 1;
-
-// Power doubles every 128 pixels fallen.
-slam_power_double_distance = 128;
-
-// Prevent completely absurd values. No lol ezzzzzzzzzzzzz
+// =====================================
+// SLAM CHARGING
+// =====================================
+slam_power_double_distance = 128; // Must be greater than zero.
 slam_power_max = 64;
 
-slam_base_damage = 15;
-slam_base_radius = 30;
+// =====================================
+// SLAM DAMAGE
+// =====================================
+slam_base_damage = 5;
+slam_max_damage = 960;
+slam_damage_power_exponent = 1;
 
+// =====================================
+// SLAM AOE (RADIUS IN PIXELS)
+// =====================================
+slam_base_radius = 30;
+slam_max_radius = 240;
+slam_radius_power_exponent = 1;
+
+// =====================================
+// SLAM KNOCKBACK (PIXELS PER SECOND)
+// =====================================
+slam_base_knockback_speed = 350;
+slam_max_knockback_speed = 900;
+slam_knockback_power_exponent = 0.5;
+// =====================================
+// SLAM COOLDOWN
+// =====================================
+slam_cooldown = 1; // Seconds between slams.
+slam_cooldown_timer = 0;
 
 // =====================================
 // SLIDING
@@ -83,14 +157,13 @@ slam_base_radius = 30;
 slide_direction = 0;
 is_sliding = false;
 
-// Sliding is 1.5 times faster than normal movement
+// Sliding speed is 1.8 times normal movement.
 slide_speed_multiplier = 1.8;
 slide_movespeed_multiplier = 1.25;
 slide_jump_speed = -8;
 slide_time = 4;
 slide_boost_timer = 0;
-// Direction of the slide
-// -1 = left, 1 = right
+// Slide direction: -1 = left, 1 = right.
 
 // =====================================
 // DYNAMIC PLAYER COLLIDER
@@ -99,139 +172,69 @@ slide_boost_timer = 0;
 player_bound_fixture = -1;
 player_collider_short = false;
 
-
 player_set_collider = function(_short)
 {
-    // Remove previous bound fixture
     if (player_bound_fixture != -1)
     {
-        physics_remove_fixture(
-            id,
-            player_bound_fixture
-        );
-
+        physics_remove_fixture(id, player_bound_fixture);
         player_bound_fixture = -1;
     }
 
+    var _fix = physics_fixture_create();
+    var _half_width;
+    var _half_height;
 
-    var _fix =
-        physics_fixture_create();
+    if (_short)
+    {
+        // Sliding: 59 px wide, 27 px tall.
+        _half_width = 29.5;
+        _half_height = 13.5;
+    }
+    else
+    {
+        // Standing: 27 px wide, 59 px tall.
+        _half_width = 13.5;
+        _half_height = 29.5;
+    }
 
-
-    // Current standing collider is roughly
-    // 27 pixels wide.
-var _half_width;
-var _half_height;
-
-if (_short)
-{
-    // Slide: player lying sideways
-    // 59 px wide × 27 px tall
-    _half_width = 29.5;
-    _half_height = 13.5;
-}
-else
-{
-    // Standing: 27 px wide × 59 px tall
-    _half_width = 13.5;
-    _half_height = 29.5;
-}
-
-
-    physics_fixture_set_box_shape(
-        _fix,
-        _half_width,
-        _half_height
-    );
-
-
-    // Match your current player physics
+    physics_fixture_set_box_shape(_fix, _half_width, _half_height);
     physics_fixture_set_density(_fix, 0.5);
     physics_fixture_set_friction(_fix, 0.5);
     physics_fixture_set_restitution(_fix, 0);
+    physics_fixture_set_linear_damping(_fix, 0.1);
+    physics_fixture_set_angular_damping(_fix, 100);
+    physics_fixture_set_collision_group(_fix, 1);
+    physics_fixture_set_kinematic(_fix);
 
-    physics_fixture_set_linear_damping(
-        _fix,
-        0.1
+    // Keep both colliders anchored at the player's feet.
+    player_bound_fixture = physics_fixture_bind_ext(
+        _fix, id, 0.5, -_half_height
     );
-
-    physics_fixture_set_angular_damping(
-        _fix,
-        100
-    );
-
-    physics_fixture_set_collision_group(
-        _fix,
-        1
-    );
-
-	physics_fixture_set_kinematic(_fix);
-
-
-    // Your player's origin is at its feet.
-    // Keep both colliders anchored to the ground.
-    player_bound_fixture =
-        physics_fixture_bind_ext(
-            _fix,
-            id,
-            0.5,
-            -_half_height
-        );
-
 
     physics_fixture_delete(_fix);
-
     player_collider_short = _short;
-
     phy_fixed_rotation = true;
 };
 
-
-// Start with standing collider
+// Start with the standing collider.
 player_set_collider(false);
 
 player_can_stand = function()
 {
-    // Current slide collider top
     var _start_y = y - 24;
-
-    // Standing collider top
     var _end_y = y - 60;
 
+    var _left = physics_raycast(
+        x - 12, _start_y, x - 12, _end_y, o_Block, false
+    );
+    var _middle = physics_raycast(
+        x, _start_y, x, _end_y, o_Block, false
+    );
+    var _right = physics_raycast(
+        x + 12, _start_y, x + 12, _end_y, o_Block, false
+    );
 
-    var _left =
-        physics_raycast(
-            x - 12,
-            _start_y,
-            x - 12,
-            _end_y,
-            o_Block,
-            false
-        );
-
-    var _middle =
-        physics_raycast(
-            x,
-            _start_y,
-            x,
-            _end_y,
-            o_Block,
-            false
-        );
-
-    var _right =
-        physics_raycast(
-            x + 12,
-            _start_y,
-            x + 12,
-            _end_y,
-            o_Block,
-            false
-        );
-
-
-    return
-        is_undefined(_left)
+    return is_undefined(_left)
         && is_undefined(_middle)
         && is_undefined(_right);
 };
@@ -243,10 +246,15 @@ player_can_stand = function()
 // Current weapon
 weapon_type = "pistol";
 
+// Legacy hit-knockback settings, retained for external attack scripts.
+// The new slam uses slam_base_knockback_speed instead.
+enemy_knock = 50;
+knockback_apply = enemy_knock;
+
 // Pistol properties
 pistol_damage = 10;
 pistol_range = 2000;
-pistol_cooldown = 0.45;
+pistol_cooldown = 0.2;
 pistol_piercing = 0;
 
 // Shooting timer
@@ -291,7 +299,7 @@ primary_fire = false;
 alt_fire = false;
 
 // =================================
-// ground detect
+// GROUND DETECTION
 // =================================
 ground_check_y_offset = 4;
 ground_check_x_offset = 10;
@@ -323,7 +331,7 @@ aim_rig_mode = AimRigMode.ONE_HANDED;
 aim_angle = 0;
 aim_facing = 1;
 
-// points in s_Player for attachments
+// Attachment points in s_Player.
 rig_neck_x = 18;
 rig_neck_y = 12;
 
@@ -333,7 +341,7 @@ rig_shoulder_l_y = 16;
 rig_shoulder_r_x = 12;
 rig_shoulder_r_y = 16;
 
-// Joint-to-Joint lengths
+// Joint-to-joint lengths.
 rig_upper_arm_length = 12;
 rig_lower_arm_length = 17;
 
@@ -356,7 +364,6 @@ rig_support_grip_y = 3;
 rig_muzzle_x = 10;
 rig_muzzle_y = 1;
 
-
 // =====================================
 // COIN ALT FIRE
 // =====================================
@@ -366,10 +373,6 @@ coin_throw_up = 4;
 
 // Small extra forward push
 coin_throw_forward = 1.5;
-
-// =====================================
-// COIN ALT FIRE
-// =====================================
 
 // Maximum number of coins.
 // Future items can increase this.
@@ -390,7 +393,6 @@ coin_recharge_timer = 0;
 // vertical speed is within this range.
 coin_split_y_speed_threshold = 0.75;
 
-
 // =====================================
 // MANTLE LUNGE
 // =====================================
@@ -400,7 +402,6 @@ mantle_lunge_direction = 0;
 
 mantle_lunge_speed = 8;
 mantle_lunge_up = -6;
-
 
 // =====================================
 // SLIDE DOUBLE JUMP
@@ -426,7 +427,6 @@ slide_double_boost_stage3_duration = 5;
 slide_double_boost_stage1_multiplier = 1.5;
 slide_double_boost_stage2_multiplier = 1.33;
 
-
 // =====================================
 // WALL SLIDE
 // =====================================
@@ -436,7 +436,6 @@ wall_slide_speed = 0;
 
 wall_slide_decel = 0.15;
 
-
 // =====================================
 // DASH
 // =====================================
@@ -444,6 +443,36 @@ wall_slide_decel = 0.15;
 dash_speed = 6;
 air_dash_speed = 3;
 dash_decay = 0.1;
+
+dash_iframe_timer = 0;
+ground_dash_iframe_duration = 0.2;
+air_dash_iframe_duration = 0.38;
+dash_iframe_is_ground = false;
+
+// Call whenever an attack attempts to damage the player.
+// Returns true when dash protection blocks it.
+dash_blocks_damage = function()
+{
+    if (dash_iframe_is_ground && !dash_active)
+    {
+        dash_iframe_timer = 0;
+        dash_iframe_is_ground = false;
+    }
+
+    // Once expired, attacks cannot restart the protection.
+    if (dash_iframe_timer <= 0)
+    {
+        return false;
+    }
+
+    if (dash_iframe_is_ground)
+    {
+        // Refresh, rather than add more time.
+        dash_iframe_timer = ground_dash_iframe_duration;
+    }
+
+    return true;
+};
 
 dash_active = false;
 dash_direction = 0;
@@ -462,7 +491,6 @@ dash_started_moving = false;
 dash_burst_timer = 0;
 dash_burst_duration = 0.12;
 dash_stationary_speed = 15;
-
 
 // =====================================
 // GROUND DASH CHAIN
@@ -508,3 +536,28 @@ coin_anchor_cooldown = 8;
 coin_anchor_cooldown_timer = 0;
 
 hacking_controller = noone;
+
+// Restore inventory when arriving from the tutorial or train.
+if (variable_global_exists("demo_travel_state"))
+{
+    if (is_struct(global.demo_travel_state))
+    {
+        var _travel = global.demo_travel_state;
+
+        pHP_max = _travel.hp_max;
+        pHP = _travel.hp;
+
+        medkit_owned = _travel.medkit_owned;
+        syringe_max = _travel.syringe_max;
+        syringe_count = _travel.syringe_count;
+
+        coin_max = _travel.coin_max;
+        coin_count = _travel.coin_count;
+
+        weapon_type = _travel.weapon_type;
+        item_coin_anchor = _travel.item_coin_anchor;
+
+        // Consume the transfer so ordinary restarts do not reuse it.
+        global.demo_travel_state = undefined;
+    }
+}

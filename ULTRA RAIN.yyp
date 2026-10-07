@@ -1,776 +1,172 @@
 {
-  "$GMProject": "v1",
-  "%Name": "ULTRA RAIN",
-  "AudioGroups": [
-    {
-      "$GMAudioGroup": "v1",
-      "%Name": "audiogroup_default",
-      "exportDir": "",
-      "name": "audiogroup_default",
-      "resourceType": "GMAudioGroup",
-      "resourceVersion": "2.0",
-      "targets": -1,
-    }
+  "$GMProject":"v1",
+  "%Name":"ULTRA RAIN",
+  "AudioGroups":[
+    {"$GMAudioGroup":"v1","%Name":"audiogroup_default","exportDir":"","name":"audiogroup_default","resourceType":"GMAudioGroup","resourceVersion":"2.0","targets":-1,},
   ],
-  "configs": {
-    "children": [],
-    "name": "Default",
+  "configs":{
+    "children":[],
+    "name":"Default",
   },
-  "defaultScriptType": 1,
-  "Folders": [
-    {
-      "$GMFolder": "",
-      "%Name": "Objects",
-      "folderPath": "folders/Objects.yy",
-      "name": "Objects",
-      "resourceType": "GMFolder",
-      "resourceVersion": "2.0",
-    },
-    {
-      "$GMFolder": "",
-      "%Name": "Enemy&Enemy relevant",
-      "folderPath": "folders/Objects/Enemy&Enemy relevant.yy",
-      "name": "Enemy&Enemy relevant",
-      "resourceType": "GMFolder",
-      "resourceVersion": "2.0",
-    },
-    {
-      "$GMFolder": "",
-      "%Name": "LE_ITEMSSSSS",
-      "folderPath": "folders/Objects/LE_ITEMSSSSS.yy",
-      "name": "LE_ITEMSSSSS",
-      "resourceType": "GMFolder",
-      "resourceVersion": "2.0",
-    },
-    {
-      "$GMFolder": "",
-      "%Name": "Player&Player relevant",
-      "folderPath": "folders/Objects/Player&Player relevant.yy",
-      "name": "Player&Player relevant",
-      "resourceType": "GMFolder",
-      "resourceVersion": "2.0",
-    },
-    {
-      "$GMFolder": "",
-      "%Name": "Walls_und_Doors",
-      "folderPath": "folders/Objects/Walls_und_Doors.yy",
-      "name": "Walls_und_Doors",
-      "resourceType": "GMFolder",
-      "resourceVersion": "2.0",
-    },
-    {
-      "$GMFolder": "",
-      "%Name": "Scripts",
-      "folderPath": "folders/Scripts.yy",
-      "name": "Scripts",
-      "resourceType": "GMFolder",
-      "resourceVersion": "2.0",
-    },
-    {
-      "$GMFolder": "",
-      "%Name": "Sprites",
-      "folderPath": "folders/Sprites.yy",
-      "name": "Sprites",
-      "resourceType": "GMFolder",
-      "resourceVersion": "2.0",
-    },
-    {
-      "$GMFolder": "",
-      "%Name": "Sprite",
-      "folderPath": "folders/Sprites/Sprite.yy",
-      "name": "Sprite",
-      "resourceType": "GMFolder",
-      "resourceVersion": "2.0",
-    },
-    {
-      "$GMFolder": "",
-      "%Name": "exposedwires",
-      "folderPath": "folders/Sprites/Sprite/exposedwires.yy",
-      "name": "exposedwires",
-      "resourceType": "GMFolder",
-      "resourceVersion": "2.0",
-    },
-    {
-      "$GMFolder": "",
-      "%Name": "Player_1",
-      "folderPath": "folders/Sprites/Sprite/Player_1.yy",
-      "name": "Player_1",
-      "resourceType": "GMFolder",
-      "resourceVersion": "2.0",
-    },
-    {
-      "$GMFolder": "",
-      "%Name": "Tile_Sets",
-      "folderPath": "folders/Sprites/Tile_Sets.yy",
-      "name": "Tile_Sets",
-      "resourceType": "GMFolder",
-      "resourceVersion": "2.0",
-    },
-    {
-      "$GMFolder": "",
-      "%Name": "tileset_sprite",
-      "folderPath": "folders/Sprites/Tile_Sets/tileset_sprite.yy",
-      "name": "tileset_sprite",
-      "resourceType": "GMFolder",
-      "resourceVersion": "2.0",
-    }
+  "defaultScriptType":1,
+  "Folders":[
+    {"$GMFolder":"","%Name":"Objects","folderPath":"folders/Objects.yy","name":"Objects","resourceType":"GMFolder","resourceVersion":"2.0",},
+    {"$GMFolder":"","%Name":"Enemy&Enemy relevant","folderPath":"folders/Objects/Enemy&Enemy relevant.yy","name":"Enemy&Enemy relevant","resourceType":"GMFolder","resourceVersion":"2.0",},
+    {"$GMFolder":"","%Name":"LE_ITEMSSSSS","folderPath":"folders/Objects/LE_ITEMSSSSS.yy","name":"LE_ITEMSSSSS","resourceType":"GMFolder","resourceVersion":"2.0",},
+    {"$GMFolder":"","%Name":"Player&Player relevant","folderPath":"folders/Objects/Player&Player relevant.yy","name":"Player&Player relevant","resourceType":"GMFolder","resourceVersion":"2.0",},
+    {"$GMFolder":"","%Name":"Walls_und_Doors","folderPath":"folders/Objects/Walls_und_Doors.yy","name":"Walls_und_Doors","resourceType":"GMFolder","resourceVersion":"2.0",},
+    {"$GMFolder":"","%Name":"Scripts","folderPath":"folders/Scripts.yy","name":"Scripts","resourceType":"GMFolder","resourceVersion":"2.0",},
+    {"$GMFolder":"","%Name":"Sprites","folderPath":"folders/Sprites.yy","name":"Sprites","resourceType":"GMFolder","resourceVersion":"2.0",},
+    {"$GMFolder":"","%Name":"Sprite","folderPath":"folders/Sprites/Sprite.yy","name":"Sprite","resourceType":"GMFolder","resourceVersion":"2.0",},
+    {"$GMFolder":"","%Name":"exposedwires","folderPath":"folders/Sprites/Sprite/exposedwires.yy","name":"exposedwires","resourceType":"GMFolder","resourceVersion":"2.0",},
+    {"$GMFolder":"","%Name":"Player_1","folderPath":"folders/Sprites/Sprite/Player_1.yy","name":"Player_1","resourceType":"GMFolder","resourceVersion":"2.0",},
+    {"$GMFolder":"","%Name":"Tile_Sets","folderPath":"folders/Sprites/Tile_Sets.yy","name":"Tile_Sets","resourceType":"GMFolder","resourceVersion":"2.0",},
+    {"$GMFolder":"","%Name":"tileset_sprite","folderPath":"folders/Sprites/Tile_Sets/tileset_sprite.yy","name":"tileset_sprite","resourceType":"GMFolder","resourceVersion":"2.0",},
   ],
-  "ForcedPrefabProjectReferences": [],
-  "IncludedFiles": [],
-  "isEcma": false,
-  "LibraryEmitters": [],
-  "MetaData": {
-    "IDEVersion": "2026.0.0.16",
+  "ForcedPrefabProjectReferences":[],
+  "IncludedFiles":[],
+  "isEcma":false,
+  "LibraryEmitters":[],
+  "MetaData":{
+    "IDEVersion":"2026.0.0.16",
   },
-  "name": "ULTRA RAIN",
-  "resources": [
-    {
-      "id": {
-        "name": "o_Block_scary",
-        "path": "objects/o_Block_scary/o_Block_scary.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "o_Block_wires_left",
-        "path": "objects/o_Block_wires_left/o_Block_wires_left.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "o_Block_wires_right",
-        "path": "objects/o_Block_wires_right/o_Block_wires_right.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "o_Block_wires",
-        "path": "objects/o_Block_wires/o_Block_wires.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "o_Block",
-        "path": "objects/o_Block/o_Block.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "o_CAMERA",
-        "path": "objects/o_CAMERA/o_CAMERA.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "o_Coin",
-        "path": "objects/o_Coin/o_Coin.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "o_Door_UNB",
-        "path": "objects/o_Door_UNB/o_Door_UNB.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "o_DoorController",
-        "path": "objects/o_DoorController/o_DoorController.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "o_HitscanVisual",
-        "path": "objects/o_HitscanVisual/o_HitscanVisual.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "o_pinhouse",
-        "path": "objects/o_pinhouse/o_pinhouse.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "o_Player",
-        "path": "objects/o_Player/o_Player.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "o_TerminalSpark",
-        "path": "objects/o_TerminalSpark/o_TerminalSpark.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "oDrone",
-        "path": "objects/oDrone/oDrone.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "oEnemy_TEMP",
-        "path": "objects/oEnemy_TEMP/oEnemy_TEMP.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "oEnemyDroneBullet",
-        "path": "objects/oEnemyDroneBullet/oEnemyDroneBullet.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "oEnemyParent",
-        "path": "objects/oEnemyParent/oEnemyParent.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "oHeal",
-        "path": "objects/oHeal/oHeal.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "oMiniBoss",
-        "path": "objects/oMiniBoss/oMiniBoss.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "oSlashEffect",
-        "path": "objects/oSlashEffect/oSlashEffect.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "oSwordBeam",
-        "path": "objects/oSwordBeam/oSwordBeam.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "oTrap",
-        "path": "objects/oTrap/oTrap.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "TIMER_STOP",
-        "path": "objects/TIMER_STOP/TIMER_STOP.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "LE_TUTORIAL_WIP",
-        "path": "rooms/LE_TUTORIAL_WIP/LE_TUTORIAL_WIP.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "Room1",
-        "path": "rooms/Room1/Room1.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "Coin_ricoshet",
-        "path": "scripts/Coin_ricoshet/Coin_ricoshet.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "draw_ik_arm",
-        "path": "scripts/draw_ik_arm/draw_ik_arm.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "player_rig_pose",
-        "path": "scripts/player_rig_pose/player_rig_pose.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "ray_bbox_fraction",
-        "path": "scripts/ray_bbox_fraction/ray_bbox_fraction.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "raycast_wall_distance",
-        "path": "scripts/raycast_wall_distance/raycast_wall_distance.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "weapon_hitscan",
-        "path": "scripts/weapon_hitscan/weapon_hitscan.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "die",
-        "path": "sprites/die/die.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "DOOR_TEMP",
-        "path": "sprites/DOOR_TEMP/DOOR_TEMP.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "exposedwires_down",
-        "path": "sprites/exposedwires_down/exposedwires_down.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "exposedwires_left",
-        "path": "sprites/exposedwires_left/exposedwires_left.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "exposedwires_right",
-        "path": "sprites/exposedwires_right/exposedwires_right.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "exposedwires_up",
-        "path": "sprites/exposedwires_up/exposedwires_up.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "Flowery_Deltarune",
-        "path": "sprites/Flowery_Deltarune/Flowery_Deltarune.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "middleground_tileset",
-        "path": "sprites/middleground_tileset/middleground_tileset.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "s_Coin_Apex",
-        "path": "sprites/s_Coin_Apex/s_Coin_Apex.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "s_Coin",
-        "path": "sprites/s_Coin/s_Coin.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "s_Dicke_Tuer",
-        "path": "sprites/s_Dicke_Tuer/s_Dicke_Tuer.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "s_Lab",
-        "path": "sprites/s_Lab/s_Lab.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "s_Pistol",
-        "path": "sprites/s_Pistol/s_Pistol.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "s_Player_Air",
-        "path": "sprites/s_Player_Air/s_Player_Air.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "s_Player_Arm_Lower_L",
-        "path": "sprites/s_Player_Arm_Lower_L/s_Player_Arm_Lower_L.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "s_Player_Arm_Lower_R",
-        "path": "sprites/s_Player_Arm_Lower_R/s_Player_Arm_Lower_R.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "s_Player_Arm_Upper_L",
-        "path": "sprites/s_Player_Arm_Upper_L/s_Player_Arm_Upper_L.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "s_Player_Arm_Upper_R",
-        "path": "sprites/s_Player_Arm_Upper_R/s_Player_Arm_Upper_R.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "s_Player_Head",
-        "path": "sprites/s_Player_Head/s_Player_Head.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "s_Player_Run",
-        "path": "sprites/s_Player_Run/s_Player_Run.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "s_Player_Slide_Left",
-        "path": "sprites/s_Player_Slide_Left/s_Player_Slide_Left.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "s_Player_Slide_Right",
-        "path": "sprites/s_Player_Slide_Right/s_Player_Slide_Right.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "s_Player_wallHold_Left",
-        "path": "sprites/s_Player_wallHold_Left/s_Player_wallHold_Left.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "s_Player_wallHold_Right",
-        "path": "sprites/s_Player_wallHold_Right/s_Player_wallHold_Right.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "s_Player_wallJump",
-        "path": "sprites/s_Player_wallJump/s_Player_wallJump.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "s_Player",
-        "path": "sprites/s_Player/s_Player.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "s_Terminal_fixed",
-        "path": "sprites/s_Terminal_fixed/s_Terminal_fixed.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "s_Terminal",
-        "path": "sprites/s_Terminal/s_Terminal.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "sDarkRepulsor",
-        "path": "sprites/sDarkRepulsor/sDarkRepulsor.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "sDrone_hit",
-        "path": "sprites/sDrone_hit/sDrone_hit.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "sDrone",
-        "path": "sprites/sDrone/sDrone.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "sEnemy_hit",
-        "path": "sprites/sEnemy_hit/sEnemy_hit.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "sEnemy",
-        "path": "sprites/sEnemy/sEnemy.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "sEnemyAttack",
-        "path": "sprites/sEnemyAttack/sEnemyAttack.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "sEnemyBite",
-        "path": "sprites/sEnemyBite/sEnemyBite.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "sEnemyClimb",
-        "path": "sprites/sEnemyClimb/sEnemyClimb.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "sEnemyStunned",
-        "path": "sprites/sEnemyStunned/sEnemyStunned.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "sHeal",
-        "path": "sprites/sHeal/sHeal.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "sMiniBoss",
-        "path": "sprites/sMiniBoss/sMiniBoss.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "sMiniBossAttack",
-        "path": "sprites/sMiniBossAttack/sMiniBossAttack.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "sMiniBossAttackNoShield",
-        "path": "sprites/sMiniBossAttackNoShield/sMiniBossAttackNoShield.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "sMiniBossClimb",
-        "path": "sprites/sMiniBossClimb/sMiniBossClimb.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "sMiniBossDefend",
-        "path": "sprites/sMiniBossDefend/sMiniBossDefend.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "sMiniBossHardlanding",
-        "path": "sprites/sMiniBossHardlanding/sMiniBossHardlanding.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "sMiniBossHit",
-        "path": "sprites/sMiniBossHit/sMiniBossHit.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "sMiniBossStand",
-        "path": "sprites/sMiniBossStand/sMiniBossStand.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "sMiniBossStandNoShield",
-        "path": "sprites/sMiniBossStandNoShield/sMiniBossStandNoShield.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "sMiniBossStunned",
-        "path": "sprites/sMiniBossStunned/sMiniBossStunned.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "spr_background_tiles",
-        "path": "sprites/spr_background_tiles/spr_background_tiles.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "Sprite1",
-        "path": "sprites/Sprite1/Sprite1.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "Sprite19",
-        "path": "sprites/Sprite19/Sprite19.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "Sprite2",
-        "path": "sprites/Sprite2/Sprite2.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "Sprite3",
-        "path": "sprites/Sprite3/Sprite3.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "Sprite4",
-        "path": "sprites/Sprite4/Sprite4.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "Sprite41",
-        "path": "sprites/Sprite41/Sprite41.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "Sprite42",
-        "path": "sprites/Sprite42/Sprite42.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "Sprite44",
-        "path": "sprites/Sprite44/Sprite44.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "Sprite5",
-        "path": "sprites/Sprite5/Sprite5.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "Sprite8",
-        "path": "sprites/Sprite8/Sprite8.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "Sprite9",
-        "path": "sprites/Sprite9/Sprite9.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "sSlash",
-        "path": "sprites/sSlash/sSlash.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "sSowrdBeam",
-        "path": "sprites/sSowrdBeam/sSowrdBeam.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "sTrap",
-        "path": "sprites/sTrap/sTrap.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "TABLE_TEMP",
-        "path": "sprites/TABLE_TEMP/TABLE_TEMP.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "Tile_Set_Sprite",
-        "path": "sprites/Tile_Set_Sprite/Tile_Set_Sprite.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "Tile_set_wall",
-        "path": "tilesets/Tile_set_wall/Tile_set_wall.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "TileSet1",
-        "path": "tilesets/TileSet1/TileSet1.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "ts_background",
-        "path": "tilesets/ts_background/ts_background.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "ts_Lab",
-        "path": "tilesets/ts_Lab/ts_Lab.yy",
-      }
-    },
-    {
-      "id": {
-        "name": "LE_TRAIN",
-        "path": "rooms/LE_TRAIN/LE_TRAIN.yy",
-      }
-    },
+  "name":"ULTRA RAIN",
+  "resources":[
+    {"id":{"name":"o_Block_Breakable","path":"objects/o_Block_Breakable/o_Block_Breakable.yy",},},
+    {"id":{"name":"o_Block_scary","path":"objects/o_Block_scary/o_Block_scary.yy",},},
+    {"id":{"name":"o_Block_wires_left","path":"objects/o_Block_wires_left/o_Block_wires_left.yy",},},
+    {"id":{"name":"o_Block_wires_right","path":"objects/o_Block_wires_right/o_Block_wires_right.yy",},},
+    {"id":{"name":"o_Block_wires","path":"objects/o_Block_wires/o_Block_wires.yy",},},
+    {"id":{"name":"o_Block","path":"objects/o_Block/o_Block.yy",},},
+    {"id":{"name":"o_CAMERA","path":"objects/o_CAMERA/o_CAMERA.yy",},},
+    {"id":{"name":"o_Chute_Breakable","path":"objects/o_Chute_Breakable/o_Chute_Breakable.yy",},},
+    {"id":{"name":"o_Coin","path":"objects/o_Coin/o_Coin.yy",},},
+    {"id":{"name":"o_DemoTerminal","path":"objects/o_DemoTerminal/o_DemoTerminal.yy",},},
+    {"id":{"name":"o_Door_Breakable","path":"objects/o_Door_Breakable/o_Door_Breakable.yy",},},
+    {"id":{"name":"o_Door_UNB","path":"objects/o_Door_UNB/o_Door_UNB.yy",},},
+    {"id":{"name":"o_DoorController","path":"objects/o_DoorController/o_DoorController.yy",},},
+    {"id":{"name":"o_DoorDebris","path":"objects/o_DoorDebris/o_DoorDebris.yy",},},
+    {"id":{"name":"o_DoorEnemySpawn","path":"objects/o_DoorEnemySpawn/o_DoorEnemySpawn.yy",},},
+    {"id":{"name":"o_HitscanVisual","path":"objects/o_HitscanVisual/o_HitscanVisual.yy",},},
+    {"id":{"name":"o_MedkitPickup","path":"objects/o_MedkitPickup/o_MedkitPickup.yy",},},
+    {"id":{"name":"o_pinhouse","path":"objects/o_pinhouse/o_pinhouse.yy",},},
+    {"id":{"name":"o_Player","path":"objects/o_Player/o_Player.yy",},},
+    {"id":{"name":"o_SecurityCamera","path":"objects/o_SecurityCamera/o_SecurityCamera.yy",},},
+    {"id":{"name":"o_TerminalSpark","path":"objects/o_TerminalSpark/o_TerminalSpark.yy",},},
+    {"id":{"name":"o_TrainRide","path":"objects/o_TrainRide/o_TrainRide.yy",},},
+    {"id":{"name":"oDrone","path":"objects/oDrone/oDrone.yy",},},
+    {"id":{"name":"oEnemy_TEMP","path":"objects/oEnemy_TEMP/oEnemy_TEMP.yy",},},
+    {"id":{"name":"oEnemyDroneBullet","path":"objects/oEnemyDroneBullet/oEnemyDroneBullet.yy",},},
+    {"id":{"name":"oEnemyParent","path":"objects/oEnemyParent/oEnemyParent.yy",},},
+    {"id":{"name":"oHeal","path":"objects/oHeal/oHeal.yy",},},
+    {"id":{"name":"oMiniBoss","path":"objects/oMiniBoss/oMiniBoss.yy",},},
+    {"id":{"name":"oSlamVFX","path":"objects/oSlamVFX/oSlamVFX.yy",},},
+    {"id":{"name":"oSlashEffect","path":"objects/oSlashEffect/oSlashEffect.yy",},},
+    {"id":{"name":"oSwordBeam","path":"objects/oSwordBeam/oSwordBeam.yy",},},
+    {"id":{"name":"oTrap","path":"objects/oTrap/oTrap.yy",},},
+    {"id":{"name":"TIMER_STOP","path":"objects/TIMER_STOP/TIMER_STOP.yy",},},
+    {"id":{"name":"LE_DEMO_END","path":"rooms/LE_DEMO_END/LE_DEMO_END.yy",},},
+    {"id":{"name":"LE_TRAIN","path":"rooms/LE_TRAIN/LE_TRAIN.yy",},},
+    {"id":{"name":"LE_TUTORIAL_WIP","path":"rooms/LE_TUTORIAL_WIP/LE_TUTORIAL_WIP.yy",},},
+    {"id":{"name":"Room1","path":"rooms/Room1/Room1.yy",},},
+    {"id":{"name":"Coin_ricoshet","path":"scripts/Coin_ricoshet/Coin_ricoshet.yy",},},
+    {"id":{"name":"draw_ik_arm","path":"scripts/draw_ik_arm/draw_ik_arm.yy",},},
+    {"id":{"name":"player_rig_pose","path":"scripts/player_rig_pose/player_rig_pose.yy",},},
+    {"id":{"name":"ray_bbox_fraction","path":"scripts/ray_bbox_fraction/ray_bbox_fraction.yy",},},
+    {"id":{"name":"raycast_wall_distance","path":"scripts/raycast_wall_distance/raycast_wall_distance.yy",},},
+    {"id":{"name":"scr_drone_trace","path":"scripts/scr_drone_trace/scr_drone_trace.yy",},},
+    {"id":{"name":"scr_save_Player","path":"scripts/scr_save_Player/scr_save_Player.yy",},},
+    {"id":{"name":"scr_slam","path":"scripts/scr_slam/scr_slam.yy",},},
+    {"id":{"name":"weapon_hitscan","path":"scripts/weapon_hitscan/weapon_hitscan.yy",},},
+    {"id":{"name":"backinblack","path":"sprites/backinblack/backinblack.yy",},},
+    {"id":{"name":"die","path":"sprites/die/die.yy",},},
+    {"id":{"name":"DOOR_TEMP","path":"sprites/DOOR_TEMP/DOOR_TEMP.yy",},},
+    {"id":{"name":"exposedwires_down","path":"sprites/exposedwires_down/exposedwires_down.yy",},},
+    {"id":{"name":"exposedwires_left","path":"sprites/exposedwires_left/exposedwires_left.yy",},},
+    {"id":{"name":"exposedwires_right","path":"sprites/exposedwires_right/exposedwires_right.yy",},},
+    {"id":{"name":"exposedwires_up","path":"sprites/exposedwires_up/exposedwires_up.yy",},},
+    {"id":{"name":"fadetoblack","path":"sprites/fadetoblack/fadetoblack.yy",},},
+    {"id":{"name":"Flowery_Deltarune","path":"sprites/Flowery_Deltarune/Flowery_Deltarune.yy",},},
+    {"id":{"name":"middleground_tileset","path":"sprites/middleground_tileset/middleground_tileset.yy",},},
+    {"id":{"name":"s_Chute_Break","path":"sprites/s_Chute_Break/s_Chute_Break.yy",},},
+    {"id":{"name":"s_Coin_Apex","path":"sprites/s_Coin_Apex/s_Coin_Apex.yy",},},
+    {"id":{"name":"s_Coin","path":"sprites/s_Coin/s_Coin.yy",},},
+    {"id":{"name":"s_Dicke_Tuer","path":"sprites/s_Dicke_Tuer/s_Dicke_Tuer.yy",},},
+    {"id":{"name":"s_Door_Break","path":"sprites/s_Door_Break/s_Door_Break.yy",},},
+    {"id":{"name":"s_DoorDebris","path":"sprites/s_DoorDebris/s_DoorDebris.yy",},},
+    {"id":{"name":"s_Lab","path":"sprites/s_Lab/s_Lab.yy",},},
+    {"id":{"name":"s_Medkit","path":"sprites/s_Medkit/s_Medkit.yy",},},
+    {"id":{"name":"s_Pistol","path":"sprites/s_Pistol/s_Pistol.yy",},},
+    {"id":{"name":"s_Player_Air","path":"sprites/s_Player_Air/s_Player_Air.yy",},},
+    {"id":{"name":"s_Player_Arm_Lower_L","path":"sprites/s_Player_Arm_Lower_L/s_Player_Arm_Lower_L.yy",},},
+    {"id":{"name":"s_Player_Arm_Lower_R","path":"sprites/s_Player_Arm_Lower_R/s_Player_Arm_Lower_R.yy",},},
+    {"id":{"name":"s_Player_Arm_Upper_L","path":"sprites/s_Player_Arm_Upper_L/s_Player_Arm_Upper_L.yy",},},
+    {"id":{"name":"s_Player_Arm_Upper_R","path":"sprites/s_Player_Arm_Upper_R/s_Player_Arm_Upper_R.yy",},},
+    {"id":{"name":"s_Player_Head","path":"sprites/s_Player_Head/s_Player_Head.yy",},},
+    {"id":{"name":"s_Player_Run","path":"sprites/s_Player_Run/s_Player_Run.yy",},},
+    {"id":{"name":"s_Player_Slide_Left","path":"sprites/s_Player_Slide_Left/s_Player_Slide_Left.yy",},},
+    {"id":{"name":"s_Player_Slide_Right","path":"sprites/s_Player_Slide_Right/s_Player_Slide_Right.yy",},},
+    {"id":{"name":"s_Player_wallHold_Left","path":"sprites/s_Player_wallHold_Left/s_Player_wallHold_Left.yy",},},
+    {"id":{"name":"s_Player_wallHold_Right","path":"sprites/s_Player_wallHold_Right/s_Player_wallHold_Right.yy",},},
+    {"id":{"name":"s_Player_wallJump","path":"sprites/s_Player_wallJump/s_Player_wallJump.yy",},},
+    {"id":{"name":"s_Player","path":"sprites/s_Player/s_Player.yy",},},
+    {"id":{"name":"s_SecurityCamera","path":"sprites/s_SecurityCamera/s_SecurityCamera.yy",},},
+    {"id":{"name":"s_Syringe","path":"sprites/s_Syringe/s_Syringe.yy",},},
+    {"id":{"name":"s_Terminal_fixed","path":"sprites/s_Terminal_fixed/s_Terminal_fixed.yy",},},
+    {"id":{"name":"s_Terminal","path":"sprites/s_Terminal/s_Terminal.yy",},},
+    {"id":{"name":"sDarkRepulsor","path":"sprites/sDarkRepulsor/sDarkRepulsor.yy",},},
+    {"id":{"name":"sDrone_hit","path":"sprites/sDrone_hit/sDrone_hit.yy",},},
+    {"id":{"name":"sDrone","path":"sprites/sDrone/sDrone.yy",},},
+    {"id":{"name":"sEnemy_hit","path":"sprites/sEnemy_hit/sEnemy_hit.yy",},},
+    {"id":{"name":"sEnemy","path":"sprites/sEnemy/sEnemy.yy",},},
+    {"id":{"name":"sEnemyAttack","path":"sprites/sEnemyAttack/sEnemyAttack.yy",},},
+    {"id":{"name":"sEnemyBite","path":"sprites/sEnemyBite/sEnemyBite.yy",},},
+    {"id":{"name":"sEnemyClimb","path":"sprites/sEnemyClimb/sEnemyClimb.yy",},},
+    {"id":{"name":"sEnemyStunned","path":"sprites/sEnemyStunned/sEnemyStunned.yy",},},
+    {"id":{"name":"sHeal","path":"sprites/sHeal/sHeal.yy",},},
+    {"id":{"name":"sMiniBoss","path":"sprites/sMiniBoss/sMiniBoss.yy",},},
+    {"id":{"name":"sMiniBossAttack","path":"sprites/sMiniBossAttack/sMiniBossAttack.yy",},},
+    {"id":{"name":"sMiniBossAttackNoShield","path":"sprites/sMiniBossAttackNoShield/sMiniBossAttackNoShield.yy",},},
+    {"id":{"name":"sMiniBossClimb","path":"sprites/sMiniBossClimb/sMiniBossClimb.yy",},},
+    {"id":{"name":"sMiniBossDefend","path":"sprites/sMiniBossDefend/sMiniBossDefend.yy",},},
+    {"id":{"name":"sMiniBossHardlanding","path":"sprites/sMiniBossHardlanding/sMiniBossHardlanding.yy",},},
+    {"id":{"name":"sMiniBossHit","path":"sprites/sMiniBossHit/sMiniBossHit.yy",},},
+    {"id":{"name":"sMiniBossStand","path":"sprites/sMiniBossStand/sMiniBossStand.yy",},},
+    {"id":{"name":"sMiniBossStandNoShield","path":"sprites/sMiniBossStandNoShield/sMiniBossStandNoShield.yy",},},
+    {"id":{"name":"sMiniBossStunned","path":"sprites/sMiniBossStunned/sMiniBossStunned.yy",},},
+    {"id":{"name":"spr_background_tiles","path":"sprites/spr_background_tiles/spr_background_tiles.yy",},},
+    {"id":{"name":"Sprite1","path":"sprites/Sprite1/Sprite1.yy",},},
+    {"id":{"name":"Sprite19","path":"sprites/Sprite19/Sprite19.yy",},},
+    {"id":{"name":"Sprite2","path":"sprites/Sprite2/Sprite2.yy",},},
+    {"id":{"name":"Sprite3","path":"sprites/Sprite3/Sprite3.yy",},},
+    {"id":{"name":"Sprite4","path":"sprites/Sprite4/Sprite4.yy",},},
+    {"id":{"name":"Sprite41","path":"sprites/Sprite41/Sprite41.yy",},},
+    {"id":{"name":"Sprite42","path":"sprites/Sprite42/Sprite42.yy",},},
+    {"id":{"name":"Sprite44","path":"sprites/Sprite44/Sprite44.yy",},},
+    {"id":{"name":"Sprite5","path":"sprites/Sprite5/Sprite5.yy",},},
+    {"id":{"name":"Sprite8","path":"sprites/Sprite8/Sprite8.yy",},},
+    {"id":{"name":"Sprite9","path":"sprites/Sprite9/Sprite9.yy",},},
+    {"id":{"name":"sSlash","path":"sprites/sSlash/sSlash.yy",},},
+    {"id":{"name":"sSowrdBeam","path":"sprites/sSowrdBeam/sSowrdBeam.yy",},},
+    {"id":{"name":"sTrap","path":"sprites/sTrap/sTrap.yy",},},
+    {"id":{"name":"TABLE_TEMP","path":"sprites/TABLE_TEMP/TABLE_TEMP.yy",},},
+    {"id":{"name":"Tile_Set_Sprite","path":"sprites/Tile_Set_Sprite/Tile_Set_Sprite.yy",},},
+    {"id":{"name":"Tile_set_wall","path":"tilesets/Tile_set_wall/Tile_set_wall.yy",},},
+    {"id":{"name":"TileSet1","path":"tilesets/TileSet1/TileSet1.yy",},},
+    {"id":{"name":"TileSet5","path":"tilesets/TileSet5/TileSet5.yy",},},
+    {"id":{"name":"ts_background","path":"tilesets/ts_background/ts_background.yy",},},
+    {"id":{"name":"ts_Lab","path":"tilesets/ts_Lab/ts_Lab.yy",},},
   ],
-  "resourceType": "GMProject",
-  "resourceVersion": "2.0",
-  "RoomOrderNodes": [
-    {
-      "roomId": {
-        "name": "Room1",
-        "path": "rooms/Room1/Room1.yy",
-      }
-    },
-    {
-      "roomId": {
-        "name": "LE_TUTORIAL_WIP",
-        "path": "rooms/LE_TUTORIAL_WIP/LE_TUTORIAL_WIP.yy",
-      }
-    },
-    {
-      "roomId": {
-        "name": "LE_TRAIN",
-        "path": "rooms/LE_TRAIN/LE_TRAIN.yy",
-      }
-    },
+  "resourceType":"GMProject",
+  "resourceVersion":"2.0",
+  "RoomOrderNodes":[
+    {"roomId":{"name":"Room1","path":"rooms/Room1/Room1.yy",},},
+    {"roomId":{"name":"LE_TUTORIAL_WIP","path":"rooms/LE_TUTORIAL_WIP/LE_TUTORIAL_WIP.yy",},},
+    {"roomId":{"name":"LE_TRAIN","path":"rooms/LE_TRAIN/LE_TRAIN.yy",},},
+    {"roomId":{"name":"LE_DEMO_END","path":"rooms/LE_DEMO_END/LE_DEMO_END.yy",},},
   ],
-  "templateType": "game",
-  "TextureGroups": [
-    {
-      "$GMTextureGroup": "",
-      "%Name": "Default",
-      "autocrop": true,
-      "border": 2,
-      "compressFormat": "bz2",
-      "customOptions": "",
-      "directory": "",
-      "groupParent": null,
-      "isScaled": true,
-      "loadType": "default",
-      "mipsToGenerate": 0,
-      "name": "Default",
-      "resourceType": "GMTextureGroup",
-      "resourceVersion": "2.0",
-      "targets": -1,
-    }
+  "templateType":"game",
+  "TextureGroups":[
+    {"$GMTextureGroup":"","%Name":"Default","autocrop":true,"border":2,"compressFormat":"bz2","customOptions":"","directory":"","groupParent":null,"isScaled":true,"loadType":"default","mipsToGenerate":0,"name":"Default","resourceType":"GMTextureGroup","resourceVersion":"2.0","targets":-1,},
   ],
 }

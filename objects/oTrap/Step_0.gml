@@ -11,10 +11,14 @@ var player = collision_rectangle(
     true
 );
 
-if (player != noone && trap_hit_timer <= 0)
+if (player != noone
+&& !player.dash_blocks_damage()
+&& trap_hit_timer <= 0)
 {
     player.pHP -= trap_damage;
     trap_hit_timer = trap_hit_cooldown;
+	
+	if (trap_damage > 0)	{ global.demo_took_damage = true;}
 
    player.trap_knockback_speed_x = clamp(
     player.phy_speed_x * trap_horizontal_retention,
