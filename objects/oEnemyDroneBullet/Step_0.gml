@@ -22,9 +22,8 @@ var player_hit = collision_line(
 
 if (player_hit != noone)
 {
-    if (!player_hit.dash_blocks_damage())
+    if (player_hit.take_damage(bullet_damage, x))
     {
-        player_hit.pHP -= bullet_damage;
 
         show_debug_message(
             "PLAYER HIT! HP: " + string(player_hit.pHP)

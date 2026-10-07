@@ -8,6 +8,37 @@ pHP_max = 100;
 pHP = pHP_max;
 dmg_cooldown = 0;
 
+// Small damage recoil; speeds use the same units as player movement.
+damage_knockback_speed = 2.5;
+damage_knockback_duration = 0.12;
+damage_knockback_lift = 1.5;
+damage_knockback_timer = 0;
+damage_knockback_speed_x = 0;
+damage_knockback_pending = false;
+
+// All attacks use this method. Pass the source's x position when available.
+// Returns true only when health was actually lost.
+take_damage = function(_amount, _source_x = undefined)
+{
+    // Slam blocks the whole hit, including recoil and trap bounce.
+    if (_amount <= 0 || pHP <= 0 || damage_blocks_damage()) return false;
+
+    var _push = 0;
+    if (!is_undefined(_source_x)) _push = sign(x - _source_x);
+    if (_push == 0) _push = -sign(aim_facing);
+    if (_push == 0) _push = -1;
+
+    pHP = max(0, pHP - _amount);
+    global.demo_took_damage = true;
+    damage_knockback_speed_x = _push * damage_knockback_speed;
+    damage_knockback_timer = damage_knockback_duration;
+    damage_knockback_pending = true;
+    is_slamming = false;
+    phy_speed_x = damage_knockback_speed_x;
+    phy_speed_y = min(phy_speed_y, -damage_knockback_lift);
+    return true;
+};
+
 // Reset on a fresh tutorial run, but preserve across the train trip.
 if (room == LE_TUTORIAL_WIP)
 {
@@ -108,6 +139,14 @@ movement_boost_multiplier = 1;
 // SLAM STATE
 // =====================================
 is_slamming = false;
+slam_iframe_timer = 0;
+slam_impact_iframe_duration = 0.12;
+
+// Shared protection for attacks and instant-kill hazards.
+damage_blocks_damage = function()
+{
+    return is_slamming || slam_iframe_timer > 0 || dash_blocks_damage();
+};
 slam_distance = 0;
 slam_last_y = 0;
 slam_power = 1;
@@ -289,7 +328,6 @@ sword_config = {
     slash_forward: 80, // distance from player to slash hitbox
     slash_down: 0,
     slash_scale: 1, // scales slash art and hitbox
-    slash_duration: 0.15,
     slash_damage: 10,
     slash_knockback: 100
 };

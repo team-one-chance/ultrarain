@@ -1,4 +1,5 @@
 var dt = delta_time / 1000000;
+attack_bite_damage_timer = max(0, attack_bite_damage_timer - dt);
 
 // Capture the state BEFORE movement/timers update this frame.
 crowd_spacing_paused = !crowd_can_separate();
@@ -295,6 +296,7 @@ if (player_y_distance <= attack_vertical_tolerance)
                         path_end();
 
                         attack_rocking = true;
+                        attack_bite_damage_timer = attack_bite_damage_delay;
                         image_index = 0;
 
                         attack_rock_side =
@@ -862,4 +864,19 @@ else if (is_climbing)
 else
 {
     sprite_index = normal_sprite;
+}
+
+// Contact hurts only while the bite is visibly active, not while chasing,
+// charging up, returning, stunned or reacting to a hit.
+if (attack_state == 0 && attack_rocking && sprite_index == bite_sprite
+&& attack_bite_damage_timer <= 0)
+{
+    var bite_target = instance_place(x, y, o_Player);
+    if (bite_target != noone && bite_target.dmg_cooldown <= 0)
+    {
+        if (bite_target.take_damage(attack_bite_damage, x))
+        {
+            bite_target.dmg_cooldown = 1;
+        }
+    }
 }
