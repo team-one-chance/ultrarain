@@ -45,7 +45,16 @@ if (_body_facing == 0)
 
 if (weapon_type == "sword")
 {
-    _part_facing = _body_facing;
+    // Keep the weapon and its slash aligned throughout the swing.
+    if (sword_swing_timer > 0)
+    {
+        _part_facing = sword_swing_facing;
+    }
+    else
+    {
+        _part_facing = is_sliding ? aim_facing : _body_facing;
+        if (_part_facing == 0) _part_facing = _body_facing;
+    }
 }
 
 // Neck
