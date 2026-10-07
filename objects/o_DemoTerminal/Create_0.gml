@@ -30,3 +30,7 @@ terminal_text_none =
 	+ "\n\n"
 	+ "It seems you have missed something, maybe try doing a better job next time.";
 	terminal_display_text = terminal_text;
+	
+	command_input = "";
+command_feedback = "";
+command_cursor_timer = 0;

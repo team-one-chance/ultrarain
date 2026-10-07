@@ -10,8 +10,8 @@
   "name":"o_CAMERA",
   "overriddenProperties":[],
   "parent":{
-    "name":"Objects",
-    "path":"folders/Objects.yy",
+    "name":"Player&Player relevant",
+    "path":"folders/Objects/Player&Player relevant.yy",
   },
   "parentObjectId":null,
   "persistent":true,
