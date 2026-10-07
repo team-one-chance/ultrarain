@@ -33,6 +33,7 @@
   "name":"ULTRA RAIN",
   "resources":[
     {"id":{"name":"o_Block_scary","path":"objects/o_Block_scary/o_Block_scary.yy",},},
+    {"id":{"name":"o_Block_wires","path":"objects/o_Block_wires/o_Block_wires.yy",},},
     {"id":{"name":"o_Block","path":"objects/o_Block/o_Block.yy",},},
     {"id":{"name":"o_CAMERA","path":"objects/o_CAMERA/o_CAMERA.yy",},},
     {"id":{"name":"o_Coin","path":"objects/o_Coin/o_Coin.yy",},},
