@@ -39,11 +39,58 @@ draw_text_ext(
     _pw - 64
 );
 
+// Command hint.
+draw_set_halign(fa_left);
+draw_set_color(make_color_rgb(130, 145, 140));
+
+draw_text(
+    _px + 32,
+    _py + _ph - 118,
+    "To restart: VRAIN initiate restart.exe"
+);
+
+// Command input, using the menu's console font.
+var _previous_font = draw_get_font();
+draw_set_font(f_Console);
+draw_set_color(make_color_rgb(90, 235, 130));
+
+var _input_x = _px + 32;
+var _input_y = _py + _ph - 90;
+var _input_text = "> " + command_input;
+
+draw_text(_input_x, _input_y, _input_text);
+
+// Blinking block cursor.
+if (floor(command_cursor_timer / 0.5) mod 2 == 0)
+{
+    var _cursor_x =
+        _input_x + string_width(_input_text) + 4;
+
+    draw_rectangle(
+        _cursor_x,
+        _input_y + 3,
+        _cursor_x + 9,
+        _input_y + 21,
+        false
+    );
+}
+
+draw_set_font(_previous_font);
+
+// Feedback for an invalid command.
+draw_set_color(make_color_rgb(255, 70, 70));
+draw_text(
+    _px + 32,
+    _py + _ph - 62,
+    command_feedback
+);
+
+draw_set_color(c_white);
 draw_set_halign(fa_center);
 draw_text(
     _gw * 0.5,
     _py + _ph - 36,
-    "[E] / ESC — CLOSE"
+    "ENTER — EXECUTE    |    ESC — CLOSE"
 );
 
 draw_set_halign(fa_left);
