@@ -1,3 +1,11 @@
+if (keyboard_check(vk_shift)
+&& keyboard_check_pressed(ord("Z")))
+{
+    instance_destroy();
+    room_goto(LE_TUTORIAL_WIP);
+    exit;
+}
+
 var _dt = delta_time / 1000000;
 var _previous_elapsed = state_elapsed;
 
