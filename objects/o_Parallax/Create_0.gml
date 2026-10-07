@@ -27,3 +27,24 @@ for (var i = 0; i < array_length(parallax_layers); i++)
         entry.start_y = layer_get_y(entry.layer_id);
     }
 }
+
+var filter_on = function()
+{
+    gpu_set_texfilter(true);
+};
+
+var filter_off = function()
+{
+    gpu_set_texfilter(false);
+};
+
+for (var i = 0; i < array_length(parallax_layers); i++)
+{
+    var background_layer = parallax_layers[i].layer_id;
+
+    if (background_layer != -1)
+    {
+        layer_script_begin(background_layer, filter_on);
+        layer_script_end(background_layer, filter_off);
+    }
+}

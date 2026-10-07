@@ -8,11 +8,21 @@ if (cam == -1)
 var cam_x = camera_get_view_x(cam);
 var cam_y = camera_get_view_y(cam);
 
-// Keep the initial layout where you painted it.
+// Anchor the painted layout to the spawn view, not the camera's initial
+// room-editor position. o_CAMERA eases from that position toward the player.
 if (!parallax_ready)
 {
     parallax_camera_start_x = cam_x;
     parallax_camera_start_y = cam_y;
+
+    var player = instance_find(o_Player, 0);
+    if (player != noone)
+    {
+        // Match the framing used by o_CAMERA.
+        parallax_camera_start_x = player.x - camera_get_view_width(cam) / 2;
+        parallax_camera_start_y = player.y - camera_get_view_height(cam) / 1.4;
+    }
+
     parallax_ready = true;
 }
 
