@@ -57,7 +57,15 @@ if (station_layer != -1)
         station_layer,
         max(0, total_travel_distance - scenery_distance)
     );
+	if (station_layer_1 != -1)
+{
+    layer_x(
+        station_layer_1,
+        max(0, total_travel_distance - scenery_distance)
+    );
 }
+}
+
 
 // Open the marked exit once, after stopping.
 if (!arrived && ride_elapsed >= ride_duration)

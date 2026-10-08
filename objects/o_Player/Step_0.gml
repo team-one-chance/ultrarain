@@ -1857,13 +1857,14 @@ if (keyboard_check_pressed(vk_f3))
     {
 		repeat(100)
 		if (timerf3 <=0) {
+        var _debug_coin_muzzle = player_get_muzzle();
         var coin = instance_create_layer(
-            x = x + 32,
-            y - 64,
+            _debug_coin_muzzle.muzzle_x,
+            _debug_coin_muzzle.muzzle_y,
             "Instances",
-            o_Coin, 
-			timerf3 = 0.001
-										);
+            o_Coin
+        );
+        timerf3 = 0.001;
 		
 		coin.split_threshold =
 			coin_split_y_speed_threshold;
@@ -1935,13 +1936,12 @@ if (!_syringe_combo
     if (coin_count > 0)
     {
 		
+        var _coin_muzzle = player_get_muzzle();
         var coin = instance_create_layer(
-            x + 32,
-            y - 64,
+            _coin_muzzle.muzzle_x,
+            _coin_muzzle.muzzle_y,
             "Instances",
             o_Coin
-			
-			
         );
 		
 		coin.split_threshold =
