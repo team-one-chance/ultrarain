@@ -1,0 +1,9 @@
+target = noone;
+is_healing = false;
+effect = 0;
+heal_total = 0;
+elapsed = 0;
+duration = 5;
+detached = false;
+fall_timer = 0;
+fall_speed = 0;

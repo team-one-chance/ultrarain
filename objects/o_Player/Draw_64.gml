@@ -280,3 +280,5 @@ draw_set_color(weapons_old_colour);
 draw_set_alpha(weapons_old_alpha);
 draw_set_halign(weapons_old_halign);
 draw_set_valign(weapons_old_valign);
+
+chip_draw_player_hud();
