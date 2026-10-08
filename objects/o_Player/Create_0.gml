@@ -89,14 +89,14 @@ use_syringe = function(_revive)
 
     if (_revive)
     {
-        pHP = pHP_max / 3;
+        pHP = pHP_max / 3 * chip_heal_multiplier();
 
         // Brief protection after revival.
         dmg_cooldown = max(dmg_cooldown, 1);
     }
     else
     {
-        pHP = min(pHP_max, pHP + pHP_max / 3);
+        pHP = min(pHP_max, pHP + pHP_max / 3 * chip_heal_multiplier());
 		        global.demo_used_healing = true;
     }
 
@@ -604,3 +604,7 @@ if (variable_global_exists("demo_travel_state"))
         global.demo_travel_state = undefined;
     }
 }
+
+
+// Chip enemy: player debuffs and wall-projectile response.
+chip_player_setup();
