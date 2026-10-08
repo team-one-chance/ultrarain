@@ -5,7 +5,7 @@ if (instance_exists(player))
 }
 
 // Expire old arcs without creating persistent effect instances.
-var _dt = min(delta_time / 1000000, 0.05);
+var _dt = min((variable_global_exists("dev_delta_time") ? (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) : delta_time) / 1000000, 0.05);
 for (var _i = array_length(wire_arcs) - 1; _i >= 0; _i--)
 {
     wire_arcs[_i].life -= _dt;

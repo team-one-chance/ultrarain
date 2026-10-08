@@ -93,7 +93,7 @@ previous_spark_hp = pHP;
 // MOVE AND DRAW SPARKS
 // =====================================
 
-var dt = min(delta_time / 1000000, 0.05);
+var dt = min((variable_global_exists("dev_delta_time") ? (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) : delta_time) / 1000000, 0.05);
 var old_colour = draw_get_color();
 var old_alpha = draw_get_alpha();
 

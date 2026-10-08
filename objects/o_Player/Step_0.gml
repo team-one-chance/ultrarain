@@ -1,4 +1,4 @@
-// Ignore menu-closing inputs for this frame, including held mouse fire.
+// Ignore menu-closing inputs for this frame; the controller clears this each Begin Step.
 if (variable_global_exists("dev_resume_input") && global.dev_resume_input) exit;
 
 // Resolve lethal hits before interaction locks or healing can skip death.
@@ -8,16 +8,16 @@ if (pHP <= 0)
     exit;
 }
 
-slam_iframe_timer = max(0, slam_iframe_timer - delta_time / 1000000);
+slam_iframe_timer = max(0, slam_iframe_timer - (variable_global_exists("dev_delta_time") ? (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) : delta_time) / 1000000);
 
 slam_cooldown_timer = max(
     0,
-    slam_cooldown_timer - delta_time / 1000000
+    slam_cooldown_timer - (variable_global_exists("dev_delta_time") ? (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) : delta_time) / 1000000
 );
 
 dash_iframe_timer = max(
     0,
-    dash_iframe_timer - delta_time / 1000000
+    dash_iframe_timer - (variable_global_exists("dev_delta_time") ? (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) : delta_time) / 1000000
 );
 
 // =====================================
@@ -259,7 +259,7 @@ if (on_ground && phy_speed_y >= 0)
 }
 else
 {
-    coyote_timer -= delta_time / 1000000;
+    coyote_timer -= (variable_global_exists("dev_delta_time") ? (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) : delta_time) / 1000000;
 
     if (coyote_timer < 0)
     {
@@ -408,7 +408,7 @@ if (is_ledge_climbing)
     phy_speed_y = 0;
 
     ledge_climb_timer +=
-        delta_time / 1000000;
+        (variable_global_exists("dev_delta_time") ? (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) : delta_time) / 1000000;
 
 
     var climb_progress =
@@ -641,7 +641,7 @@ else if (!on_ground)
 if (wall_jump_lock_time > 0)
 {
     wall_jump_lock_time -=
-        delta_time / 1000000;
+        (variable_global_exists("dev_delta_time") ? (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) : delta_time) / 1000000;
 
     if (wall_jump_lock_time <= 0)
     {
@@ -1101,7 +1101,7 @@ else if (dash_active && on_ground)
 if (dash_chain_timer > 0)
 {
     dash_chain_timer -=
-        delta_time / 1000000;
+        (variable_global_exists("dev_delta_time") ? (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) : delta_time) / 1000000;
 
     if (dash_chain_timer <= 0)
     {
@@ -1114,7 +1114,7 @@ if (dash_chain_timer > 0)
 if (ground_dash_cooldown_timer > 0)
 {
     ground_dash_cooldown_timer -=
-        delta_time / 1000000;
+        (variable_global_exists("dev_delta_time") ? (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) : delta_time) / 1000000;
 
     if (ground_dash_cooldown_timer < 0)
     {
@@ -1127,7 +1127,7 @@ if (ground_dash_cooldown_timer > 0)
 if (air_dash_cooldown_timer > 0)
 {
     air_dash_cooldown_timer -=
-        delta_time / 1000000;
+        (variable_global_exists("dev_delta_time") ? (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) : delta_time) / 1000000;
 
     if (air_dash_cooldown_timer < 0)
     {
@@ -1158,7 +1158,7 @@ if (dash_active)
     else if (!dash_started_moving)
     {
         dash_burst_timer -=
-            delta_time / 1000000;
+            (variable_global_exists("dev_delta_time") ? (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) : delta_time) / 1000000;
 
         phy_speed_x =
             dash_direction
@@ -1406,7 +1406,7 @@ else
 if (slide_boost_timer > 0)
 {
     slide_boost_timer -=
-        delta_time / 1000000;
+        (variable_global_exists("dev_delta_time") ? (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) : delta_time) / 1000000;
 
     if (slide_boost_timer < 0)
     {
@@ -1423,7 +1423,7 @@ if (slide_boost_timer > 0)
 if (slide_double_jump_timer > 0)
 {
     slide_double_jump_timer -=
-        delta_time / 1000000;
+        (variable_global_exists("dev_delta_time") ? (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) : delta_time) / 1000000;
 
     if (slide_double_jump_timer < 0)
     {
@@ -1439,7 +1439,7 @@ if (slide_double_jump_timer > 0)
 if (slide_double_boost_stage > 0)
 {
     slide_double_boost_timer -=
-        delta_time / 1000000;
+        (variable_global_exists("dev_delta_time") ? (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) : delta_time) / 1000000;
 
     if (slide_double_boost_timer <= 0)
     {
@@ -1738,7 +1738,7 @@ aim_rig_mode = (weapon_type == "sword")
 
 if (weapon_fire_timer > 0)
 {
-    weapon_fire_timer -= delta_time / 1000000;
+    weapon_fire_timer -= (variable_global_exists("dev_delta_time") ? (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) : delta_time) / 1000000;
 
     if (weapon_fire_timer < 0)
     {
@@ -1750,7 +1750,7 @@ if (sword_swing_timer > 0)
 {
     sword_swing_timer = max(
         0,
-        sword_swing_timer - delta_time / 1000000
+        sword_swing_timer - (variable_global_exists("dev_delta_time") ? (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) : delta_time) / 1000000
     );
 }
 
@@ -1761,7 +1761,7 @@ if (sword_swing_timer > 0)
 if (perfect_apex_flash_timer > 0)
 {
     perfect_apex_flash_timer -=
-        delta_time / 1000000;
+        (variable_global_exists("dev_delta_time") ? (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) : delta_time) / 1000000;
 
     if (perfect_apex_flash_timer < 0)
     {
@@ -1849,7 +1849,7 @@ else if (weapon_type == "sword")
 // =====================================
 // ALT FIRE - RIGHT MOUSE / THROW COIN
 // =====================================
-timerf3 = timerf3 - delta_time / 1000000
+timerf3 = timerf3 - (variable_global_exists("dev_delta_time") ? (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) : delta_time) / 1000000
 if (keyboard_check_pressed(vk_f3)) 
 { 
     // Only throw if we actually have a coin.
@@ -2014,7 +2014,7 @@ coin.pin_owner = noone;
 if (coin_anchor_cooldown_timer > 0)
 {
     coin_anchor_cooldown_timer -=
-        delta_time / 1000000;
+        (variable_global_exists("dev_delta_time") ? (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) : delta_time) / 1000000;
 
     if (coin_anchor_cooldown_timer < 0)
     {
@@ -2030,7 +2030,7 @@ if (coin_anchor_cooldown_timer > 0)
 // =====================================
 
 dmg_cooldown -=
-    delta_time / 1000000;
+    (variable_global_exists("dev_delta_time") ? (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) : delta_time) / 1000000;
 
 if (dmg_cooldown < 0)
 {
@@ -2049,7 +2049,7 @@ if (dmg_cooldown < 0)
 if (coin_count < coin_max)
 {
     coin_recharge_timer +=
-        delta_time / 1000000;
+        (variable_global_exists("dev_delta_time") ? (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) : delta_time) / 1000000;
 
 
     // Gain one coin every recharge interval.
@@ -2219,7 +2219,7 @@ if (variable_instance_exists(id, "trap_knockback_timer"))
         phy_speed_x = trap_knockback_speed_x;
         trap_knockback_timer = max(
             0,
-            trap_knockback_timer - delta_time / 1000000
+            trap_knockback_timer - (variable_global_exists("dev_delta_time") ? (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) : delta_time) / 1000000
         );
     }
 }
@@ -2235,6 +2235,6 @@ if (damage_knockback_timer > 0)
 {
     phy_speed_x = damage_knockback_speed_x;
     damage_knockback_timer = max(
-        0, damage_knockback_timer - delta_time / 1000000
+        0, damage_knockback_timer - (variable_global_exists("dev_delta_time") ? (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) : delta_time) / 1000000
     );
 }

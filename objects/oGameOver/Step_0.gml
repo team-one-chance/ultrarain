@@ -1,4 +1,4 @@
-game_over_age += delta_time / 1000000;
+game_over_age += (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) / 1000000;
 update_layout();
 if (game_over_age < game_over_delay) exit;
 

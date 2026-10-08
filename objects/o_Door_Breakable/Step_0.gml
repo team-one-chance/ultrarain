@@ -34,7 +34,7 @@ if (break_requested && !broken)
 
 if (broken)
 {
-    flash_elapsed += delta_time / 1000000;
+    flash_elapsed += (variable_global_exists("dev_delta_time") ? (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) : delta_time) / 1000000;
 
     // Spawn enemies after the three flashes finish.
     if (flash_elapsed >= flash_duration)

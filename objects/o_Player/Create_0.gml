@@ -1,7 +1,7 @@
 timerf3 = 0;
 
-// Room-local controller; its debug toggles persist across room restarts.
-if (!instance_exists(o_DevMenu)) instance_create_depth(0, 0, -100000, o_DevMenu);
+// Keep the dev controller within GameMaker's drawable depth range.
+if (!instance_exists(o_DevMenu)) instance_create_depth(0, 0, -14000, o_DevMenu);
 
 // =====================================
 // HEALTH

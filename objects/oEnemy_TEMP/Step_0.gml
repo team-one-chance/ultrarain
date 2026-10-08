@@ -1,4 +1,7 @@
-var dt = delta_time / 1000000;
+// Dev AI freeze keeps drawing and damage available.
+if (variable_global_exists("dev_freeze_enemies") && global.dev_freeze_enemies) exit;
+
+var dt = (variable_global_exists("dev_delta_time") ? (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) : delta_time) / 1000000;
 attack_bite_damage_timer = max(0, attack_bite_damage_timer - dt);
 
 // Capture the state BEFORE movement/timers update this frame.

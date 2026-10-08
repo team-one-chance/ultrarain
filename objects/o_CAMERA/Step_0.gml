@@ -30,7 +30,7 @@ var cam_y = camera_get_view_y(cam);
 // DELTA TIME
 // =====================================
 
-var dt = delta_time / 1000000;
+var dt = (variable_global_exists("dev_delta_time") ? (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) : delta_time) / 1000000;
 
 // =====================================
 // FOLLOW SPEED

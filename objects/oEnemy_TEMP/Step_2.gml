@@ -1,9 +1,12 @@
+// Dev AI freeze keeps drawing and damage available.
+if (variable_global_exists("dev_freeze_enemies") && global.dev_freeze_enemies) exit;
+
 // =====================================
-// CROWD SPACING — AFTER NORMAL MOVEMENT
+// CROWD SPACING â€” AFTER NORMAL MOVEMENT
 // =====================================
 if (!crowd_spacing_paused && crowd_can_separate())
 {
-    var _crowd_dt = delta_time / 1000000;
+    var _crowd_dt = (variable_global_exists("dev_delta_time") ? (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) : delta_time) / 1000000;
     var _crowd_centre = (bbox_left + bbox_right) * 0.5;
     var _crowd_width = bbox_right - bbox_left + 1;
     var _crowd_feet = bbox_bottom;

@@ -2,7 +2,7 @@ var _player = instance_find(o_Player, 0);
 
 if (!instance_exists(_player)) exit;
 
-var _dt = delta_time / 1000000;
+var _dt = (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) / 1000000;
 
 ride_elapsed = min(
     ride_duration,

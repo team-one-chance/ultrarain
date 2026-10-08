@@ -32,7 +32,6 @@
   },
   "name":"ULTRA RAIN",
   "resources":[
-    {"id":{"name":"o_DevMenu","path":"objects/o_DevMenu/o_DevMenu.yy",},},
     {"id":{"name":"f_Console","path":"fonts/f_Console/f_Console.yy",},},
     {"id":{"name":"o_Block_Breakable","path":"objects/o_Block_Breakable/o_Block_Breakable.yy",},},
     {"id":{"name":"o_Block_scary","path":"objects/o_Block_scary/o_Block_scary.yy",},},
@@ -45,6 +44,7 @@
     {"id":{"name":"o_Chute_Breakable","path":"objects/o_Chute_Breakable/o_Chute_Breakable.yy",},},
     {"id":{"name":"o_Coin","path":"objects/o_Coin/o_Coin.yy",},},
     {"id":{"name":"o_DemoTerminal","path":"objects/o_DemoTerminal/o_DemoTerminal.yy",},},
+    {"id":{"name":"o_DevMenu","path":"objects/o_DevMenu/o_DevMenu.yy",},},
     {"id":{"name":"o_Door_Breakable","path":"objects/o_Door_Breakable/o_Door_Breakable.yy",},},
     {"id":{"name":"o_Door_UNB","path":"objects/o_Door_UNB/o_Door_UNB.yy",},},
     {"id":{"name":"o_DoorController","path":"objects/o_DoorController/o_DoorController.yy",},},

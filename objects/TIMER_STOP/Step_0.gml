@@ -1,6 +1,6 @@
 if (timer_running)
 {
-    elapsed_time += delta_time / 1000000;
+    elapsed_time += (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) / 1000000;
 }
 
 // Touching the finish boards the train.
