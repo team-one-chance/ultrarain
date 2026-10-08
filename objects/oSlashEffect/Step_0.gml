@@ -14,7 +14,7 @@ if (slash_animation_finished)
     exit;
 }
 
-slash_age += delta_time / 1000000;
+slash_age += (variable_global_exists("dev_delta_time") ? (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) : delta_time) / 1000000;
 var slash_progress = clamp(slash_age / max(0.001, duration), 0, 1);
 image_index = min(image_number - 1, floor(slash_progress * image_number));
 slash_animation_finished = slash_progress >= 1;

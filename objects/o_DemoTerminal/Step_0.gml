@@ -11,7 +11,7 @@ if (reading)
         exit;
     }
 
-    command_cursor_timer += delta_time / 1000000;
+    command_cursor_timer += (variable_global_exists("dev_delta_time") ? (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) : delta_time) / 1000000;
 
     if (keyboard_check_pressed(vk_escape))
     {

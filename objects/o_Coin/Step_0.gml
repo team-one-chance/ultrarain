@@ -93,7 +93,7 @@ if (abs(phy_speed_y) <= split_threshold)
 {
     apex_anim_frame +=
         apex_anim_speed
-        * (delta_time / 1000000);
+        * ((variable_global_exists("dev_delta_time") ? (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) : delta_time) / 1000000);
 
     if (apex_anim_frame >= sprite_get_number(s_Coin_Apex))
     {

@@ -1,3 +1,6 @@
+// Dev AI freeze keeps drawing and damage available.
+if (variable_global_exists("dev_freeze_enemies") && global.dev_freeze_enemies) exit;
+
 // =====================================
 // UNIQUE MOVEMENT PATTERN MUST BE KEPT
 // =====================================
@@ -5,7 +8,7 @@
 // UNIQUE MOVEMENT PATTERN
 // =====================================
 
-var dt = delta_time / 1000000;
+var dt = (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) / 1000000;
 var slam_locked = enemy_slam_step(dt);
 var player = instance_nearest(
     x,
@@ -275,7 +278,7 @@ if (!drone_engaged)
 
 if (hit_timer > 0)
 {
-    hit_timer -= delta_time / 1000000;
+    hit_timer -= (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) / 1000000;
 
     sprite_index = sDrone_hit;
 }
@@ -290,7 +293,7 @@ else
 
 if (shoot_timer > 0)
 {
-    shoot_timer -= delta_time / 1000000;
+    shoot_timer -= (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) / 1000000;
 }
 
 var shoot_player = instance_nearest(x, y, o_Player);

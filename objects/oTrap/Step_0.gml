@@ -1,4 +1,4 @@
-var dt = delta_time / 1000000;
+var dt = (variable_global_exists("dev_delta_time") ? (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) : delta_time) / 1000000;
 trap_hit_timer = max(0, trap_hit_timer - dt);
 
 var player = collision_rectangle(
