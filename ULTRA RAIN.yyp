@@ -76,6 +76,7 @@
     {"id":{"name":"LE_TRAIN","path":"rooms/LE_TRAIN/LE_TRAIN.yy",},},
     {"id":{"name":"LE_TUTORIAL_WIP","path":"rooms/LE_TUTORIAL_WIP/LE_TUTORIAL_WIP.yy",},},
     {"id":{"name":"TESTING","path":"rooms/TESTING/TESTING.yy",},},
+    {"id":{"name":"RoomUI","path":"roomui/RoomUI/RoomUI.yy",},},
     {"id":{"name":"Coin_ricoshet","path":"scripts/Coin_ricoshet/Coin_ricoshet.yy",},},
     {"id":{"name":"draw_ik_arm","path":"scripts/draw_ik_arm/draw_ik_arm.yy",},},
     {"id":{"name":"player_rig_pose","path":"scripts/player_rig_pose/player_rig_pose.yy",},},

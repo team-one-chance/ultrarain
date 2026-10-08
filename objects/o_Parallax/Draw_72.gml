@@ -38,15 +38,28 @@ for (var i = 0; i < array_length(parallax_layers); i++)
         continue;
     }
 
+    var offset_x = camera_delta_x * (1 - entry.speed_x);
+    var offset_y = camera_delta_y * (1 - entry.speed_y);
+
+    // Negative limits leave that axis unrestricted.
+    if (entry.max_offset_x >= 0)
+    {
+        offset_x = clamp(offset_x, -entry.max_offset_x, entry.max_offset_x);
+    }
+    if (entry.max_offset_y >= 0)
+    {
+        offset_y = clamp(offset_y, -entry.max_offset_y, entry.max_offset_y);
+    }
+
     layer_x(
         entry.layer_id,
         round(entry.start_x
-            + camera_delta_x * (1 - entry.speed_x))
+            + offset_x)
     );
 
     layer_y(
         entry.layer_id,
         round(entry.start_y
-            + camera_delta_y * (1 - entry.speed_y))
+            + offset_y)
     );
 }
