@@ -10,8 +10,8 @@
   "name":"o_BootMenu",
   "overriddenProperties":[],
   "parent":{
-    "name":"ULTRA RAIN",
-    "path":"ULTRA RAIN.yyp",
+    "name":"Rooms",
+    "path":"folders/Rooms.yy",
   },
   "parentObjectId":null,
   "persistent":false,

@@ -6,6 +6,14 @@ if (keyboard_check(vk_shift)
     exit;
 }
 
+if (keyboard_check(vk_shift)
+&& keyboard_check_pressed(ord("T")))
+{
+    instance_destroy();
+    room_goto(LE_TRAIN);
+    exit;
+}
+
 var _dt = delta_time / 1000000;
 var _previous_elapsed = state_elapsed;
 
