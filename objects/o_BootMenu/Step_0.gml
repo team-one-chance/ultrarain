@@ -6,7 +6,7 @@ if (keyboard_check(vk_shift)
     exit;
 }
 
-var _dt = delta_time / 1000000;
+var _dt = (variable_global_exists("dev_delta_time") ? (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) : delta_time) / 1000000;
 var _previous_elapsed = state_elapsed;
 
 state_elapsed += _dt;

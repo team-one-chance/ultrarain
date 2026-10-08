@@ -1,4 +1,4 @@
-var fx_dt = delta_time / 1000000;
+var fx_dt = (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) / 1000000;
 fx_age += fx_dt;
 if (fx_age >= fx_duration)
 {

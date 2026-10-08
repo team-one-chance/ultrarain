@@ -9,7 +9,7 @@
 // Same falling sparks as the terminal.
 if (broken)
 {
-    spark_timer -= delta_time / 1000000;
+    spark_timer -= (variable_global_exists("dev_delta_time") ? (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) : delta_time) / 1000000;
 
     if (spark_timer <= 0)
     {

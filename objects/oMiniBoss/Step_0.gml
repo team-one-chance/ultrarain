@@ -1,4 +1,7 @@
-var dt = delta_time / 1000000;
+// Dev AI freeze keeps drawing and damage available.
+if (variable_global_exists("dev_freeze_enemies") && global.dev_freeze_enemies) exit;
+
+var dt = (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) / 1000000;
 // Capture this before inherited Step decrements the timers.
 var slam_locked = slam_stun_timer > 0 || slam_knockback_timer > 0;
 // Parent Step has no hit-sprite/timer processing in the supplied version.

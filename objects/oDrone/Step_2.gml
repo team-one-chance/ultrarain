@@ -1,10 +1,13 @@
+// Dev AI freeze keeps drawing and damage available.
+if (variable_global_exists("dev_freeze_enemies") && global.dev_freeze_enemies) exit;
+
 // Let slam knockback run without separation fighting it.
 if (slam_knockback_timer > 0 || slam_stun_timer > 0)
 {
     exit;
 }
 
-var _dt = delta_time / 1000000;
+var _dt = (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) / 1000000;
 
 for (var _i = 0; _i < instance_number(oDrone); _i++)
 {

@@ -40,7 +40,7 @@ if (player_near && keyboard_check_pressed(ord("E")))
 // Emit three falling sparks per burst at irregular intervals.
 if (controller_state >= 1)
 {
-    spark_timer -= delta_time / 1000000;
+    spark_timer -= (variable_global_exists("dev_delta_time") ? (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) : delta_time) / 1000000;
 
     if (spark_timer <= 0)
     {
@@ -78,7 +78,7 @@ repeat (3)
     }
 }
 
-var _dt = delta_time / 1000000;
+var _dt = (variable_global_exists("dev_delta_time") ? (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) : delta_time) / 1000000;
 _player = instance_nearest(x, y, o_Player);
 
 player_near = false;

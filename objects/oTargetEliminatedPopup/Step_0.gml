@@ -1,4 +1,4 @@
-popup_age += delta_time / 1000000;
+popup_age += (variable_global_exists("dev_delta_time") ? (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) : delta_time) / 1000000;
 if (popup_age >= popup_duration)
 {
     instance_destroy();
