@@ -1,5 +1,8 @@
 timerf3 = 0;
 
+// Room-local controller; its debug toggles persist across room restarts.
+if (!instance_exists(o_DevMenu)) instance_create_depth(0, 0, -100000, o_DevMenu);
+
 // =====================================
 // HEALTH
 // =====================================
@@ -145,7 +148,8 @@ slam_impact_iframe_duration = 0.12;
 // Shared protection for attacks and instant-kill hazards.
 damage_blocks_damage = function()
 {
-    return is_slamming || slam_iframe_timer > 0 || dash_blocks_damage();
+    return (variable_global_exists("dev_invincible") && global.dev_invincible)
+        || is_slamming || slam_iframe_timer > 0 || dash_blocks_damage();
 };
 slam_distance = 0;
 slam_last_y = 0;

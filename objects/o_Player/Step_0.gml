@@ -1,3 +1,6 @@
+// Ignore menu-closing inputs for this frame, including held mouse fire.
+if (variable_global_exists("dev_resume_input") && global.dev_resume_input) exit;
+
 // Resolve lethal hits before interaction locks or healing can skip death.
 if (pHP <= 0)
 {

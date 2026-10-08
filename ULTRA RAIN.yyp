@@ -32,6 +32,7 @@
   },
   "name":"ULTRA RAIN",
   "resources":[
+    {"id":{"name":"o_DevMenu","path":"objects/o_DevMenu/o_DevMenu.yy",},},
     {"id":{"name":"f_Console","path":"fonts/f_Console/f_Console.yy",},},
     {"id":{"name":"o_Block_Breakable","path":"objects/o_Block_Breakable/o_Block_Breakable.yy",},},
     {"id":{"name":"o_Block_scary","path":"objects/o_Block_scary/o_Block_scary.yy",},},
