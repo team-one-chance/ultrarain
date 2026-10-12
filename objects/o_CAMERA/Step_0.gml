@@ -19,6 +19,15 @@ var view_height = camera_get_view_height(cam);
 var target_x = o_Player.x - view_width / 2;
 var target_y = o_Player.y - view_height / 1.4;
 
+// Hold the camera on the stationary cabin while the scenery moves.
+var _train = instance_find(o_TrainRide, 0);
+if (instance_exists(_train) && _train.ride_started && !_train.arrived)
+{
+    target_x = _train.camera_target_x - view_width / 2;
+    target_y = _train.camera_target_y - view_height / 1.4;
+}
+
+
 // =====================================
 // CURRENT CAMERA POSITION
 // =====================================
@@ -57,4 +66,5 @@ cam_y += (target_y - cam_y) * vertical_strength;
 // =====================================
 
 camera_set_view_pos(cam, cam_x, cam_y);
+
 

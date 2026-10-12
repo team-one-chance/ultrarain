@@ -1,20 +1,28 @@
 if (timer_running)
 {
-    elapsed_time += (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) / 1000000;
+    elapsed_time += (
+        variable_global_exists("dev_delta_time")
+        ? global.dev_delta_time
+        : delta_time
+    ) / 1000000;
 }
 
-// Touching the finish boards the train.
-if (timer_running && place_meeting(x, y, o_Player))
+if (!timer_running) exit;
+
+var _player = instance_find(o_Player, 0);
+
+if (!instance_exists(_player)) exit;
+
+var _train = instance_nearest(
+    _player.x, _player.y, o_TrainRide
+);
+
+if (!instance_exists(_train)) exit;
+
+// begin_ride checks whether the player is inside the cabin.
+// No collision with the timer's sprite is required.
+if (_train.begin_ride(_player))
 {
-    var _player = instance_nearest(x, y, o_Player);
-
-    if (instance_exists(_player))
-    {
-        timer_running = false;
-        global.demo_finish_time = elapsed_time;
-
-        demo_save_player(_player);
-        room_goto(LE_TRAIN);
-        exit;
-    }
+    timer_running = false;
+    global.demo_finish_time = elapsed_time;
 }
