@@ -28,12 +28,18 @@ tunnel_b = layer_get_id("Tunnel_B");
 station_layer = layer_get_id("Station_Arrival");
 station_layer_1 = layer_get_id("Station_Arrival_1");
 departure_layer = layer_get_id("Station_Departure");
+underwalkway_layer = layer_get_id("underwalkway");
+fade2black_layer = layer_get_id("fade2black");
+bgfar_layer = layer_get_id("BG_Far");
 // Store each layer's room-editor offset so relocated artwork stays aligned.
 tunnel_a_base_x = tunnel_a != -1 ? layer_get_x(tunnel_a) : 0;
 tunnel_b_base_x = tunnel_b != -1 ? layer_get_x(tunnel_b) : 0;
 station_base_x = station_layer != -1 ? layer_get_x(station_layer) : 0;
 station_1_base_x = station_layer_1 != -1 ? layer_get_x(station_layer_1) : 0;
 departure_base_x = departure_layer != -1 ? layer_get_x(departure_layer) : 0;
+underwalkway_base_x = underwalkway_layer != -1 ? layer_get_x(underwalkway_layer) : 0;
+fade2black_base_x = fade2black_layer != -1 ? layer_get_x(fade2black_layer) : 0;
+bgfar_base_x = bgfar_layer != -1 ? layer_get_x(bgfar_layer) : 0;
 tunnel_repeat_width = 3200;
 tunnel_scroll = 0;
 
@@ -139,6 +145,7 @@ begin_ride = function(_player)
         return false;
     }
 
+    if (bgfar_layer != -1) bgfar_base_x = layer_get_x(bgfar_layer);
     ride_started = true;
     ride_elapsed = 0;
     scenery_speed = scenery_max_speed;

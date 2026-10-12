@@ -79,6 +79,9 @@ tunnel_scroll = scenery_distance mod tunnel_repeat_width;
 if (tunnel_a != -1) layer_x(tunnel_a, tunnel_a_base_x - tunnel_scroll);
 if (tunnel_b != -1) layer_x(tunnel_b, tunnel_b_base_x + tunnel_repeat_width - tunnel_scroll);
 if (departure_layer != -1) layer_x(departure_layer, departure_base_x - scenery_distance);
+if (underwalkway_layer != -1) layer_x(underwalkway_layer, underwalkway_base_x - scenery_distance);
+if (fade2black_layer != -1) layer_x(fade2black_layer, fade2black_base_x - scenery_distance);
+if (bgfar_layer != -1) layer_x(bgfar_layer, bgfar_base_x - scenery_distance);
 if (station_layer != -1)
     layer_x(station_layer, station_base_x + max(0, total_travel_distance - scenery_distance));
 if (station_layer_1 != -1)
