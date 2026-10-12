@@ -20,6 +20,7 @@
   "HTile":false,
   "layers":[
     {"$GMImageLayer":"","%Name":"8c90ce4f-a9d3-4b15-94b5-cb3eba0fc422","blendMode":0,"displayName":"default","isLocked":false,"name":"8c90ce4f-a9d3-4b15-94b5-cb3eba0fc422","opacity":100.0,"resourceType":"GMImageLayer","resourceVersion":"2.0","visible":true,},
+    {"$GMImageLayer":"","%Name":"cb7ab740-b682-479d-8532-c32661e8d28b","blendMode":0,"displayName":"Layer 1","isLocked":false,"name":"cb7ab740-b682-479d-8532-c32661e8d28b","opacity":100.0,"resourceType":"GMImageLayer","resourceVersion":"2.0","visible":true,},
   ],
   "name":"Sprite9",
   "nineSlice":null,
