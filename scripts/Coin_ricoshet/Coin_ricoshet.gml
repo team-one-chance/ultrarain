@@ -96,7 +96,7 @@ function coin_ricochet(
         // EVERY COIN DOUBLES DAMAGE
         // =================================
 
-        _current_damage *= 2;
+        _current_damage *= 1.25;
 
 
         show_debug_message(

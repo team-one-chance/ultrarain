@@ -56,7 +56,8 @@ function weapon_hitscan(_damage, _range, _piercing)
                 o_Coin,
                 o_SecurityCamera,
                 o_Door_Breakable,
-                o_Chute_Breakable
+                o_Chute_Breakable,
+				o_Door_UNB
             ],
             false,
             true,

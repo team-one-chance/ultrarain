@@ -40,3 +40,40 @@ door_open = function()
     image_index = 0;
     image_speed = 1;
 };
+
+// 3 = closing
+door_close = function()
+{
+	show_debug_message(
+    "Door closing requested. State: "
+    + string(door_state)
+);
+    if (door_state != 2) return;
+
+    // Restore the closed door's collision.
+    if (door_fixture == -1)
+    {
+        var _fix = physics_fixture_create();
+
+        physics_fixture_set_box_shape(_fix, 16, 32);
+        physics_fixture_set_density(_fix, 0);
+        physics_fixture_set_friction(_fix, 0.5);
+        physics_fixture_set_restitution(_fix, 0);
+        physics_fixture_set_collision_group(_fix, 1);
+
+        door_fixture = physics_fixture_bind_ext(
+            _fix,
+            id,
+            sprite_get_width(sprite_index) / 2
+                - sprite_get_xoffset(sprite_index),
+            sprite_get_height(sprite_index) / 2
+                - sprite_get_yoffset(sprite_index)
+        );
+
+        physics_fixture_delete(_fix);
+    }
+
+    door_state = 3;
+    image_index = image_number - 1;
+    image_speed = -1;
+};

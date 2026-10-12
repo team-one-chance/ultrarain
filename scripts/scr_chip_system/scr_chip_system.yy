@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_chip_system",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_chip_system",
+  "parent":{
+    "name":"chipenm",
+    "path":"folders/temp/chipenm.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

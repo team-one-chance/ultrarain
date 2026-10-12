@@ -1,6 +1,8 @@
 // Ignore menu-closing inputs for this frame; the controller clears this each Begin Step.
 if (variable_global_exists("dev_resume_input") && global.dev_resume_input) exit;
 
+chip_player_tick();
+
 // Resolve lethal hits before interaction locks or healing can skip death.
 if (pHP <= 0)
 {
@@ -39,6 +41,8 @@ if (hacking_controller != noone)
 // =====================================
 // ACTIVE SPEED BOOST
 // =====================================
+
+var _chip_move_speed = move_speed * chip_movement_multiplier();
 
 var speed_boost_multiplier = 1;
 
@@ -86,6 +90,9 @@ var ground_right =
     ) != noone;
 
 var on_ground = ground_left || ground_right;
+
+// The thrown chip starts its two-second stun on landing.
+if (chip_ground_update(on_ground)) exit;
 
 if (on_ground)
 {
@@ -181,6 +188,13 @@ var touching_right_wall = (right_wall_lower || right_wall_mid || right_wall_uppe
 	||
 	(right_wall_upper != noone);*/
 
+// A thrown chip temporarily prevents regrabbing or wall jumping.
+if (chip_wall_release_timer > 0 || chip_waiting_for_landing)
+{
+    touching_left_wall = false;
+    touching_right_wall = false;
+}
+
 var touching_wall =
     touching_left_wall
     || touching_right_wall;
@@ -235,6 +249,12 @@ if (right_wall_lower != noone
     {
         right_ledge = true;
     }
+}
+
+if (chip_wall_release_timer > 0 || chip_waiting_for_landing)
+{
+    left_ledge = false;
+    right_ledge = false;
 }
 
 if (keyboard_check(vk_shift)
@@ -811,7 +831,7 @@ else if (move != 0)
 image_speed =
     max(
         0.5,
-        abs(phy_speed_x) / move_speed
+        abs(phy_speed_x) / _chip_move_speed
     );
 }
 
@@ -953,13 +973,13 @@ else if (wall_jump_lock_time > 0)
 if (is_sliding)
 {
     phy_speed_x =
-        slide_direction * move_speed * slide_speed_multiplier;
+        slide_direction * _chip_move_speed * slide_speed_multiplier;
 }
 else if (dash_active && on_ground)
 {
         phy_speed_x =
             slide_direction
-            * move_speed
+            * _chip_move_speed
             * slide_speed_multiplier
 			+ 1;
     }
@@ -976,28 +996,28 @@ else if (dash_active && on_ground)
         var air_accel = 0.35;
 
         var air_speed_limit =
-            move_speed;
+            _chip_move_speed;
 
 
         // Slide double-jump boost has priority
         if (slide_double_boost_stage == 1)
         {
             air_speed_limit =
-                move_speed
+                _chip_move_speed
                 * slide_double_boost_stage1_multiplier;
         }
 
         else if (slide_double_boost_stage == 2)
         {
             air_speed_limit =
-                move_speed
+                _chip_move_speed
                 * slide_double_boost_stage2_multiplier;
         }
 
         else if (slide_boost_timer > 0)
         {
             air_speed_limit =
-                move_speed
+                _chip_move_speed
                 * slide_movespeed_multiplier;
         }
 
@@ -1064,7 +1084,7 @@ else if (dash_active && on_ground)
     {
         phy_speed_x =
             move
-            * move_speed
+            * _chip_move_speed
             * slide_double_boost_stage1_multiplier;
     }
 
@@ -1072,7 +1092,7 @@ else if (dash_active && on_ground)
     {
         phy_speed_x =
             move
-            * move_speed
+            * _chip_move_speed
             * slide_double_boost_stage2_multiplier;
     }
 
@@ -1080,14 +1100,14 @@ else if (dash_active && on_ground)
     {
         phy_speed_x =
             move
-            * move_speed
+            * _chip_move_speed
             * slide_movespeed_multiplier;
     }
 
     else
     {
         phy_speed_x =
-            move * move_speed;
+            move * _chip_move_speed;
     }
 
 // =====================================
@@ -1200,7 +1220,7 @@ if (dash_active)
             dash_current_speed = 0;
 
             phy_speed_x =
-                move * move_speed;
+                move * _chip_move_speed;
         }
 
         // Still holding the dash direction:
@@ -1209,7 +1229,7 @@ if (dash_active)
         {
             dash_current_speed =
                 max(
-                    move_speed,
+                    _chip_move_speed,
                     dash_current_speed - dash_decay
                 );
 
@@ -1217,7 +1237,7 @@ if (dash_active)
                 dash_direction
                 * dash_current_speed;
 
-            if (dash_current_speed <= move_speed)
+            if (dash_current_speed <= _chip_move_speed)
             {
                 dash_active = false;
                 dash_direction = 0;
@@ -1507,7 +1527,7 @@ if (slide_double_jump_timer > 0)
 
     // Give immediate forward momentum
     var slide_double_launch_speed =
-        move_speed
+        _chip_move_speed
         * slide_double_jump_launch_multiplier
 		+2;
 
@@ -1800,7 +1820,7 @@ if (weapon_type == "pistol")
             pistol_piercing
         );
 
-        weapon_fire_timer = pistol_cooldown;
+        weapon_fire_timer = pistol_cooldown * chip_attack_multiplier();
     }
 }
 else if (weapon_type == "sword")
@@ -1808,9 +1828,11 @@ else if (weapon_type == "sword")
     // Start one swing per click; show its trail during the downward strike.
     if (!_syringe_combo
 	&& mouse_check_button_pressed(mb_left)
-	&& sword_swing_timer <= 0)
+	&& sword_swing_timer <= 0
+    && chip_sword_cooldown_timer <= 0)
     {
         sword_swing_timer = max(0.001, sword_config.swing_duration);
+        chip_sword_cooldown_timer = sword_swing_timer * chip_attack_multiplier();
         sword_swing_pending_hit = true;
         // Aim independently of the slide's movement/body direction.
         sword_swing_facing = is_sliding
@@ -2238,3 +2260,11 @@ if (damage_knockback_timer > 0)
         0, damage_knockback_timer - (variable_global_exists("dev_delta_time") ? (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) : delta_time) / 1000000
     );
 }
+
+
+// Expose the actual wall-hold state to chip enemies (wall_holding is local).
+chip_wall_holding_now = !on_ground && wall_holding
+    && !is_slamming && !is_ledge_climbing
+    && wall_jump_lock_time <= 0
+    && chip_wall_release_timer <= 0 && !chip_waiting_for_landing
+    && abs(phy_speed_y) < 1 && abs(phy_speed_x) < 1;
