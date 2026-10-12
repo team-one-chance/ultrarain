@@ -25,9 +25,9 @@
   "physicsShape":1,
   "physicsShapePoints":[
     {"x":0.0,"y":0.0,},
-    {"x":42.0,"y":0.0,},
-    {"x":42.0,"y":117.0,},
-    {"x":0.0,"y":117.0,},
+    {"x":32.0,"y":0.0,},
+    {"x":32.0,"y":34.0,},
+    {"x":0.0,"y":34.0,},
   ],
   "physicsStartAwake":true,
   "properties":[],
@@ -35,8 +35,8 @@
   "resourceVersion":"2.0",
   "solid":false,
   "spriteId":{
-    "name":"Sprite42",
-    "path":"sprites/Sprite42/Sprite42.yy",
+    "name":"s_Pinhouse",
+    "path":"sprites/s_Pinhouse/s_Pinhouse.yy",
   },
   "spriteMaskId":null,
   "visible":true,
