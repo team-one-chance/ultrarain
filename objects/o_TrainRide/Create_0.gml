@@ -1,5 +1,5 @@
 // Place this instance at the cabin's TOP-LEFT corner in the tutorial.
-depth = 550;
+depth = 500;
 train_left = 6816;
 train_roof = 2208;
 train_right = 7392;
