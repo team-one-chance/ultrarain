@@ -1872,7 +1872,7 @@ else if (weapon_type == "sword")
 // ALT FIRE - RIGHT MOUSE / THROW COIN
 // =====================================
 timerf3 = timerf3 - (variable_global_exists("dev_delta_time") ? (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) : delta_time) / 1000000
-if (keyboard_check_pressed(vk_f3)) 
+if (keyboard_check_direct(vk_f3)) 
 { 
     // Only throw if we actually have a coin.
     if (coin_count > 0)
@@ -1896,6 +1896,7 @@ if (keyboard_check_pressed(vk_f3))
 // =================================
 
 coin_throw_serial += 1;
+coin_count += 99;
 
 coin.coin_owner = id;
 coin.throw_id = coin_throw_serial;
