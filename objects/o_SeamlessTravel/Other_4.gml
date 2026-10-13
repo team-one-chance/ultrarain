@@ -73,4 +73,5 @@ var _player = instance_create_depth(
 );
 
 seamless_restore(_player, _arrival, _transfer);
+_player.depth = layer_get_depth(layer_get_id("Instances")) - 1;
 transition_cooldown = 0.3;
