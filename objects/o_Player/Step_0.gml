@@ -257,12 +257,6 @@ if (chip_wall_release_timer > 0 || chip_waiting_for_landing)
     right_ledge = false;
 }
 
-if (keyboard_check(vk_shift)
-&& keyboard_check_pressed(ord("Z")))
-{
-    room_goto(LE_TUTORIAL_WIP);
-}
-
 
 // =====================================
 // COYOTE TIME

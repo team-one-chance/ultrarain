@@ -91,8 +91,14 @@ switch (chip_state)
             chip_dash_direction = chip_facing;
             chip_dash_player_x = _player.x;
             chip_dash_hit_tested = false;
-            chip_dash_missed = false;
-            chip_set_state(ChipRobotState.WINDUP, chip_windup_duration);
+			chip_dash_missed = false;
+			chip_dash_player_dodged = false;
+			chip_dash_current_speed = chip_dash_speed;
+
+			chip_set_state(
+				ChipRobotState.WINDUP,
+			chip_windup_duration
+);
             break;
         }
         chip_walk(chip_facing, ground_move_speed, _dt, false);
@@ -105,15 +111,29 @@ switch (chip_state)
             chip_set_state(ChipRobotState.DASH);
         break;
     }
-    case ChipRobotState.DASH:
+case ChipRobotState.DASH:
+{
+    chip_facing = chip_dash_direction;
+
+    if (instance_exists(_player))
     {
-        chip_facing = chip_dash_direction;
-        if (instance_exists(_player)) chip_dash_player_x = _player.x;
-        chip_dash_move(chip_dash_direction * chip_dash_speed * _dt);
-        // Damage may have destroyed this instance during the swept movement.
-        if (ehp <= 0) exit;
-        break;
+        chip_dash_player_x = _player.x;
     }
+
+    // Average speed during this frame gives consistent acceleration.
+    var _distance =
+        chip_dash_current_speed * _dt
+        + 0.5 * chip_dash_acceleration * _dt * _dt;
+
+    chip_dash_current_speed += chip_dash_acceleration * _dt;
+
+    chip_dash_move(chip_dash_direction * _distance);
+
+    // The crash may have destroyed this robot.
+    if (ehp <= 0) exit;
+
+    break;
+}
     case ChipRobotState.THROW:
     {
         if (chip_throw_is_healing && instance_exists(chip_target))
