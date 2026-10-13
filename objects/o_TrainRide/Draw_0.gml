@@ -15,7 +15,7 @@ var _old_color = draw_get_color();
 var _old_alpha = draw_get_alpha();
 draw_set_alpha(1);
 draw_set_color(c_black);
- draw_rectangle(_draw_left, _draw_top, _draw_right, _draw_bottom, false);
+ // draw_rectangle(_draw_left, _draw_top, _draw_right, _draw_bottom, false);
 
 var _spacing = 160;
 var _offset = scenery_distance mod _spacing;
