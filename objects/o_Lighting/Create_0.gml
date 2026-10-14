@@ -1,5 +1,5 @@
-// Lighting tuning. Ambient channels: 255 = original scene brightness.
-enabled = true;
+// Place one controller per room. enabled and ambient_color are editor properties.
+// Ambient channels: 255 = original scene brightness.
 depth = -13000;
 // Cone rendering mode is configured here.
 cone_shader_enabled = true;
@@ -10,7 +10,6 @@ cone_shape_uniform = shader_get_uniform(sh_CeilingCone, "u_shape");
 cone_strength_uniform = shader_get_uniform(sh_CeilingCone, "u_strength");
 cone_dither_uniform = shader_get_uniform(sh_CeilingCone, "u_dither");
 //ambient_color = make_color_rgb(210, 216, 225);
-ambient_color = make_color_rgb(110, 116, 125);
 //ambient_color = make_color_rgb(60, 66, 75);
 terminal_radius = 80;
 terminal_strength = 0.20;
@@ -60,6 +59,8 @@ bloom_enabled = true;
 bloom_scene_enabled = false; // Broad lit surfaces otherwise create a foggy wash.
 lamp_bloom_strength = 0.65;
 terminal_bloom_strength = 0.5;
+lava_bloom_strength = 1.0; // Independent of the subtle scene bloom strength.
+lava_bloom_radius = 12;
 bloom_threshold = 0.55;
 bloom_strength = 0.30;
 bloom_radius = 4;

@@ -19,6 +19,7 @@
   "height":64,
   "HTile":false,
   "layers":[
+    {"$GMImageLayer":"","%Name":"7a0515f7-eab3-48bd-9b78-cc23b69104b7","blendMode":0,"displayName":"Layer 1","isLocked":false,"name":"7a0515f7-eab3-48bd-9b78-cc23b69104b7","opacity":100.0,"resourceType":"GMImageLayer","resourceVersion":"2.0","visible":true,},
     {"$GMImageLayer":"","%Name":"e82ffe53-7e5c-4901-ad01-766928da0d6d","blendMode":0,"displayName":"default","isLocked":false,"name":"e82ffe53-7e5c-4901-ad01-766928da0d6d","opacity":100.0,"resourceType":"GMImageLayer","resourceVersion":"2.0","visible":true,},
   ],
   "name":"sMoltenLava",

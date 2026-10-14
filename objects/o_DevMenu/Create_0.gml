@@ -136,7 +136,7 @@ menu_actions = function()
         case 1: return [1, 2, 3, 4, 99];
         case 2: return [5, 6, 7, 8, 9, 99];
         case 3: return [20, 21, 22, 23, 24, 99];
-        case 4: return [30, 31, 32, 33, 34, 99];
+        case 4: return [30, 31, 34, 33, 36, 35, 32, 99];
         case 5: return [0, 99];
     }
     return [101, 102, 103, 104, 105, 10];
@@ -170,9 +170,11 @@ menu_label = function(_action)
         case 24: return "Clear all enemies";
         case 30: return "Simulation pause [F4]: " + (time_paused ? "ON" : "OFF");
         case 31: return "Advance one frame [F5]";
-        case 32: return "Speed: 100% (BROKEN)" + (time_rate == 1 ? " (selected)" : "");
-        case 33: return "Speed: 50% (BROKEN)" + (time_rate == 0.5 ? " (selected)" : "");
-        case 34: return "Speed: 25% (BROKEN)" + (time_rate == 0.25 ? " (selected)" : "");
+        case 32: return "Speed: 100%" + (time_rate == 1 ? " (selected)" : "");
+        case 33: return "Speed: 300%" + (time_rate == 3 ? " (selected)" : "");
+        case 34: return "Speed: 400%" + (time_rate == 4 ? " (selected)" : "");
+        case 35: return "Speed: 150%" + (time_rate == 1.5 ? " (selected)" : "");
+        case 36: return "Speed: 200%" + (time_rate == 2 ? " (selected)" : "");
     }
     return "";
 };
@@ -201,9 +203,10 @@ run_action = function(_action)
     if (_action == 1) { global.dev_invincible = !global.dev_invincible; return; }
     if (_action == 23) { global.dev_freeze_enemies = !global.dev_freeze_enemies; return; }
     if (_action == 30) { time_paused = !time_paused; return; }
-    if (_action >= 32 && _action <= 34)
+    if (_action >= 32 && _action <= 36)
     {
-        time_rate = (_action == 32) ? 1 : ((_action == 33) ? 0.5 : 0.25);
+        var _time_rates = [1, 3, 4, 1.5, 2];
+        time_rate = _time_rates[_action - 32];
         return;
     }
     if (_action == 7 && is_undefined(test_position)) return;

@@ -225,6 +225,51 @@ if (bloom_enabled && bloom_strength > 0 && surface_exists(application_surface)
         gpu_set_blendmode(bm_add);
         draw_set_alpha(clamp(bloom_strength, 0, 1));
         draw_surface_stretched(bloom_surface_a, _cx, _cy, _vw, _vh);
+        // Reuse the bloom buffers for a separate, stronger lava-only glow.
+        if (instance_exists(oLavaFromTheMolten) && lava_bloom_strength > 0)
+        {
+            draw_set_alpha(1);
+            draw_set_color(c_white);
+            gpu_set_blendmode(bm_normal);
+            surface_set_target(bloom_surface_a);
+            camera_apply(_cam);
+            draw_clear_alpha(c_black, 1);
+            with (oLavaFromTheMolten)
+            {
+                if (visible && sprite_index != -1 && image_alpha > 0)
+                {
+                    draw_sprite_ext(sprite_index, image_index, x, y,
+                        image_xscale, image_yscale, image_angle, image_blend, image_alpha);
+                }
+            }
+            surface_reset_target();
+
+            gpu_set_blendmode_ext(bm_one, bm_zero);
+            surface_set_target(bloom_surface_b);
+            camera_apply(bloom_camera);
+            draw_clear_alpha(c_black, 1);
+            shader_set(sh_BloomBlur);
+            shader_set_uniform_f(bloom_step_uniform, max(0, lava_bloom_radius) * 0.5 / _vw, 0);
+            draw_surface_stretched(bloom_surface_a, 0, 0, _bw, _bh);
+            shader_reset();
+            surface_reset_target();
+
+            surface_set_target(bloom_surface_a);
+            camera_apply(bloom_camera);
+            draw_clear_alpha(c_black, 1);
+            shader_set(sh_BloomBlur);
+            shader_set_uniform_f(bloom_step_uniform, 0, max(0, lava_bloom_radius) * 0.5 / _vh);
+            draw_surface_stretched(bloom_surface_b, 0, 0, _bw, _bh);
+            shader_reset();
+            surface_reset_target();
+
+            matrix_set(matrix_world, _world);
+            matrix_set(matrix_view, _view);
+            matrix_set(matrix_projection, _projection);
+            gpu_set_blendmode(bm_add);
+            draw_set_alpha(clamp(lava_bloom_strength, 0, 1));
+            draw_surface_stretched(bloom_surface_a, _cx, _cy, _vw, _vh);
+        }
         gpu_set_blendmode(bm_normal);
         gpu_set_texfilter(_old_filter);
     }
