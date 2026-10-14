@@ -28,6 +28,7 @@ if (!parallax_ready)
 
 var camera_delta_x = cam_x - parallax_camera_start_x;
 var camera_delta_y = cam_y - parallax_camera_start_y;
+var train_ride = instance_find(o_TrainRide, 0);
 
 for (var i = 0; i < array_length(parallax_layers); i++)
 {
@@ -51,11 +52,21 @@ for (var i = 0; i < array_length(parallax_layers); i++)
         offset_y = clamp(offset_y, -entry.max_offset_y, entry.max_offset_y);
     }
 
-    layer_x(
-        entry.layer_id,
-        round(entry.start_x
-            + offset_x)
-    );
+    // The train owns BG_Far's horizontal position from departure onward.
+    var train_controls_x = false;
+    if (instance_exists(train_ride))
+    {
+        train_controls_x = train_ride.ride_started
+            && entry.layer_id == train_ride.bgfar_layer;
+    }
+    if (!train_controls_x)
+    {
+        layer_x(
+            entry.layer_id,
+            round(entry.start_x
+                + offset_x)
+        );
+    }
 
     layer_y(
         entry.layer_id,

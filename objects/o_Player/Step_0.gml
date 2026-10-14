@@ -257,12 +257,6 @@ if (chip_wall_release_timer > 0 || chip_waiting_for_landing)
     right_ledge = false;
 }
 
-if (keyboard_check(vk_shift)
-&& keyboard_check_pressed(ord("Z")))
-{
-    room_goto(LE_TUTORIAL_WIP);
-}
-
 
 // =====================================
 // COYOTE TIME
@@ -1872,12 +1866,11 @@ else if (weapon_type == "sword")
 // ALT FIRE - RIGHT MOUSE / THROW COIN
 // =====================================
 timerf3 = timerf3 - (variable_global_exists("dev_delta_time") ? (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) : delta_time) / 1000000
-if (keyboard_check_pressed(vk_f3)) 
+if (keyboard_check_direct(vk_f3))
 { 
     // Only throw if we actually have a coin.
     if (coin_count > 0)
     {
-		repeat(100)
 		if (timerf3 <=0) {
         var _debug_coin_muzzle = player_get_muzzle();
         var coin = instance_create_layer(
@@ -1886,7 +1879,6 @@ if (keyboard_check_pressed(vk_f3))
             "Instances",
             o_Coin
         );
-        timerf3 = 0.001;
 		
 		coin.split_threshold =
 			coin_split_y_speed_threshold;
@@ -1896,6 +1888,7 @@ if (keyboard_check_pressed(vk_f3))
 // =================================
 
 coin_throw_serial += 1;
+coin_count += 99;
 
 coin.coin_owner = id;
 coin.throw_id = coin_throw_serial;

@@ -9,8 +9,8 @@
   "name":"o_DisplaySettings",
   "overriddenProperties":[],
   "parent":{
-    "name":"Rooms",
-    "path":"folders/Rooms.yy",
+    "name":"R_objekte",
+    "path":"folders/Rooms/R_objekte.yy",
   },
   "parentObjectId":null,
   "persistent":false,
