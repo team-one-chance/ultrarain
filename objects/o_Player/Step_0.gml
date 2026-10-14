@@ -257,12 +257,6 @@ if (chip_wall_release_timer > 0 || chip_waiting_for_landing)
     right_ledge = false;
 }
 
-if (keyboard_check(vk_shift)
-&& keyboard_check_pressed(ord("Z")))
-{
-    room_goto(LE_TUTORIAL_WIP);
-}
-
 
 // =====================================
 // COYOTE TIME
@@ -1877,7 +1871,6 @@ if (keyboard_check_direct(vk_f3))
     // Only throw if we actually have a coin.
     if (coin_count > 0)
     {
-		repeat(100)
 		if (timerf3 <=0) {
         var _debug_coin_muzzle = player_get_muzzle();
         var coin = instance_create_layer(
@@ -1886,7 +1879,6 @@ if (keyboard_check_direct(vk_f3))
             "Instances",
             o_Coin
         );
-        timerf3 = 0.001;
 		
 		coin.split_threshold =
 			coin_split_y_speed_threshold;

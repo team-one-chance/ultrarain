@@ -16,7 +16,7 @@ terminal_text =
 terminal_no_damage_text =
     "Huh..."
     + "\n"
-    + "It seems you havent gotten damaged in the entire demo? Did you check out the secret area yet? (SECRET AREA WIP)";
+    + "It seems you havent gotten damaged in the entire demo? Did you check out the secret area yet? maybe you have to look more carefully and explore more. they say that its only dark if you're not used to it.";
 
 terminal_no_healing_text =
     "NO HEALING USED."

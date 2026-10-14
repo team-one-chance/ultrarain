@@ -12,6 +12,8 @@ image_yscale = 1;
 // Ground movement is pixels per second; this object does NOT use physics.
 ground_move_speed = 160;
 retreat_speed = 230;
+chip_separation_gap = 8;
+chip_separation_speed = 300;
 vertical_speed = 0;
 gravity_force = 900;
 maximum_fall_speed = 500;
@@ -35,18 +37,21 @@ chip_wall_target = noone;
 chip_dash_direction = 1;
 chip_dash_hit_tested = false;
 chip_dash_missed = false;
+chip_dash_player_dodged = false;
+chip_dash_current_speed = 0;
 chip_dash_player_x = x;
 chip_last_player_x = x;
 
 // Tuning.
-chip_attack_range = 180;
+chip_attack_range = 1800;
 chip_windup_duration = 0.65;
 chip_windup_duration = 0.65;
-chip_dash_speed = 500;
+chip_dash_speed = 500;          // Starting speed, pixels per second.
+chip_dash_acceleration = 100;   // Adds 100 pixels/second each second.
 chip_throw_windup = 0.7;
 chip_throw_range = 420;
 chip_wall_watch_duration = 0.65;
-chip_rebuild_duration = 0.10;
+chip_rebuild_duration = 8;
 chip_self_heal = 25;
 chip_ally_heal_fraction = 0.35;
 chip_ally_heal_cap = 35;
@@ -128,12 +133,14 @@ chip_crash = function(_enemy)
     take_damage(_amount, 0, 0, false);
 };
 
-// Returns true when a wall or another enemy stopped the dash.
+// Walls always stop the charge.
+// Enemies only stop it after the player dodges using dash iFrames.
 chip_dash_move = function(_amount)
 {
     var _steps = max(1, ceil(abs(_amount)));
     var _step = _amount / _steps;
     var _hits = ds_list_create();
+
     for (var _i = 0; _i < _steps; _i++)
     {
         if (chip_wall_at(x + _step, y))
@@ -142,30 +149,30 @@ chip_dash_move = function(_amount)
             chip_crash(noone);
             return true;
         }
+
         x += _step;
-        ds_list_clear(_hits);
-        collision_rectangle_list(bbox_left, bbox_top, bbox_right, bbox_bottom,
-            oEnemyParent, false, true, _hits, false);
-        if (ds_list_size(_hits) > 0)
-        {
-            var _enemy = _hits[| 0];
-            ds_list_destroy(_hits);
-            chip_crash(_enemy);
-            return true;
-        }
+
+        // Test the player before other enemies.
         if (!chip_dash_hit_tested)
         {
             var _player = instance_place(x, y, o_Player);
+
             if (_player != noone)
             {
                 chip_dash_hit_tested = true;
+
+                // This method also refreshes active ground-dash iFrames.
+                var _dash_protected = _player.dash_blocks_damage();
+
                 var _result = _player.chip_receive_hit(x, false);
+
                 if (_result == 2)
                 {
                     ds_list_destroy(_hits);
                     chip_request_boosted_heal();
                     return false;
                 }
+
                 if (_result == 1)
                 {
                     chip_has_chip = false;
@@ -173,12 +180,45 @@ chip_dash_move = function(_amount)
                     chip_begin_retreat();
                     return false;
                 }
-                // Protection counts as a dodge: keep travelling past them.
+
+                // The hit was blocked. Only dash protection enables
+                // crashes into other enemies.
+                chip_dash_player_dodged = _dash_protected;
                 chip_dash_missed = true;
             }
         }
+
+        if (chip_dash_player_dodged)
+        {
+            ds_list_clear(_hits);
+
+            collision_rectangle_list(
+                bbox_left,
+                bbox_top,
+                bbox_right,
+                bbox_bottom,
+                oEnemyParent,
+                false,
+                true,
+                _hits,
+                false
+            );
+
+            if (ds_list_size(_hits) > 0)
+            {
+                var _enemy = _hits[| 0];
+
+                ds_list_destroy(_hits);
+                chip_crash(_enemy);
+                return true;
+            }
+        }
+
         if ((x - chip_dash_player_x) * chip_dash_direction > 24)
+        {
             chip_dash_missed = true;
+        }
+
         if (x < 24 || x > room_width - 24)
         {
             ds_list_destroy(_hits);
@@ -186,6 +226,7 @@ chip_dash_move = function(_amount)
             return true;
         }
     }
+
     ds_list_destroy(_hits);
     return false;
 };

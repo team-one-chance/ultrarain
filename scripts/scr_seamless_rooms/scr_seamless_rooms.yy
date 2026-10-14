@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_seamless_rooms",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_seamless_rooms",
+  "parent":{
+    "name":"R_scripts",
+    "path":"folders/Rooms/R_scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

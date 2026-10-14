@@ -1,3 +1,10 @@
+// Room Start restored the exact source-camera framing.
+if (variable_instance_exists(id, "seamless_hold_frames") && seamless_hold_frames > 0)
+{
+    seamless_hold_frames--;
+    exit;
+}
+
 if (!instance_exists(o_Player))
 {
     exit;
@@ -27,6 +34,37 @@ if (instance_exists(_train) && _train.ride_started && !_train.arrived)
     target_y = _train.camera_target_y - view_height / 1.4;
 }
 
+
+// Ease toward the crossing line in either room, then release as you leave.
+// The train camera takes priority while travelling.
+var _train_camera_active = instance_exists(_train) && _train.ride_started && !_train.arrived;
+if (!_train_camera_active)
+{
+    var _focus_gate = noone;
+    var _best_weight = 0;
+    for (var _i = 0; _i < instance_number(o_SeamlessGate); _i++)
+    {
+        var _gate = instance_find(o_SeamlessGate, _i);
+        if (abs(o_Player.y - _gate.y) > _gate.vertical_tolerance) continue;
+        var _weight = clamp(1 - abs(o_Player.x - _gate.x)
+            / max(1, _gate.camera_approach_distance), 0, 1);
+        _weight = _weight * _weight * (3 - 2 * _weight);
+        if (_weight > _best_weight)
+        {
+            _best_weight = _weight;
+            _focus_gate = _gate;
+        }
+    }
+    if (_focus_gate != noone)
+    {
+        target_x = lerp(target_x,
+            _focus_gate.x + _focus_gate.camera_focus_offset_x - view_width / 2,
+            _best_weight);
+        target_y = lerp(target_y,
+            _focus_gate.y + _focus_gate.camera_focus_offset_y - view_height / 1.4,
+            _best_weight);
+    }
+}
 
 // =====================================
 // CURRENT CAMERA POSITION
@@ -66,5 +104,6 @@ cam_y += (target_y - cam_y) * vertical_strength;
 // =====================================
 
 camera_set_view_pos(cam, cam_x, cam_y);
+
 
 
