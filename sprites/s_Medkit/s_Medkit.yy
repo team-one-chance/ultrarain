@@ -2,9 +2,9 @@
   "$GMSprite":"v2",
   "%Name":"s_Medkit",
   "bboxMode":0,
-  "bbox_bottom":22,
-  "bbox_left":3,
-  "bbox_right":28,
+  "bbox_bottom":24,
+  "bbox_left":1,
+  "bbox_right":30,
   "bbox_top":5,
   "collisionKind":1,
   "collisionTolerance":0,
@@ -12,7 +12,14 @@
   "edgeFiltering":false,
   "For3D":false,
   "frames":[
+    {"$GMSpriteFrame":"v1","%Name":"8d8896c1-9cb2-4fee-b4db-536373197dc2","name":"8d8896c1-9cb2-4fee-b4db-536373197dc2","resourceType":"GMSpriteFrame","resourceVersion":"2.0",},
+    {"$GMSpriteFrame":"v1","%Name":"0418b0ec-969b-4c89-8efb-6d9a1b0740b0","name":"0418b0ec-969b-4c89-8efb-6d9a1b0740b0","resourceType":"GMSpriteFrame","resourceVersion":"2.0",},
     {"$GMSpriteFrame":"v1","%Name":"b01bc671-c43e-4b40-b4ab-c81bcb3a31b8","name":"b01bc671-c43e-4b40-b4ab-c81bcb3a31b8","resourceType":"GMSpriteFrame","resourceVersion":"2.0",},
+    {"$GMSpriteFrame":"v1","%Name":"42ff4daa-bdd9-4a8e-aad5-1540928855dd","name":"42ff4daa-bdd9-4a8e-aad5-1540928855dd","resourceType":"GMSpriteFrame","resourceVersion":"2.0",},
+    {"$GMSpriteFrame":"v1","%Name":"082ba42c-c7dd-42b6-a44b-c21785d642b9","name":"082ba42c-c7dd-42b6-a44b-c21785d642b9","resourceType":"GMSpriteFrame","resourceVersion":"2.0",},
+    {"$GMSpriteFrame":"v1","%Name":"64b80bd3-1899-490f-9adc-d9d373ef6cb0","name":"64b80bd3-1899-490f-9adc-d9d373ef6cb0","resourceType":"GMSpriteFrame","resourceVersion":"2.0",},
+    {"$GMSpriteFrame":"v1","%Name":"6e10d541-d855-4677-82a5-f0537e72a305","name":"6e10d541-d855-4677-82a5-f0537e72a305","resourceType":"GMSpriteFrame","resourceVersion":"2.0",},
+    {"$GMSpriteFrame":"v1","%Name":"bfc14f41-e3e2-48c7-80a5-408e533ca1b5","name":"bfc14f41-e3e2-48c7-80a5-408e533ca1b5","resourceType":"GMSpriteFrame","resourceVersion":"2.0",},
   ],
   "gridX":0,
   "gridY":0,
@@ -49,7 +56,7 @@
     },
     "eventStubScript":null,
     "eventToFunction":{},
-    "length":1.0,
+    "length":8.0,
     "lockOrigin":false,
     "moments":{
       "$KeyframeStore<MomentsEventKeyframe>":"",
@@ -59,7 +66,7 @@
     },
     "name":"s_Medkit",
     "playback":1,
-    "playbackSpeed":30.0,
+    "playbackSpeed":15.0,
     "playbackSpeedType":0,
     "resourceType":"GMSequence",
     "resourceVersion":"2.0",
@@ -69,8 +76,29 @@
     "tracks":[
       {"$GMSpriteFramesTrack":"","builtinName":0,"events":[],"inheritsTrackColour":true,"interpolation":1,"isCreationTrack":false,"keyframes":{"$KeyframeStore<SpriteFrameKeyframe>":"","Keyframes":[
             {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{
+                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"8d8896c1-9cb2-4fee-b4db-536373197dc2","path":"sprites/s_Medkit/s_Medkit.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
+              },"Disabled":false,"id":"1bc30fd0-4e23-47ab-9120-230f1e8d15ed","IsCreationKey":false,"Key":0.0,"Length":1.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
+            {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{
+                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"0418b0ec-969b-4c89-8efb-6d9a1b0740b0","path":"sprites/s_Medkit/s_Medkit.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
+              },"Disabled":false,"id":"e0dcbbc4-1c4b-4983-a3b0-b5680228e0aa","IsCreationKey":false,"Key":1.0,"Length":1.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
+            {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{
                 "0":{"$SpriteFrameKeyframe":"","Id":{"name":"b01bc671-c43e-4b40-b4ab-c81bcb3a31b8","path":"sprites/s_Medkit/s_Medkit.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
-              },"Disabled":false,"id":"6dc2eb4e-d616-4942-8f69-5ee829c9b38f","IsCreationKey":false,"Key":0.0,"Length":1.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
+              },"Disabled":false,"id":"6dc2eb4e-d616-4942-8f69-5ee829c9b38f","IsCreationKey":false,"Key":2.0,"Length":1.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
+            {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{
+                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"42ff4daa-bdd9-4a8e-aad5-1540928855dd","path":"sprites/s_Medkit/s_Medkit.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
+              },"Disabled":false,"id":"77ace494-c88f-4123-8b8f-84d27737c469","IsCreationKey":false,"Key":3.0,"Length":1.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
+            {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{
+                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"082ba42c-c7dd-42b6-a44b-c21785d642b9","path":"sprites/s_Medkit/s_Medkit.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
+              },"Disabled":false,"id":"f47a77b2-1788-463c-b611-a7ff0df0eadc","IsCreationKey":false,"Key":4.0,"Length":1.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
+            {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{
+                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"64b80bd3-1899-490f-9adc-d9d373ef6cb0","path":"sprites/s_Medkit/s_Medkit.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
+              },"Disabled":false,"id":"62bbe17a-9159-4c12-849b-ae090ea28aa4","IsCreationKey":false,"Key":5.0,"Length":1.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
+            {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{
+                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"6e10d541-d855-4677-82a5-f0537e72a305","path":"sprites/s_Medkit/s_Medkit.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
+              },"Disabled":false,"id":"2b91db12-547e-4ea7-a582-d62c1b22453d","IsCreationKey":false,"Key":6.0,"Length":1.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
+            {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{
+                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"bfc14f41-e3e2-48c7-80a5-408e533ca1b5","path":"sprites/s_Medkit/s_Medkit.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
+              },"Disabled":false,"id":"165e05d2-2b8d-4d59-9112-bab76f022b67","IsCreationKey":false,"Key":7.0,"Length":1.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
           ],"resourceType":"KeyframeStore<SpriteFrameKeyframe>","resourceVersion":"2.0",},"modifiers":[],"name":"frames","resourceType":"GMSpriteFramesTrack","resourceVersion":"2.0","spriteId":null,"trackColour":0,"tracks":[],"traits":0,},
     ],
     "visibleRange":null,
