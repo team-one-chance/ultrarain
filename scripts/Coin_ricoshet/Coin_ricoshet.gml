@@ -457,6 +457,16 @@ function coin_ricochet(
                 // one of the other split shots.
                 if (instance_exists(_target))
                 {
+                    instance_create_depth(
+                        _shot_x[shot_index], _shot_y[shot_index],
+                        -10000, o_ShotImpact,
+                        {
+                            impact_direction: point_direction(
+                                _last_x, _last_y, _shot_x[shot_index], _shot_y[shot_index]
+                            ),
+                            impact_enemy: true
+                        }
+                    );
                     _target.take_damage(
                         _current_damage
                     );

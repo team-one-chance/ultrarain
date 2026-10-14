@@ -98,6 +98,19 @@ function weapon_hitscan(_damage, _range, _piercing)
 
             ds_list_add(already_hit, inst);
 
+            // Spawn before damage so lethal hits also leave a burst.
+            if (instance_exists(inst) && inst.object_index != o_Coin)
+            {
+                var _enemy_impact = inst.object_index == oEnemyParent
+                    || object_is_ancestor(inst.object_index, oEnemyParent);
+                instance_create_depth(
+                    check_x - lengthdir_x(1, shoot_direction),
+                    check_y - lengthdir_y(1, shoot_direction),
+                    -10000, o_ShotImpact,
+                    { impact_direction: shoot_direction, impact_enemy: _enemy_impact }
+                );
+            }
+
             // =================================
             // BREAKABLE BLOCK
             // =================================
