@@ -104,6 +104,3 @@ cam_y += (target_y - cam_y) * vertical_strength;
 // =====================================
 
 camera_set_view_pos(cam, cam_x, cam_y);
-
-
-

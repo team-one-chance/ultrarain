@@ -1,6 +1,8 @@
 // =====================================
 // BASE BEAM — ONE COIN
 // =====================================
+// Start with the growth frames; Animation End loops only frames 10-16.
+image_index = 0;
 move_speed = 16;
 move_dir = 0;
 life = 1.5;
