@@ -1,3 +1,9 @@
+if (variable_instance_exists(id, "train_departing") && train_departing)
+{
+    path_end();
+    speed = 0;
+    exit;
+}
 if (variable_global_exists("dev_freeze_enemies")
 && global.dev_freeze_enemies)
 {
@@ -23,6 +29,22 @@ for (var _i = 0; _i < instance_number(o_ChipRobot); _i++)
     var _other = instance_find(o_ChipRobot, _i);
 
     if (_other == id) continue;
+	
+	    // Let robots travelling in opposite directions pass through.
+    var _my_direction =
+        (chip_state == ChipRobotState.RETREAT)
+        ? chip_retreat_direction
+        : chip_facing;
+
+    var _other_direction =
+        (_other.chip_state == ChipRobotState.RETREAT)
+        ? _other.chip_retreat_direction
+        : _other.chip_facing;
+
+    if (_my_direction * _other_direction < 0)
+    {
+        continue;
+    }
 
     // Ignore robots on different floors.
     if (bbox_bottom <= _other.bbox_top

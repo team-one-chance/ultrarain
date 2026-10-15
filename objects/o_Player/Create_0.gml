@@ -23,6 +23,7 @@ damage_knockback_pending = false;
 // Returns true only when health was actually lost.
 take_damage = function(_amount, _source_x = undefined)
 {
+	    if (grinder_dying) return false;
     // Slam blocks the whole hit, including recoil and trap bounce.
     if (_amount <= 0 || pHP <= 0 || damage_blocks_damage()) return false;
 
@@ -608,3 +609,59 @@ if (variable_global_exists("demo_travel_state"))
 
 // Chip enemy: player debuffs and wall-projectile response.
 chip_player_setup();
+
+grinder_dying = false;
+grinder_elapsed = 0;
+grinder_pull_duration = 0.35;
+grinder_crush_duration = 0.30;
+
+grinder_start_x = 0;
+grinder_start_y = 0;
+grinder_target_x = 0;
+grinder_target_y = 0;
+grinder_pivot_x = 0;
+grinder_pivot_y = 0;
+grinder_gear_depth = 0;
+
+begin_grinder_death = function(_gear)
+{
+    if (grinder_dying || pHP <= 0) return;
+
+    grinder_dying = true;
+    grinder_elapsed = 0;
+
+    grinder_start_x = x;
+    grinder_start_y = y;
+
+    // Remember the body's centre relative to its origin.
+    grinder_pivot_x = (bbox_left + bbox_right) * 0.5 - x;
+    grinder_pivot_y = (bbox_top + bbox_bottom) * 0.5 - y;
+
+    var _pull_direction =
+        (_gear.object_index == o_GrinderLeft) ? -1 : 1;
+
+    grinder_target_x =
+        (_gear.bbox_left + _gear.bbox_right) * 0.5
+        - grinder_pivot_x
+        + 32 * _pull_direction;
+
+    grinder_target_y =
+        (_gear.bbox_top + _gear.bbox_bottom) * 0.5
+        - grinder_pivot_y;
+
+    grinder_gear_depth = _gear.depth;
+
+    // Draw the body behind the teeth as it is pulled inward.
+    depth = grinder_gear_depth + 1;
+    image_speed = 0;
+
+    is_slamming = false;
+    dash_active = false;
+    chip_wall_holding_now = false;
+
+    phy_speed_x = 0;
+    phy_speed_y = 0;
+    phy_active = false;
+
+    global.demo_took_damage = true;
+};

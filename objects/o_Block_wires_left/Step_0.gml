@@ -58,3 +58,22 @@ if (wire_burst_timer <= 0 && sprite_index != -1)
         wire_burst_interval_min, wire_burst_interval_max
     );
 }
+
+for (var _i = array_length(wire_contact_lights) - 1; _i >= 0; _i--)
+{
+    var _flash = wire_contact_lights[_i];
+    _flash.life -= _dt;
+
+    if (_flash.life <= 0 || !instance_exists(_flash.light))
+    {
+        if (instance_exists(_flash.light))
+            instance_destroy(_flash.light);
+
+        array_delete(wire_contact_lights, _i, 1);
+    }
+    else
+    {
+        var _fade = _flash.life / _flash.duration;
+        _flash.light.light_strength = 0.9 * _fade * _fade;
+    }
+}

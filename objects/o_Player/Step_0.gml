@@ -1,7 +1,52 @@
 // Ignore menu-closing inputs for this frame; the controller clears this each Begin Step.
 if (variable_global_exists("dev_resume_input") && global.dev_resume_input) exit;
 
+// WASD controls only the camera while freecam is active.
+if (variable_global_exists("dev_freecam") && global.dev_freecam)
+{
+    phy_speed_x = 0;
+    phy_speed_y = 0;
+    exit;
+}
+
 chip_player_tick();
+
+if (grinder_dying)
+{
+    var _dt = (
+        variable_global_exists("dev_delta_time")
+        ? global.dev_delta_time
+        : delta_time
+    ) / 1000000;
+
+    grinder_elapsed += _dt;
+
+    var _pull = clamp(
+        grinder_elapsed / grinder_pull_duration,
+        0, 1
+    );
+
+    _pull = _pull * _pull * (3 - 2 * _pull);
+
+    phy_position_x = lerp(
+        grinder_start_x, grinder_target_x, _pull
+    );
+
+    phy_position_y = lerp(
+        grinder_start_y, grinder_target_y, _pull
+    );
+
+    if (grinder_elapsed >=
+        grinder_pull_duration + grinder_crush_duration)
+    {
+        // Let the existing Destroy event produce the explosion.
+        depth = grinder_gear_depth - 1;
+        pHP = 0;
+        instance_destroy();
+    }
+
+    exit;
+}
 
 // Resolve lethal hits before interaction locks or healing can skip death.
 if (pHP <= 0)

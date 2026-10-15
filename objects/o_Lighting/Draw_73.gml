@@ -1,3 +1,4 @@
+if (variable_global_exists("dev_freecam") && global.dev_freecam) exit;
 if (!enabled || !view_enabled) exit;
 var _cam = view_camera[view_current];
 if (_cam == -1) exit;

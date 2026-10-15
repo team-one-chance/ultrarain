@@ -1,3 +1,45 @@
+var _grinder_old_matrix = matrix_get(matrix_world);
+
+if (grinder_dying)
+{
+    var _crush = clamp(
+        (grinder_elapsed - grinder_pull_duration)
+        / grinder_crush_duration,
+        0, 1
+    );
+
+    var _cx = x + grinder_pivot_x;
+    var _cy = y + grinder_pivot_y;
+
+    var _to_origin = matrix_build(
+        -_cx, -_cy, 0,
+        0, 0, 0,
+        1, 1, 1
+    );
+
+    var _squeeze = matrix_build(
+        0, 0, 0,
+        0, 0, 0,
+        lerp(1, 0.12, _crush),
+        lerp(1, 0.55, _crush),
+        1
+    );
+
+    var _back = matrix_build(
+        _cx, _cy, 0,
+        0, 0, 0,
+        1, 1, 1
+    );
+
+    var _transform = matrix_multiply(_to_origin, _squeeze);
+    _transform = matrix_multiply(_transform, _back);
+    _transform = matrix_multiply(
+        _transform, _grinder_old_matrix
+    );
+
+    matrix_set(matrix_world, _transform);
+}
+
 // physics_world_draw_debug(phy_debug_render_shapes);
 
 var _body_facing = sign(image_xscale);
@@ -444,3 +486,5 @@ else
 }
 
 // draw_text(x - 30, y - 80, sprite_get_name(sprite_index));
+
+matrix_set(matrix_world, _grinder_old_matrix);

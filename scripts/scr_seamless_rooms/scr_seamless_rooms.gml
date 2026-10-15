@@ -51,6 +51,23 @@ function seamless_capture(_player, _gate, _destination)
         if (is_method(_value)) continue;
         variable_struct_set(_values, _name, _value);
     }
+    var _parallax_snapshot = undefined;
+    var _parallax = instance_find(o_Parallax, 0);
+
+    if (instance_exists(_parallax))
+    {
+        if (_parallax.parallax_ready)
+        {
+            _parallax_snapshot = {
+                anchor_offset_x:
+                    _parallax.parallax_camera_start_x - _gate.x,
+
+                anchor_offset_y:
+                    _parallax.parallax_camera_start_y - _gate.y
+            };
+        }
+    }
+
     var _cam = view_camera[0];
     return {
         destination_room: _destination,
@@ -66,6 +83,7 @@ function seamless_capture(_player, _gate, _destination)
         camera_width: camera_get_view_width(_cam),
         camera_height: camera_get_view_height(_cam),
         camera_angle: camera_get_view_angle(_cam),
+        parallax: _parallax_snapshot,
         values: _values
     };
 }
@@ -137,6 +155,27 @@ function seamless_restore(_player, _arrival, _transfer)
     camera_set_view_pos(_cam,
         _arrival.x + _transfer.camera_offset_x,
         _arrival.y + _transfer.camera_offset_y);
+		    // Continue parallax from the source room's reference point.
+    if (variable_struct_exists(_transfer, "parallax"))
+    {
+        if (!is_undefined(_transfer.parallax))
+        {
+            var _parallax = instance_find(o_Parallax, 0);
+
+            if (instance_exists(_parallax))
+            {
+                _parallax.parallax_camera_start_x =
+                    _arrival.x
+                    + _transfer.parallax.anchor_offset_x;
+
+                _parallax.parallax_camera_start_y =
+                    _arrival.y
+                    + _transfer.parallax.anchor_offset_y;
+
+                _parallax.parallax_ready = true;
+            }
+        }
+    }
     var _camera_object = instance_find(o_CAMERA, 0);
     if (!instance_exists(_camera_object))
         _camera_object = instance_create_depth(0, 0, -100, o_CAMERA);

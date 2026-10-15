@@ -1,3 +1,4 @@
+freecam_restore_layers();
 if (!enabled || world_frozen || !global.dev_collisions) exit;
 var _color = draw_get_color();
 var _alpha = draw_get_alpha();

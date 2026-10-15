@@ -51,7 +51,7 @@ physics_fixture_set_restitution(
 // player and other group-1 physics objects.
 physics_fixture_set_collision_group(
     fix,
-    1
+    0
 );
 
 

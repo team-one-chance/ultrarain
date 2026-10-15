@@ -137,7 +137,7 @@ menu_actions = function()
         case 2: return [5, 6, 7, 8, 9, 99];
         case 3: return [20, 21, 22, 23, 24, 99];
         case 4: return [30, 31, 32, 33, 34, 99];
-        case 5: return [0, 99];
+        case 5: return [0, 11, 99];
     }
     return [101, 102, 103, 104, 105, 10];
 };
@@ -163,6 +163,7 @@ menu_label = function(_action)
         case 8: return "Teleport to room spawn";
         case 9: return "Restart room";
         case 10: return "Close menu";
+		case 11: return "Freecam [F6]: " + (global.dev_freecam ? "ON" : "OFF");
         case 20: return "Spawn grunt at captured cursor";
         case 21: return "Spawn drone at captured cursor";
         case 22: return "Spawn miniboss at captured cursor";
@@ -204,6 +205,16 @@ run_action = function(_action)
     if (_action >= 32 && _action <= 34)
     {
         time_rate = (_action == 32) ? 1 : ((_action == 33) ? 0.5 : 0.25);
+        return;
+    }
+	if (_action == 11)
+    {
+        thaw_world();
+        freecam_restore_layers();
+        global.dev_freecam = !global.dev_freecam;
+        time_paused = false;
+        step_requested = false;
+        resume_game();
         return;
     }
     if (_action == 7 && is_undefined(test_position)) return;
@@ -255,4 +266,21 @@ run_action = function(_action)
     update_enemy_freeze();
     resume_game();
     if (time_paused) freeze_world();
+};
+
+// Debug freecam: camera movement uses real seconds.
+global.dev_freecam = false;
+global.dev_freecam_speed = 650;
+global.dev_freecam_fast_speed = 2200;
+freecam_layer_states = [];
+
+freecam_restore_layers = function()
+{
+    for (var _i = 0; _i < array_length(freecam_layer_states); _i++)
+    {
+        var _saved = freecam_layer_states[_i];
+        if (layer_exists(_saved.layer))
+            layer_set_visible(_saved.layer, _saved.was_visible);
+    }
+    freecam_layer_states = [];
 };
