@@ -79,7 +79,32 @@ phy_fixed_rotation = true;
 if (hacking_controller != noone)
 {
     phy_speed_x = 0;
-    phy_speed_y = 0;
+
+    var _ground_y = y + ground_check_y_offset;
+
+    var _grounded =
+        collision_point(
+            x - ground_check_x_offset,
+            _ground_y,
+            o_Block, false, true
+        ) != noone
+        ||
+        collision_point(
+            x + ground_check_x_offset,
+            _ground_y,
+            o_Block, false, true
+        ) != noone;
+
+    var _sprite = _grounded ? s_Player : s_Player_Air;
+
+    if (sprite_index != _sprite)
+    {
+        sprite_index = _sprite;
+        image_index = 0;
+    }
+
+    image_speed = _grounded ? 0 : 1;
+
     exit;
 }
 
