@@ -1789,8 +1789,9 @@ if (perfect_apex_flash_timer > 0)
 // =====================================
 
 // Both buttons reserve the input for syringe use.
+var _basher_ui_mouse = variable_global_exists("basher_tuner_capture_mouse") && global.basher_tuner_capture_mouse;
 var _syringe_combo =
-    mouse_check_button(mb_left)
+    !_basher_ui_mouse && mouse_check_button(mb_left)
     && mouse_check_button(mb_right);
 
 if (_syringe_combo
@@ -1804,7 +1805,7 @@ if (_syringe_combo
 if (weapon_type == "pistol")
 {
     // Keep the existing hold-to-fire behaviour.
-    if (!_syringe_combo
+    if (!_basher_ui_mouse && !_syringe_combo
 	&& mouse_check_button(mb_left)
 	&& weapon_fire_timer <= 0)
     {
@@ -1820,7 +1821,7 @@ if (weapon_type == "pistol")
 else if (weapon_type == "sword")
 {
     // Start one swing per click; show its trail during the downward strike.
-    if (!_syringe_combo
+    if (!_basher_ui_mouse && !_syringe_combo
 	&& mouse_check_button_pressed(mb_left)
 	&& sword_swing_timer <= 0
     && chip_sword_cooldown_timer <= 0)
@@ -1944,7 +1945,7 @@ coin.pin_owner = noone;
     }
 }
 
-if (!_syringe_combo
+if (!_basher_ui_mouse && !_syringe_combo
 && mouse_check_button_pressed(mb_right))
 {
     // Only throw if we actually have a coin.
@@ -2105,6 +2106,7 @@ if (
 
 if (
     item_coin_anchor
+    && !_basher_ui_mouse
     && mouse_check_button_pressed(mb_middle)
     && coin_anchor_cooldown_timer <= 0
     && pinned_coin == noone
