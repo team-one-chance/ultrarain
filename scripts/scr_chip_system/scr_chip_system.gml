@@ -133,6 +133,7 @@ function chip_player_setup()
         if (_amount <= 0 || pHP <= 0) return;
         // Deliberately bypass damage_blocks_damage() and all iFrames.
         pHP = max(0, pHP - _amount);
+        if (pHP > 0) audio_play_sound(sfxPTakeDamage, 1, false);
         global.demo_took_damage = true;
     };
 

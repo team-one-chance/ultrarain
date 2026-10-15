@@ -52,6 +52,8 @@ function coin_ricochet(
     var _perfect_threshold =
         0.05;
 
+    var _chain_perfect_apex = false;
+
 
     // =====================================
     // TRAVEL THROUGH EVERY COIN
@@ -80,6 +82,7 @@ function coin_ricochet(
         if (_coin_y_speed <= _perfect_threshold)
         {
             _coin_shot_count = 4;
+            _chain_perfect_apex = true;
 
             perfect_apex_flash_timer =
                 perfect_apex_flash_duration;
@@ -542,4 +545,7 @@ function coin_ricochet(
     ds_list_destroy(
         _coins
     );
+
+    // One cue for the entire shot, regardless of how many coins it chained.
+    audio_play_sound(_chain_perfect_apex ? sfxBulletFlash : sfxRicochet, 1, false);
 }

@@ -5,6 +5,8 @@ if (reading)
 {
     if (!instance_exists(reader))
     {
+        stop_command_result_sfx();
+        command_restart_pending = false;
         reading = false;
         reader = noone;
         keyboard_string = "";
@@ -13,6 +15,22 @@ if (reading)
 
     command_cursor_timer += (variable_global_exists("dev_delta_time") ? (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) : delta_time) / 1000000;
 
+    // Let the accepted-command cue finish before restarting the game.
+    if (command_restart_pending)
+    {
+        if (!audio_is_playing(command_result_sound))
+        {
+            reader.hacking_controller = noone;
+            keyboard_string = "";
+            global.demo_travel_state = undefined;
+            global.demo_took_damage = false;
+            global.demo_used_healing = false;
+            global.demo_finish_time = 0;
+            game_restart();
+        }
+        exit;
+    }
+
     if (keyboard_check_pressed(vk_escape))
     {
         if (reader.hacking_controller == id)
@@ -20,10 +38,27 @@ if (reading)
             reader.hacking_controller = noone;
         }
 
+        stop_command_result_sfx();
         reader = noone;
         reading = false;
         keyboard_string = "";
         exit;
+    }
+
+    // Choose independently for each typing key, including Backspace and Enter.
+    for (var _key = 8; _key <= 226; _key++)
+    {
+        var _typing_key = _key == vk_backspace || _key == vk_enter || _key == vk_space
+            || (_key >= 48 && _key <= 57)   // Number row.
+            || (_key >= 65 && _key <= 90)   // Letters.
+            || (_key >= 96 && _key <= 111)  // Numpad digits and operators.
+            || (_key >= 186 && _key <= 192) // Punctuation.
+            || (_key >= 219 && _key <= 222) || _key == 226;
+
+        if (_typing_key && keyboard_check_pressed(_key))
+        {
+            audio_play_sound(choose(sfxTyping1, sfxTyping2, sfxTyping3, sfxTyping4), 1, false);
+        }
     }
 
     // Capture typing, including Backspace.
@@ -35,19 +70,16 @@ if (reading)
         if (string_lower(command_input)
             == "vrain initiate restart.exe")
         {
-            reader.hacking_controller = noone;
-            keyboard_string = "";
-
-            global.demo_travel_state = undefined;
-            global.demo_took_damage = false;
-            global.demo_used_healing = false;
-            global.demo_finish_time = 0;
-
-            game_restart();
+            stop_command_result_sfx();
+            command_result_sound = audio_play_sound(sfxTerminalValid, 1, false);
+            command_restart_pending = true;
+            command_feedback = "Command accepted. Restarting...";
             exit;
         }
         else
         {
+            stop_command_result_sfx();
+            command_result_sound = audio_play_sound(sfxTerminalInvalid, 1, false);
             command_feedback = "ERROR: command not recognized.";
             command_input = "";
             keyboard_string = "";
@@ -76,6 +108,7 @@ if (instance_exists(_player))
     {
         reader = _player;
         reading = true;
+        command_restart_pending = false;
 
         keyboard_string = "";
         command_input = "";

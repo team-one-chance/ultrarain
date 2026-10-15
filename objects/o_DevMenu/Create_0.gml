@@ -50,6 +50,16 @@ menu_layout = function()
 freeze_world = function()
 {
     if (world_frozen) return;
+    with (o_Player)
+    {
+        stop_movement_sfx();
+        stop_electric_wires_sfx();
+        stop_molten_lava_sfx();
+        stop_gear_grinder_sfx();
+        stop_ambush_alarm_sfx();
+    }
+    with (o_DoorController) stop_wire_flash_sfx();
+    with (o_TrainRide) stop_tram_sfx();
     if (surface_exists(application_surface))
     {
         paused_surface = surface_create(surface_get_width(application_surface), surface_get_height(application_surface));

@@ -1,5 +1,8 @@
 split_threshold = 0.75;
 
+// Play once whenever a coin is thrown.
+audio_play_sound(sfxCoin, 1, false);
+
 // =====================================
 // APEX ANIMATION
 // =====================================
