@@ -84,7 +84,7 @@ release_robot = function(_spawn_x, _opening_y)
 {
     if (instance_number(o_FallingRobotScrap) >= max_falling_bodies) return noone;
     var _body = instance_create_depth(_spawn_x, _opening_y,
-        depth - 1, o_FallingRobotScrap);
+        depth = -1, o_FallingRobotScrap);
     _body.scrap_emitter = id;
     _body.scrap_release_y = _opening_y;
     _body.y = _opening_y - 24 * _body.scrap_size;
