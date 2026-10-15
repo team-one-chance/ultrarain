@@ -1,8 +1,3 @@
-if (layer_hidden)
-{
-    exit;
-}
-
 var trigger_half_width = max(0, reveal_trigger_width) * 0.5;
 var trigger_half_height = max(0, reveal_trigger_height) * 0.5;
 

@@ -1,6 +1,8 @@
 player = noone;
 broken = false;
 block_hp = 30;
+vent_cover_layer = "fade2blackvent";
+vent_cover_names = [];
 
 image_speed = 0;
 
@@ -38,6 +40,21 @@ take_damage = function(_damage)
     if (block_hp > 0) return;
 
     broken = true;
+
+    var _layer = layer_get_id(vent_cover_layer);
+
+    if (_layer != -1)
+    {
+        for (var _i = 0; _i < array_length(vent_cover_names); _i++)
+        {
+            var _cover = layer_sprite_get_id(_layer, vent_cover_names[_i]);
+
+            if (_cover != -1)
+            {
+                layer_sprite_destroy(_cover);
+            }
+        }
+    }
 
     repeat (16)
     {

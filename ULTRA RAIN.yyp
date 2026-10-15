@@ -264,12 +264,14 @@
   "resourceType":"GMProject",
   "resourceVersion":"2.0",
   "RoomOrderNodes":[
-    {"roomId":{"name":"LE_TUTORIAL_WIP","path":"rooms/LE_TUTORIAL_WIP/LE_TUTORIAL_WIP.yy",},},
-    {"roomId":{"name":"TESTING","path":"rooms/TESTING/TESTING.yy",},},
     {"roomId":{"name":"LE_MENU","path":"rooms/LE_MENU/LE_MENU.yy",},},
+    {"roomId":{"name":"LE_TUTORIAL_WIP","path":"rooms/LE_TUTORIAL_WIP/LE_TUTORIAL_WIP.yy",},},
     {"roomId":{"name":"LE_DEMO_END","path":"rooms/LE_DEMO_END/LE_DEMO_END.yy",},},
     {"roomId":{"name":"LE_TRAIN","path":"rooms/LE_TRAIN/LE_TRAIN.yy",},},
     {"roomId":{"name":"LE_PWR","path":"rooms/LE_PWR/LE_PWR.yy",},},
+    {"children":[
+        {"roomId":{"name":"TESTING","path":"rooms/TESTING/TESTING.yy",},},
+      ],"groupName":"testing_ALWAYS_LAST",},
   ],
   "templateType":"game",
   "TextureGroups":[

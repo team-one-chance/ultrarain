@@ -24,6 +24,7 @@ stop_tram_sfx = function()
 scenery_max_speed = 220;
 scenery_speed = 0;
 scenery_distance = 0;
+departure_enemies = [];
 cruise_duration = max(0, ride_duration - arrival_duration);
 total_travel_distance = scenery_max_speed * cruise_duration
     + scenery_max_speed * arrival_duration * 0.5;
@@ -36,6 +37,7 @@ tunnel_a = layer_get_id("Tunnel_A");
 tunnel_b = layer_get_id("Tunnel_B");
 station_layer = layer_get_id("Station_Arrival");
 station_layer_1 = layer_get_id("Station_Arrival_1");
+station_layer_2 = layer_get_id("Station_Arrival_1_light");
 departure_layer = layer_get_id("Station_Departure");
 underwalkway_layer = layer_get_id("underwalkway");
 fade2black_layer = layer_get_id("fade2black");
@@ -45,6 +47,8 @@ tunnel_a_base_x = tunnel_a != -1 ? layer_get_x(tunnel_a) : 0;
 tunnel_b_base_x = tunnel_b != -1 ? layer_get_x(tunnel_b) : 0;
 station_base_x = station_layer != -1 ? layer_get_x(station_layer) : 0;
 station_1_base_x = station_layer_1 != -1 ? layer_get_x(station_layer_1) : 0;
+station_2_base_x = station_layer_2 != -1 ? layer_get_x(station_layer_2) : 0;
+station_lights = [];
 departure_base_x = departure_layer != -1 ? layer_get_x(departure_layer) : 0;
 underwalkway_base_x = underwalkway_layer != -1 ? layer_get_x(underwalkway_layer) : 0;
 fade2black_base_x = fade2black_layer != -1 ? layer_get_x(fade2black_layer) : 0;
@@ -159,6 +163,38 @@ begin_ride = function(_player)
     tram_sound = audio_play_sound(sfxTram, 1, true);
     ride_elapsed = 0;
     scenery_speed = scenery_max_speed;
+	
+	// Enemies outside the cabin belong to the departing scenery.
+    departure_enemies = [];
+    for (var _enemy_i = 0; _enemy_i < instance_number(oEnemyParent); _enemy_i++)
+    {
+        var _enemy = instance_find(oEnemyParent, _enemy_i);
+        var _cx = (_enemy.bbox_left + _enemy.bbox_right) * 0.5;
+        var _cy = (_enemy.bbox_top + _enemy.bbox_bottom) * 0.5;
+
+        var _in_cabin = _cx >= train_left && _cx <= train_right
+            && _cy >= train_roof && _cy <= train_floor;
+
+        // Leave enemies in the destination station alone.
+        if (_in_cabin || _cx > train_right) continue;
+
+        array_push(departure_enemies, {
+            enemy: _enemy,
+            start_x: _enemy.x,
+            start_y: _enemy.y
+        });
+
+        _enemy.train_departing = true;
+        if (variable_instance_exists(_enemy, "drone_ready"))
+            _enemy.drone_ready = false;
+        if (variable_instance_exists(_enemy, "drone_fire_state"))
+            _enemy.drone_fire_state = 0;
+        with (_enemy)
+        {
+            path_end();
+            speed = 0;
+        }
+    }
 
     return true;
 };

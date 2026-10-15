@@ -1,3 +1,31 @@
+// Freecam takes priority over train framing and seamless gate framing.
+if (variable_global_exists("dev_freecam") && global.dev_freecam)
+{
+    var _free_cam = view_camera[0];
+    if (_free_cam == -1) exit;
+
+    var _dx = keyboard_check(ord("D")) - keyboard_check(ord("A"));
+    var _dy = keyboard_check(ord("S")) - keyboard_check(ord("W"));
+    var _length = point_distance(0, 0, _dx, _dy);
+
+    if (_length > 0)
+    {
+        _dx /= _length;
+        _dy /= _length;
+    }
+
+    var _speed = keyboard_check(vk_shift)
+        ? global.dev_freecam_fast_speed
+        : global.dev_freecam_speed;
+    var _dt = min(delta_time / 1000000, 0.05);
+
+    camera_set_view_pos(
+        _free_cam,
+        camera_get_view_x(_free_cam) + _dx * _speed * _dt,
+        camera_get_view_y(_free_cam) + _dy * _speed * _dt
+    );
+    exit;
+}
 // Room Start restored the exact source-camera framing.
 if (variable_instance_exists(id, "seamless_hold_frames") && seamless_hold_frames > 0)
 {

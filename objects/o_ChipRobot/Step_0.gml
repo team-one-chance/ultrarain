@@ -1,3 +1,9 @@
+if (variable_instance_exists(id, "train_departing") && train_departing)
+{
+    path_end();
+    speed = 0;
+    exit;
+}
 if (variable_global_exists("dev_freeze_enemies") && global.dev_freeze_enemies) exit;
 var _dt = chip_dt();
 hit_timer = max(0, hit_timer - _dt);

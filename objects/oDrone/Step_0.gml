@@ -1,3 +1,9 @@
+if (variable_instance_exists(id, "train_departing") && train_departing)
+{
+    path_end();
+    speed = 0;
+    exit;
+}
 // Dev AI freeze keeps drawing and damage available.
 if (variable_global_exists("dev_freeze_enemies") && global.dev_freeze_enemies) exit;
 
@@ -16,7 +22,21 @@ var player = instance_nearest(
     o_Player
 );
 
-if (player != noone && !slam_locked)
+var _bumping = drone_bump_timer > 0;
+
+if (_bumping && !slam_locked)
+{
+    path_end();
+    speed = 0;
+    repath_timer = 0;
+
+    drone_bump_timer = max(0, drone_bump_timer - dt);
+
+    x += drone_bump_velocity_x * dt;
+    y += drone_bump_velocity_y * dt;
+}
+
+if (player != noone && !slam_locked && !_bumping)
 {
     // Position the drone initially approaches
     var approach_x = player.x;
