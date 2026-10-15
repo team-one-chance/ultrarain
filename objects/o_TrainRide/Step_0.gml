@@ -86,6 +86,21 @@ if (station_layer != -1)
     layer_x(station_layer, station_base_x + max(0, total_travel_distance - scenery_distance));
 if (station_layer_1 != -1)
     layer_x(station_layer_1, station_1_base_x + max(0, total_travel_distance - scenery_distance));
+var _light_offset = max(
+    0,
+    total_travel_distance - scenery_distance
+);
+
+for (var _i = 0; _i < array_length(station_lights); _i++)
+{
+    var _entry = station_lights[_i];
+
+    if (instance_exists(_entry.instance))
+    {
+        _entry.instance.x = _entry.home_x + _light_offset;
+    }
+}
+	
 
 if (ride_elapsed >= ride_duration)
 {
