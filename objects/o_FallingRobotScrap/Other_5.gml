@@ -1,4 +1,4 @@
-scrap_needs_rebind = scrap_emerged && (scrap_state == 0 || scrap_state == 2);
+scrap_needs_rebind = scrap_emerged && scrap_state == 0;
 if (scrap_fixture != -1 && scrap_needs_rebind)
 {
     scrap_vx = phy_linear_velocity_x;

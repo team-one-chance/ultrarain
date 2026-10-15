@@ -76,51 +76,11 @@ switch (scrap_state)
             scrap_spin = random_range(-160, 160);
             scrap_stage_time = 0;
             scrap_state = 2;
+scrap_stop_physics();
+
 scrap_state = 2;
+scrap_can_damage = false;
 depth = scrap_normal_depth;
-
-// Check whether there is actual lava beneath this robot.
-var _lava_below = false;
-
-for (var _j = 0; _j < instance_number(oMoltenLava); _j++)
-{
-    var _lava = instance_find(oMoltenLava, _j);
-
-    if (x >= _lava.bbox_left
-    && x <= _lava.bbox_right
-    && _lava.bbox_bottom >= y)
-    {
-        _lava_below = true;
-        break;
-    }
-}
-
-// Robots over lava remain physical.
-// Of those missing the lava, 10% remain physical.
-var _physical = _lava_below || random(1) < 0.01;
-
-if (_physical)
-{
-    // Bridge debris can damage the player on its first impact.
-    scrap_can_damage = !_lava_below;
-    scrap_hit_player = false;
-
-    scrap_bind_physics();
-}
-else
-{
-    // State 4: background debris, without physical collision.
-    scrap_state = 4;
-    scrap_can_damage = false;
-    scrap_stop_physics();
-
-    var _player = instance_find(o_Player, 0);
-
-    if (instance_exists(_player))
-    {
-        depth = _player.depth + 1;
-    }
-}
 
 scrap_before_x = x;
 scrap_before_y = y;
@@ -128,13 +88,21 @@ scrap_before_y = y;
         break;
     }
 
-    case 2:
-    {
-        if (scrap_fixture == -1) scrap_bind_physics();
-        phy_linear_velocity_y = min(phy_linear_velocity_y, scrap_max_fall_speed);
-        scrap_draw_angle += scrap_spin * _dt;
-        break;
-    }
+case 2:
+{
+    scrap_vy = min(
+        scrap_vy + scrap_gravity * _dt,
+        scrap_max_fall_speed
+    );
+
+    scrap_set_position(
+        x + scrap_vx * _dt,
+        y + scrap_vy * _dt
+    );
+
+    scrap_draw_angle += scrap_spin * _dt;
+    break;
+}
 	
 	case 4:
 {
