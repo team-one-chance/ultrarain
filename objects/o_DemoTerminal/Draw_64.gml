@@ -78,7 +78,7 @@ if (floor(command_cursor_timer / 0.5) mod 2 == 0)
 draw_set_font(_previous_font);
 
 // Feedback for an invalid command.
-draw_set_color(make_color_rgb(255, 70, 70));
+draw_set_color(command_restart_pending ? c_lime : make_color_rgb(255, 70, 70));
 draw_text(
     _px + 32,
     _py + _ph - 62,

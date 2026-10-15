@@ -166,6 +166,42 @@ draw_text(
     coin_text
 );
 
+// Show Pinhouse and its live cooldown once the pickup is owned.
+if (item_coin_anchor)
+{
+    var pinhouse_icon_scale = 1;
+    var pinhouse_icon_width = sprite_get_width(s_Pinhouse) * pinhouse_icon_scale;
+    var pinhouse_icon_height = sprite_get_height(s_Pinhouse) * pinhouse_icon_scale;
+    var pinhouse_gui_x = coin_gui_x + icon_width + coin_icon_gap
+        + string_width(coin_text) + 16;
+    var pinhouse_icon_top = coin_gui_y
+        + floor((string_height(coin_text) - pinhouse_icon_height) * 0.5);
+
+    draw_sprite_ext(
+        s_Pinhouse,
+        0,
+        pinhouse_gui_x + sprite_get_xoffset(s_Pinhouse) * pinhouse_icon_scale,
+        pinhouse_icon_top + sprite_get_yoffset(s_Pinhouse) * pinhouse_icon_scale,
+        pinhouse_icon_scale,
+        pinhouse_icon_scale,
+        0,
+        c_white,
+        1
+    );
+
+    var pinhouse_ready = coin_anchor_cooldown_timer <= 0;
+    var pinhouse_cooldown_text = pinhouse_ready
+        ? "Ready"
+        : string_format(ceil(coin_anchor_cooldown_timer * 10) / 10, 0, 1) + "s";
+
+    draw_set_color(pinhouse_ready ? c_lime : c_white);
+    draw_text(
+        pinhouse_gui_x + pinhouse_icon_width + coin_icon_gap,
+        coin_gui_y,
+        pinhouse_cooldown_text
+    );
+}
+
 draw_set_color(old_colour);
 draw_set_alpha(old_alpha);
 draw_set_halign(old_halign);

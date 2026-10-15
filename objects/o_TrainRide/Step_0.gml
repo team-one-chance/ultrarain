@@ -54,9 +54,17 @@ if (!ride_started)
     exit;
 }
 
-if (arrived) exit;
+if (arrived)
+{
+    stop_tram_sfx();
+    exit;
+}
 var _player = instance_find(o_Player, 0);
-if (!instance_exists(_player)) exit;
+if (!instance_exists(_player))
+{
+    stop_tram_sfx();
+    exit;
+}
 var _dt = max(0, (variable_global_exists("dev_delta_time")
     ? global.dev_delta_time : delta_time) / 1000000);
 ride_elapsed = min(ride_duration, ride_elapsed + _dt);
@@ -74,6 +82,12 @@ else
     scenery_distance = scenery_max_speed * cruise_duration
         + scenery_max_speed * (_braking_time - sqr(_braking_time) / (2 * arrival_duration));
 }
+
+if (tram_sound == -1 || !audio_is_playing(tram_sound))
+{
+    tram_sound = audio_play_sound(sfxTram, 1, true);
+}
+audio_sound_gain(tram_sound, clamp(scenery_speed / max(1, scenery_max_speed), 0, 1), 0);
 
 tunnel_scroll = scenery_distance mod tunnel_repeat_width;
 if (tunnel_a != -1) layer_x(tunnel_a, tunnel_a_base_x - tunnel_scroll);
@@ -105,6 +119,7 @@ for (var _i = 0; _i < array_length(station_lights); _i++)
 if (ride_elapsed >= ride_duration)
 {
     arrived = true;
+    stop_tram_sfx();
     scenery_speed = 0;
     if (instance_exists(train_exit_door)) train_exit_door.door_open();
 }

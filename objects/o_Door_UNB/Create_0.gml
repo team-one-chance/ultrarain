@@ -37,6 +37,7 @@ door_open = function()
     if (door_state != 0) return;
 
     door_state = 1;
+    audio_play_sound(sfxDoorOpen, 1, false);
     image_index = 0;
     image_speed = 1;
 };
@@ -74,6 +75,7 @@ door_close = function()
     }
 
     door_state = 3;
+    audio_play_sound(sfxDoorClose, 1, false);
     image_index = image_number - 1;
     image_speed = -1;
 };

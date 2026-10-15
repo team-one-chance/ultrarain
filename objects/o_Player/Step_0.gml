@@ -1,5 +1,13 @@
+// Track actual movement so pushing against a wall does not make footsteps.
+var _footstep_moved = abs(x - footstep_last_x) > 0.1;
+footstep_last_x = x;
+
 // Ignore menu-closing inputs for this frame; the controller clears this each Begin Step.
-if (variable_global_exists("dev_resume_input") && global.dev_resume_input) exit;
+if (variable_global_exists("dev_resume_input") && global.dev_resume_input)
+{
+    stop_movement_sfx();
+    exit;
+}
 
 // WASD controls only the camera while freecam is active.
 if (variable_global_exists("dev_freecam") && global.dev_freecam)
@@ -55,6 +63,11 @@ if (pHP <= 0)
     exit;
 }
 
+update_electric_wires_sfx();
+update_molten_lava_sfx();
+update_gear_grinder_sfx();
+update_ambush_alarm_sfx();
+
 slam_iframe_timer = max(0, slam_iframe_timer - (variable_global_exists("dev_delta_time") ? (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) : delta_time) / 1000000);
 
 slam_cooldown_timer = max(
@@ -78,6 +91,8 @@ phy_fixed_rotation = true;
 // =====================================
 if (hacking_controller != noone)
 {
+    stop_movement_sfx();
+    footstep_timer = 0;
     phy_speed_x = 0;
 
     var _ground_y = y + ground_check_y_offset;
@@ -161,8 +176,21 @@ var ground_right =
 
 var on_ground = ground_left || ground_right;
 
+// Only the airborne-to-grounded transition plays a normal landing sound.
+if (on_ground && !sfx_was_grounded && phy_speed_y >= 0
+    && !is_slamming && !is_ledge_climbing && !is_mantle_lunging)
+{
+    audio_play_sound(sfxLandingNoSlam, 1, false);
+}
+sfx_was_grounded = on_ground;
+
 // The thrown chip starts its two-second stun on landing.
-if (chip_ground_update(on_ground)) exit;
+if (chip_ground_update(on_ground))
+{
+    stop_movement_sfx();
+    footstep_timer = 0;
+    exit;
+}
 
 if (on_ground)
 {
@@ -600,6 +628,7 @@ if (is_ledge_climbing)
         && move != 0)
         {
             is_mantle_lunging = true;
+            audio_play_sound(sfxJump, 1, false);
 
             mantle_lunge_direction =
                 move;
@@ -1344,6 +1373,7 @@ if (dash_pressed && !is_sliding)
     && move != 0
     && ground_dash_cooldown_timer <= 0)
     {	
+		audio_play_sound(sfxJumpDash, 1, false);
 		dash_iframe_timer = ground_dash_iframe_duration;
         dash_iframe_is_ground = true;
         // Cancel wall-jump control lock
@@ -1397,6 +1427,7 @@ phy_speed_x =
     else if (!on_ground
     && air_dash_cooldown_timer <= 0)
     {
+		audio_play_sound(sfxJumpDash, 1, false);
 		dash_iframe_timer = air_dash_iframe_duration;
         dash_iframe_is_ground = false;
         // Cancel wall-jump control lock
@@ -1565,6 +1596,7 @@ if (jump_pressed
 
 if (slide_double_jump_timer > 0)
 {
+    audio_play_sound(sfxJumpDash, 1, false);
     // Use the direction the player is facing NOW,
     // not the direction the original slide started in.
     var double_jump_direction = move;
@@ -1641,6 +1673,7 @@ if (slide_double_jump_timer > 0)
     {
         if (is_sliding && player_can_stand())
         {
+            audio_play_sound(sfxJump, 1, false);
             // IMPORTANT:
             // Remember which way we were sliding
             // BEFORE resetting slide_direction.
@@ -1667,6 +1700,7 @@ if (slide_double_jump_timer > 0)
 
 else
 {
+    audio_play_sound(dash_chain > 0 ? sfxJumpDash : sfxJump, 1, false);
     phy_speed_y =
         jump_speed;
 
@@ -1724,6 +1758,7 @@ else if (!on_ground
     if (touching_left_wall
     && left_wall_jumps_used < max_wall_jumps_per_side)
     {
+        audio_play_sound(sfxJump, 1, false);
         left_wall_jumps_used += 1;
 
         phy_speed_y =
@@ -1745,6 +1780,7 @@ else if (!on_ground
     else if (touching_right_wall
     && right_wall_jumps_used < max_wall_jumps_per_side)
     {
+        audio_play_sound(sfxJump, 1, false);
         right_wall_jumps_used += 1;
 
         phy_speed_y =
@@ -1792,6 +1828,8 @@ if (on_ground && is_slamming)
 	slam_cooldown_timer = slam_cooldown;
     slam_apply(x, y, impact_radius, impact_damage, impact_speed, id);
 
+    audio_play_sound(sfxSlam, 1, false);
+
     var slam_fx = instance_create_depth(x, y, depth - 10, oSlamVFX);
     slam_fx.start_slam_vfx(impact_radius, impact_power);
 
@@ -1806,6 +1844,10 @@ if (on_ground && is_slamming)
 
 if (keyboard_check_pressed(ord("1")))
 {
+    if (weapon_type != "pistol")
+    {
+        audio_play_sound(sfxSwitchGun, 1, false);
+    }
     weapon_type = "pistol";
     sword_swing_timer = 0;
     sword_swing_pending_hit = false;
@@ -1813,6 +1855,10 @@ if (keyboard_check_pressed(ord("1")))
 
 if (keyboard_check_pressed(ord("2")))
 {
+    if (weapon_type != "sword")
+    {
+        audio_play_sound(sfxSwordSwitch, 1, false);
+    }
     weapon_type = "sword";
 }
 
@@ -1878,6 +1924,7 @@ if (weapon_type == "pistol")
 	&& mouse_check_button(mb_left)
 	&& weapon_fire_timer <= 0)
     {
+        audio_play_sound(sfxGunshot, 1, false);
         weapon_hitscan(
             pistol_damage,
             pistol_range,
@@ -1914,6 +1961,10 @@ else if (weapon_type == "sword")
             >= clamp(sword_config.windup_phase, 0.001, 0.998))
     {
         sword_swing_pending_hit = false;
+        var _slash_sound = sword_slash_sound_index == 0
+            ? sfxSwordSlash1 : sfxSwordSlash2;
+        audio_play_sound(_slash_sound, 1, false);
+        sword_slash_sound_index = 1 - sword_slash_sound_index;
 
         var slash = instance_create_depth(
             x + sword_config.slash_forward * sword_swing_facing,
@@ -2331,3 +2382,76 @@ chip_wall_holding_now = !on_ground && wall_holding
     && wall_jump_lock_time <= 0
     && chip_wall_release_timer <= 0 && !chip_waiting_for_landing
     && abs(phy_speed_y) < 1 && abs(phy_speed_x) < 1;
+
+// =====================================
+// WALL SLIDE AUDIO
+// =====================================
+// Loop only while descending along a wall; stop on jumps, holds and landings.
+var _wall_slide_sounding = wall_slide_active && wall_holding && touching_wall
+    && !on_ground && phy_speed_y > 0.1 && wall_jump_lock_time <= 0
+    && !is_slamming && !is_ledge_climbing && !is_mantle_lunging
+    && coyote_timer <= 0 && damage_knockback_timer <= 0;
+
+if (_wall_slide_sounding)
+{
+    if (wall_slide_sound == -1 || !audio_is_playing(wall_slide_sound))
+    {
+        wall_slide_sound = audio_play_sound(sfxWallSlide, 1, true);
+    }
+}
+else
+{
+    stop_wall_slide_sfx();
+}
+
+// =====================================
+// GROUND SLIDE AUDIO
+// =====================================
+// Keep the ground-slide loop tied to movement, just like the wall-slide loop.
+var _slide_sounding = is_sliding && on_ground && _footstep_moved
+    && abs(phy_speed_x) > 0.1 && phy_speed_y >= 0
+    && !is_slamming && !is_ledge_climbing && !is_mantle_lunging
+    && damage_knockback_timer <= 0;
+
+if (_slide_sounding)
+{
+    if (slide_sound == -1 || !audio_is_playing(slide_sound))
+    {
+        slide_sound = audio_play_sound(sfxSlide, 1, true);
+    }
+}
+else
+{
+    stop_slide_sfx();
+}
+
+// =====================================
+// RUNNING FOOTSTEPS
+// =====================================
+// Check after jumps, slides, dashes and recoil have resolved for this frame.
+var _footstep_running = on_ground && move != 0 && _footstep_moved
+    && abs(phy_speed_x) > 0.1 && phy_speed_y >= 0
+    && !is_sliding && !is_slamming
+    && !is_ledge_climbing && !is_mantle_lunging
+    && damage_knockback_timer <= 0
+    && (!variable_instance_exists(id, "trap_knockback_timer") || trap_knockback_timer <= 0);
+
+if (_footstep_running)
+{
+    var _footstep_dt = (variable_global_exists("dev_delta_time")
+        ? global.dev_delta_time : delta_time) / 1000000;
+    // Advance the cadence with current speed, including the ground dash burst.
+    var _footstep_speed_ratio = abs(phy_speed_x) / max(0.001, move_speed);
+    footstep_timer = max(0, footstep_timer - _footstep_dt * max(0.5, _footstep_speed_ratio));
+
+    if (footstep_timer <= 0)
+    {
+        audio_play_sound(sfxFootsteps, 1, false);
+        footstep_timer = footstep_interval;
+    }
+}
+else
+{
+    // Start with a footstep when grounded running resumes.
+    footstep_timer = 0;
+}

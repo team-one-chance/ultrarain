@@ -12,6 +12,15 @@ ride_elapsed = 0;
 ride_duration = 12;
 arrival_duration = 4;
 arrived = false;
+tram_sound = -1;
+stop_tram_sfx = function()
+{
+    if (tram_sound != -1 && audio_is_playing(tram_sound))
+    {
+        audio_stop_sound(tram_sound);
+    }
+    tram_sound = -1;
+};
 scenery_max_speed = 220;
 scenery_speed = 0;
 scenery_distance = 0;
@@ -151,6 +160,7 @@ begin_ride = function(_player)
 
     if (bgfar_layer != -1) bgfar_base_x = layer_get_x(bgfar_layer);
     ride_started = true;
+    tram_sound = audio_play_sound(sfxTram, 1, true);
     ride_elapsed = 0;
     scenery_speed = scenery_max_speed;
 	
