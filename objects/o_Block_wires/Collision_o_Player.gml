@@ -1,7 +1,8 @@
-// Dash and slam protection also block this hazard.
-if (other.damage_blocks_damage()) exit;
+if (!instance_exists(other)) exit;
+if (other.grinder_dying) exit;
 
-// Mark this instant-kill hazard as a death before the Destroy event runs.
+wire_contact_effect(other, true);
+
 other.pHP = 0;
 global.demo_took_damage = true;
 instance_destroy(other);

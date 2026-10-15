@@ -151,3 +151,15 @@ take_damage = function(
         _is_sword
     );
 };
+
+drone_frame_start_x = x;
+drone_frame_start_y = y;
+
+drone_bump_timer = 0;
+drone_bump_duration = 0.4;
+drone_bump_speed = 150;
+drone_bump_velocity_x = 0;
+drone_bump_velocity_y = 0;
+
+// Keep the collision mask stable during hit animations.
+mask_index = normal_sprite;

@@ -65,13 +65,14 @@ if (opened)
         "F2 collisions | F4 pause/resume | F5 single frame",
         _text_scale * 0.85, _text_scale * 0.85, 0);
 }
-else if (global.dev_invincible || global.dev_collisions || global.dev_freeze_enemies || time_paused || time_rate != 1)
+else if (global.dev_freecam || global.dev_invincible || global.dev_collisions || global.dev_freeze_enemies || time_paused || time_rate != 1)
 {
     var _status = "DEV [F1]"
         + (time_paused ? " | PAUSED [F4] / STEP [F5]" : (time_rate != 1 ? " | " + string(round(time_rate * 100)) + "% SPEED" : ""))
         + (global.dev_invincible ? " | INVINCIBLE" : "")
         + (global.dev_freeze_enemies ? " | AI FROZEN" : "")
-        + (global.dev_collisions ? " | COLLISIONS" : "");
+        + (global.dev_collisions ? " | COLLISIONS" : "")
+        + (global.dev_freecam ? " | FREECAM [F6] / WASD / SHIFT" : "");
     draw_set_color(c_black);
     draw_set_alpha(0.8);
     draw_rectangle(8, 8, min(_gw - 8, string_width(_status) * 0.65 + 32), global.dev_collisions ? 78 : 36, false);

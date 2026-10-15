@@ -15,6 +15,7 @@ arrived = false;
 scenery_max_speed = 220;
 scenery_speed = 0;
 scenery_distance = 0;
+departure_enemies = [];
 cruise_duration = max(0, ride_duration - arrival_duration);
 total_travel_distance = scenery_max_speed * cruise_duration
     + scenery_max_speed * arrival_duration * 0.5;
@@ -149,6 +150,38 @@ begin_ride = function(_player)
     ride_started = true;
     ride_elapsed = 0;
     scenery_speed = scenery_max_speed;
+	
+	// Enemies outside the cabin belong to the departing scenery.
+    departure_enemies = [];
+    for (var _enemy_i = 0; _enemy_i < instance_number(oEnemyParent); _enemy_i++)
+    {
+        var _enemy = instance_find(oEnemyParent, _enemy_i);
+        var _cx = (_enemy.bbox_left + _enemy.bbox_right) * 0.5;
+        var _cy = (_enemy.bbox_top + _enemy.bbox_bottom) * 0.5;
+
+        var _in_cabin = _cx >= train_left && _cx <= train_right
+            && _cy >= train_roof && _cy <= train_floor;
+
+        // Leave enemies in the destination station alone.
+        if (_in_cabin || _cx > train_right) continue;
+
+        array_push(departure_enemies, {
+            enemy: _enemy,
+            start_x: _enemy.x,
+            start_y: _enemy.y
+        });
+
+        _enemy.train_departing = true;
+        if (variable_instance_exists(_enemy, "drone_ready"))
+            _enemy.drone_ready = false;
+        if (variable_instance_exists(_enemy, "drone_fire_state"))
+            _enemy.drone_fire_state = 0;
+        with (_enemy)
+        {
+            path_end();
+            speed = 0;
+        }
+    }
 
     return true;
 };

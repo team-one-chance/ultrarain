@@ -1,3 +1,4 @@
+if (variable_global_exists("dev_freecam") && global.dev_freecam) exit;
 // Temporary resolution readout; drawn after world pixelation so text stays sharp.
 if (!enabled || resolution_indicator_timer <= 0 || !view_enabled) exit;
 var _cam = view_camera[0];

@@ -6,7 +6,7 @@ if (!instance_exists(drop_emitter)) {
 }
 hatch_age += _dt;
 hatch_stage_time += _dt;
-if (hatch_age > 1) {
+if (hatch_age > 2) {
     instance_destroy();
     exit;
 }
