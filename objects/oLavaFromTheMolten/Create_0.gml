@@ -1,0 +1,1 @@
+depth = oMoltenLava.depth +2;
