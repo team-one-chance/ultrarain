@@ -46,6 +46,7 @@
     {"name":"inst_260033AC","path":"rooms/LE_TUTORIAL_WIP/LE_TUTORIAL_WIP.yy",},
     {"name":"inst_426BE4A1","path":"rooms/LE_TUTORIAL_WIP/LE_TUTORIAL_WIP.yy",},
     {"name":"inst_76E92FF4","path":"rooms/LE_TUTORIAL_WIP/LE_TUTORIAL_WIP.yy",},
+    {"name":"inst_673DB51B","path":"rooms/LE_TUTORIAL_WIP/LE_TUTORIAL_WIP.yy",},
     {"name":"inst_44F68311","path":"rooms/LE_TUTORIAL_WIP/LE_TUTORIAL_WIP.yy",},
     {"name":"inst_23BF102B","path":"rooms/LE_TUTORIAL_WIP/LE_TUTORIAL_WIP.yy",},
     {"name":"inst_13221063","path":"rooms/LE_TUTORIAL_WIP/LE_TUTORIAL_WIP.yy",},

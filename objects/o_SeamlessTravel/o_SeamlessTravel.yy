@@ -1,13 +1,17 @@
 {
   "$GMObject": "",
   "%Name": "o_SeamlessTravel",
-  "eventList": [],
+  "eventList": [
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":4,"eventType":7,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":3,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
+  ],
   "managed": true,
   "name": "o_SeamlessTravel",
   "overriddenProperties": [],
   "parent": {
-    "name": "ULTRA RAIN",
-    "path": "ULTRA RAIN.yyp",
+    "name":"R_objekte",
+    "path":"folders/Rooms/R_objekte.yy",
   },
   "parentObjectId": null,
   "persistent": false,
@@ -29,5 +33,5 @@
   "solid": false,
   "spriteId": null,
   "spriteMaskId": null,
-  "visible": true,
+  "visible": false,
 }

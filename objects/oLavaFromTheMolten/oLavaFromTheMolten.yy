@@ -6,8 +6,8 @@
   "name": "oLavaFromTheMolten",
   "overriddenProperties": [],
   "parent": {
-    "name": "ULTRA RAIN",
-    "path": "ULTRA RAIN.yyp",
+    "name":"Objects",
+    "path":"folders/Objects.yy",
   },
   "parentObjectId": null,
   "persistent": false,
@@ -27,7 +27,10 @@
   "resourceType": "GMObject",
   "resourceVersion": "2.0",
   "solid": false,
-  "spriteId": null,
+  "spriteId": {
+    "name":"sLavaFromTheMolten",
+    "path":"sprites/sLavaFromTheMolten/sLavaFromTheMolten.yy",
+  },
   "spriteMaskId": null,
   "visible": true,
 }
