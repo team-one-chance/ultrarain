@@ -108,6 +108,17 @@ stop_movement_sfx = function()
     stop_slide_sfx();
 };
 
+// Limit busy scrap piles to one impact and one crushing cue at a time.
+scrap_impact_sound = -1;
+scrap_crush_sound = -1;
+stop_scrap_sfx = function()
+{
+    if (scrap_impact_sound != -1) audio_stop_sound(scrap_impact_sound);
+    if (scrap_crush_sound != -1) audio_stop_sound(scrap_crush_sound);
+    scrap_impact_sound = -1;
+    scrap_crush_sound = -1;
+};
+
 // One nearby-wire ambience loop, shared across all three wire hazard types.
 electric_wires_sound = -1;
 // Rooms can delay one wire group until a platform is reached and silence it at the lab.
@@ -205,10 +216,10 @@ update_electric_wires_sfx = function()
     {
         if (electric_wires_sound == -1 || !audio_is_playing(electric_wires_sound))
         {
-            electric_wires_sound = audio_play_sound(sfxElectricWires, 0, true);
+            electric_wires_sound = audio_play_sound(sfxElectricWires, 0, true, 0);
         }
         electric_wires_fade_remaining = 0;
-        audio_sound_gain(electric_wires_sound, _gain, 0);
+        audio_sound_gain(electric_wires_sound, _gain * 0.4, 80);
     }
     else
     {
@@ -235,9 +246,9 @@ update_molten_lava_sfx = function()
     {
         if (molten_lava_sound == -1 || !audio_is_playing(molten_lava_sound))
         {
-            molten_lava_sound = audio_play_sound(sfxMoltenLava, 0, true);
+            molten_lava_sound = audio_play_sound(sfxMoltenLava, 0, true, 0);
         }
-        audio_sound_gain(molten_lava_sound, clamp(1 - _distance / _range, 0, 1), 0);
+        audio_sound_gain(molten_lava_sound, clamp(1 - _distance / _range, 0, 1) * 0.4, 80);
     }
     else
     {
@@ -272,9 +283,9 @@ update_gear_grinder_sfx = function()
     {
         if (gear_grinder_sound == -1 || !audio_is_playing(gear_grinder_sound))
         {
-            gear_grinder_sound = audio_play_sound(sfxGearGrinder, 0, true);
+            gear_grinder_sound = audio_play_sound(sfxGearGrinder, 0, true, 0);
         }
-        audio_sound_gain(gear_grinder_sound, clamp(1 - _distance / _range, 0, 1), 0);
+        audio_sound_gain(gear_grinder_sound, clamp(1 - _distance / _range, 0, 1) * 0.5, 80);
     }
     else
     {
@@ -297,11 +308,7 @@ stop_ambush_alarm_sfx = function()
 
 start_ambush_alarm_sfx = function(_door)
 {
-    array_push(ambush_alarm_doors, _door);
-    if (ambush_alarm_sound == -1 || !audio_is_playing(ambush_alarm_sound))
-    {
-        ambush_alarm_sound = audio_play_sound(sfxAlarm, 1, true);
-    }
+    if (instance_exists(_door)) array_push(ambush_alarm_doors, _door);
 };
 
 update_ambush_alarm_sfx = function()
@@ -317,10 +324,25 @@ update_ambush_alarm_sfx = function()
 
     if (array_length(ambush_alarm_doors) + array_length(ambush_alarm_enemies) > 0)
     {
+        // The alarm follows the active encounter rather than filling the room.
+        var _distance = 640;
+        var _sources = [ambush_alarm_doors, ambush_alarm_enemies];
+        for (var _group = 0; _group < array_length(_sources); _group++)
+        {
+            var _instances = _sources[_group];
+            for (var _i = 0; _i < array_length(_instances); _i++)
+                _distance = min(_distance, distance_to_object(_instances[_i]));
+        }
+        if (_distance >= 640)
+        {
+            stop_ambush_alarm_sfx();
+            return;
+        }
         if (ambush_alarm_sound == -1 || !audio_is_playing(ambush_alarm_sound))
         {
-            ambush_alarm_sound = audio_play_sound(sfxAlarm, 1, true);
+            ambush_alarm_sound = audio_play_sound(sfxAlarm, 1, true, 0);
         }
+        audio_sound_gain(ambush_alarm_sound, (1 - _distance / 640) * 0.55, 80);
     }
     else
     {

@@ -62,6 +62,16 @@ if (boot_state != 8)
 
         draw_set_color(_entry.tint);
 
+        if (_entry.message == "> rules.exe overwriting..."
+        && transition_sound != -1 && audio_is_playing(transition_sound))
+        {
+            var _sample = clamp(
+                floor(audio_sound_get_track_position(transition_sound) / 0.05),
+                0, array_length(transition_envelope) - 1
+            );
+            draw_set_alpha(0.15 + 0.85 * transition_envelope[_sample]);
+        }
+
 var _text_scale =
     (_entry.message == "> rules.exe overwriting...")
     ? 1.3 : 1;
@@ -74,6 +84,7 @@ draw_text_transformed(
     _text_scale,
     0
 );
+        draw_set_alpha(1);
     }
 
     // Enter prompt and blinking block cursor.

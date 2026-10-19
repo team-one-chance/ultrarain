@@ -57,6 +57,7 @@ freeze_world = function()
         stop_molten_lava_sfx();
         stop_gear_grinder_sfx();
         stop_ambush_alarm_sfx();
+        stop_scrap_sfx();
     }
     with (o_DoorController) stop_wire_flash_sfx();
     with (o_TrainRide) stop_tram_sfx();

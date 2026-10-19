@@ -67,6 +67,19 @@ train_entrance_door = noone;
 boarding_requested = false;
 entrance_open_distance = 110;
 
+train_boarding_unlocked = function()
+{
+    if (instance_exists(oMiniBoss)) return false;
+
+    // An untriggered ambush must not count as an already-defeated boss.
+    for (var _i = 0; _i < instance_number(o_DoorEnemySpawn); _i++)
+    {
+        var _spawn = instance_find(o_DoorEnemySpawn, _i);
+        if (_spawn.enemy_object == oMiniBoss) return false;
+    }
+    return true;
+};
+
 train_find_entrance = function()
 {
     if (instance_exists(train_entrance_door))
@@ -91,12 +104,14 @@ train_find_entrance = function()
     }
 
     train_entrance_door = _door;
+    train_entrance_door.boarding_lock_owner = id;
     return true;
 };
 
 begin_ride = function(_player)
 {
     if (ride_started
+    || !train_boarding_unlocked()
     || !instance_exists(_player)
     || _player.pHP <= 0)
     {
@@ -160,7 +175,7 @@ begin_ride = function(_player)
 
     if (bgfar_layer != -1) bgfar_base_x = layer_get_x(bgfar_layer);
     ride_started = true;
-    tram_sound = audio_play_sound(sfxTram, 1, true);
+    tram_sound = audio_play_sound(sfxTram, 0, true, 0.65);
     ride_elapsed = 0;
     scenery_speed = scenery_max_speed;
 	

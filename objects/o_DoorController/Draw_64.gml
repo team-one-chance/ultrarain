@@ -63,11 +63,13 @@ draw_text(_text_x, _hint_y, _hint);
 
 draw_set_halign(fa_left);
 
-    // Wires and sockets.
+    var _mx = device_mouse_x_to_gui(0);
+    var _my = device_mouse_y_to_gui(0);
+
+    // Draw wires first so they cannot cover socket highlights.
     for (var i = 0; i < 4; i++)
     {
         var _left_y = _first_y + i * _row_gap;
-        var _right_y = _first_y + i * _row_gap;
 
         // Connected wire, or wire being dragged.
         if (wire_connections[i] != -1)
@@ -75,7 +77,17 @@ draw_set_halign(fa_left);
             var _target_y =
                 _first_y + wire_connections[i] * _row_gap;
 
-            draw_set_color(c_gray);
+            var _wire_color = wire_colors[left_order[i]];
+            var _flash = wire_connect_flash[i] / wire_connect_flash_duration;
+            draw_set_color(_wire_color);
+            draw_set_alpha(0.18 + 0.3 * _flash);
+            draw_line_width(
+                _left_x, _left_y,
+                _right_x, _target_y,
+                9
+            );
+            draw_set_alpha(1);
+            draw_set_color(merge_color(_wire_color, c_white, _flash));
             draw_line_width(
                 _left_x, _left_y,
                 _right_x, _target_y,
@@ -87,49 +99,73 @@ draw_set_halign(fa_left);
             draw_set_color(c_gray);
             draw_line_width(
                 _left_x, _left_y,
-                device_mouse_x_to_gui(0),
-                device_mouse_y_to_gui(0),
+                _mx, _my,
                 3
             );
         }
 
-        // Normally gray; flash the real color briefly.
-var _left_color = c_gray;
-var _right_color = c_gray;
-
-// Check whether this right socket has a wire connected.
-var _right_connected = false;
-
-for (var k = 0; k < 4; k++)
-{
-    if (wire_connections[k] == i)
-    {
-        _right_connected = true;
-        break;
     }
-}
 
-// Connected sockets stay colored.
-// Unconnected sockets still flash.
-if (wire_connections[i] != -1 || wire_flash_time > 0)
-{
-    _left_color = wire_colors[left_order[i]];
-}
+    for (var i = 0; i < 4; i++)
+    {
+        var _socket_y = _first_y + i * _row_gap;
+        var _left_connected = wire_connections[i] != -1;
+        var _right_connected = false;
+        var _right_flash = 0;
 
-if (_right_connected || wire_flash_time > 0)
-{
-    _right_color = wire_colors[right_order[i]];
-}
-if (_right_connected || wire_flash_time > 0)
-{
-    _right_color = wire_colors[right_order[i]];
-}
+        for (var k = 0; k < 4; k++)
+        {
+            if (wire_connections[k] == i)
+            {
+                _right_connected = true;
+                _right_flash = wire_connect_flash[k];
+                break;
+            }
+        }
 
-        draw_set_color(_left_color);
-        draw_circle(_left_x, _left_y, 14, false);
+        // Share the same feedback on both endpoints of a completed pair.
+        for (var _side = 0; _side < 2; _side++)
+        {
+            var _socket_x = (_side == 0) ? _left_x : _right_x;
+            var _connected = (_side == 0) ? _left_connected : _right_connected;
+            var _color_id = (_side == 0) ? left_order[i] : right_order[i];
+            var _flash = ((_side == 0) ? wire_connect_flash[i] : _right_flash)
+                / wire_connect_flash_duration;
+            var _hovered = point_distance(_mx, _my, _socket_x, _socket_y) <= 26;
+            var _selected = _side == 0 && drag_wire == i;
+            var _socket_color = (_connected || wire_flash_time > 0)
+                ? wire_colors[_color_id] : c_gray;
 
-        draw_set_color(_right_color);
-        draw_circle(_right_x, _right_y, 14, false);
+            // Neutral hover feedback preserves the puzzle's hidden colors.
+            if (_hovered || _selected)
+            {
+                draw_set_color(c_white);
+                draw_set_alpha(0.18);
+                draw_circle(_socket_x, _socket_y, 24, false);
+                draw_set_alpha(1);
+                draw_circle(_socket_x, _socket_y, 22, true);
+                draw_circle(_socket_x, _socket_y, 23, true);
+            }
+
+            if (_flash > 0)
+            {
+                draw_set_color(c_white);
+                draw_set_alpha(_flash);
+                draw_circle(_socket_x, _socket_y, 18 + 10 * (1 - _flash), true);
+                draw_set_alpha(0.35 * _flash);
+                draw_circle(_socket_x, _socket_y, 21, false);
+                draw_set_alpha(1);
+            }
+
+            draw_set_color(merge_color(_socket_color, c_white, _flash));
+            draw_circle(_socket_x, _socket_y, 14, false);
+
+            if (_connected)
+            {
+                draw_set_color(c_white);
+                draw_circle(_socket_x, _socket_y, 17, true);
+            }
+        }
     }
 
     draw_set_color(c_white);
