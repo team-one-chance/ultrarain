@@ -229,7 +229,7 @@ if (bloom_enabled && bloom_strength > 0 && surface_exists(application_surface)
         // Reuse the bloom buffers for a separate, stronger lava-only glow.
         if (instance_exists(oLavaFromTheMolten) && lava_bloom_strength > 0)
         {
-            draw_set_alpha(1);
+            draw_set_alpha(1);	
             draw_set_color(c_white);
             gpu_set_blendmode(bm_normal);
             surface_set_target(bloom_surface_a);

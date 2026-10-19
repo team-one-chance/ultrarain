@@ -495,6 +495,15 @@ player_collider_short = false;
 
 player_set_collider = function(_short)
 {
+    // Never expand an existing body into a ceiling.
+    if (!_short && player_bound_fixture != -1)
+    {
+        if (variable_instance_exists(id, "player_can_stand"))
+        {
+            if (!player_can_stand()) return;
+        }
+    }
+
     if (player_bound_fixture != -1)
     {
         physics_remove_fixture(id, player_bound_fixture);
@@ -542,17 +551,40 @@ player_set_collider(false);
 
 player_can_stand = function()
 {
-    var _start_y = y - 24;
-    var _end_y = y - 60;
+    var _px = phy_position_x;
+    var _py = phy_position_y;
+
+    // Standing fixture:
+    // 27 pixels wide, 59 tall, horizontal centre offset +0.5.
+    if (collision_rectangle(
+        _px - 13,
+        _py - 59,
+        _px + 14,
+        _py - 1,
+        o_Block,
+        false,
+        true
+    ) != noone)
+    {
+        return false;
+    }
 
     var _left = physics_raycast(
-        x - 12, _start_y, x - 12, _end_y, o_Block, false
+        _px - 12, _py - 24,
+        _px - 12, _py - 60,
+        o_Block, false
     );
+
     var _middle = physics_raycast(
-        x, _start_y, x, _end_y, o_Block, false
+        _px, _py - 24,
+        _px, _py - 60,
+        o_Block, false
     );
+
     var _right = physics_raycast(
-        x + 12, _start_y, x + 12, _end_y, o_Block, false
+        _px + 12, _py - 24,
+        _px + 12, _py - 60,
+        o_Block, false
     );
 
     return is_undefined(_left)

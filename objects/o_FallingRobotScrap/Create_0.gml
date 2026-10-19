@@ -14,6 +14,7 @@ image_yscale = scrap_size;
 scrap_radius = 21 * scrap_size;
 scrap_visual_extent = ceil(24 * scrap_size * sqrt(2)) + 2;
 scrap_normal_depth = depth;
+depth = o_Player.depth + 1;
 
 scrap_emitter = noone;
 scrap_release_y = -100000;
