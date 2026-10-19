@@ -33,3 +33,13 @@ wire_connections = [-1, -1, -1, -1];
 drag_wire = -1;
 wire_flash_timer = 0;
 wire_flash_time = 0;
+
+wire_flash_sound = -1;
+stop_wire_flash_sfx = function()
+{
+    if (wire_flash_sound != -1 && audio_is_playing(wire_flash_sound))
+    {
+        audio_stop_sound(wire_flash_sound);
+    }
+    wire_flash_sound = -1;
+};

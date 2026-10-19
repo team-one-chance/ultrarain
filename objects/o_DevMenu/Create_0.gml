@@ -50,6 +50,16 @@ menu_layout = function()
 freeze_world = function()
 {
     if (world_frozen) return;
+    with (o_Player)
+    {
+        stop_movement_sfx();
+        stop_electric_wires_sfx();
+        stop_molten_lava_sfx();
+        stop_gear_grinder_sfx();
+        stop_ambush_alarm_sfx();
+    }
+    with (o_DoorController) stop_wire_flash_sfx();
+    with (o_TrainRide) stop_tram_sfx();
     if (surface_exists(application_surface))
     {
         paused_surface = surface_create(surface_get_width(application_surface), surface_get_height(application_surface));
@@ -163,6 +173,7 @@ menu_label = function(_action)
         case 8: return "Teleport to room spawn";
         case 9: return "Restart room";
         case 10: return "Close menu";
+		case 11: return "Freecam [F6]: " + (global.dev_freecam ? "ON" : "OFF");
         case 20: return "Spawn grunt at captured cursor";
         case 21: return "Spawn drone at captured cursor";
         case 22: return "Spawn miniboss at captured cursor";
@@ -207,6 +218,16 @@ run_action = function(_action)
     {
         var _time_rates = [1, 3, 4, 1.5, 2];
         time_rate = _time_rates[_action - 32];
+        return;
+    }
+	if (_action == 11)
+    {
+        thaw_world();
+        freecam_restore_layers();
+        global.dev_freecam = !global.dev_freecam;
+        time_paused = false;
+        step_requested = false;
+        resume_game();
         return;
     }
     if (_action == 7 && is_undefined(test_position)) return;
@@ -258,4 +279,21 @@ run_action = function(_action)
     update_enemy_freeze();
     resume_game();
     if (time_paused) freeze_world();
+};
+
+// Debug freecam: camera movement uses real seconds.
+global.dev_freecam = false;
+global.dev_freecam_speed = 650;
+global.dev_freecam_fast_speed = 2200;
+freecam_layer_states = [];
+
+freecam_restore_layers = function()
+{
+    for (var _i = 0; _i < array_length(freecam_layer_states); _i++)
+    {
+        var _saved = freecam_layer_states[_i];
+        if (layer_exists(_saved.layer))
+            layer_set_visible(_saved.layer, _saved.was_visible);
+    }
+    freecam_layer_states = [];
 };

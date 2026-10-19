@@ -54,4 +54,7 @@ configure_coin_beam = function(_count, _direction)
     // Scale both the sprite and its actual enemy hit area.
     image_xscale = _facing * beam_base_xscale * beam_aoe_scale;
     image_yscale = beam_base_yscale * beam_aoe_scale;
+
+    // Select the release cue after the consumed coin count is known.
+    audio_play_sound(beam_coins_used >= 4 ? sfxSwordBeamMax : sfxSwordBeam, 1, false);
 };

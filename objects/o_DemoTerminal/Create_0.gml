@@ -34,3 +34,13 @@ terminal_text_none =
 	command_input = "";
 command_feedback = "";
 command_cursor_timer = 0;
+command_result_sound = -1;
+command_restart_pending = false;
+stop_command_result_sfx = function()
+{
+    if (command_result_sound != -1 && audio_is_playing(command_result_sound))
+    {
+        audio_stop_sound(command_result_sound);
+    }
+    command_result_sound = -1;
+};

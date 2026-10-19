@@ -23,6 +23,7 @@ if (player_near && keyboard_check_pressed(ord("E")))
     if (controller_state == 0)
     {
         controller_state = 1;
+        audio_play_sound(sfxHijackTerminalStart, 1, false);
         sprite_index = broken_sprite;
         image_index = 0;
         image_speed = 0;
@@ -107,6 +108,7 @@ if (player_near && keyboard_check_pressed(ord("E")))
     else if (controller_state == 1)
     {
         controller_state = 2;
+        audio_play_sound(sfxHijackTerminal, 1, false);
         hacker = _player;
         hacker.hacking_controller = id;
 
@@ -193,6 +195,7 @@ if (controller_state == 2)
 
         hacker = noone;
         controller_state = 1;
+        stop_wire_flash_sfx();
         drag_wire = -1;
     }
     else
@@ -205,6 +208,19 @@ if (controller_state == 2)
         {
             wire_flash_time = 0.22;
             wire_flash_timer = random_range(1.1, 1.8);
+        }
+
+        // Use the same on/off state as the sockets, including after a pause.
+        if (wire_flash_time > 0)
+        {
+            if (wire_flash_sound == -1 || !audio_is_playing(wire_flash_sound))
+            {
+                wire_flash_sound = audio_play_sound(sfxBlinkingLights, 1, false);
+            }
+        }
+        else
+        {
+            stop_wire_flash_sfx();
         }
 
         var _gui_w = display_get_gui_width();
@@ -294,6 +310,7 @@ if (!_occupied
                 hacker.hacking_controller = noone;
                 hacker = noone;
                 controller_state = 3;
+                stop_wire_flash_sfx();
 
                 if (instance_exists(linked_door))
                 {

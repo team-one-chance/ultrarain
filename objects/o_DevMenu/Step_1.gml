@@ -1,6 +1,14 @@
 global.dev_resume_input = false;
 if (!enabled) exit;
 
+if (keyboard_check_pressed(vk_f6))
+{
+    run_action(11);
+    update_time();
+    update_enemy_freeze();
+    exit;
+}
+
 if (is_undefined(spawn_position) && instance_exists(o_Player))
     spawn_position = [o_Player.x, o_Player.y];
 if (keyboard_check_pressed(collision_key)) global.dev_collisions = !global.dev_collisions;

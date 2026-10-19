@@ -12,6 +12,7 @@ if (instance_exists(_player))
         _player.medkit_owned = true;
         _player.syringe_count = _player.syringe_max;
 
+        audio_play_sound(sfxMedkitPickup, 1, false);
         instance_destroy();
     }
 }

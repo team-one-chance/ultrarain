@@ -23,6 +23,7 @@ damage_knockback_pending = false;
 // Returns true only when health was actually lost.
 take_damage = function(_amount, _source_x = undefined)
 {
+	    if (grinder_dying) return false;
     // Slam blocks the whole hit, including recoil and trap bounce.
     if (_amount <= 0 || pHP <= 0 || damage_blocks_damage()) return false;
 
@@ -32,6 +33,7 @@ take_damage = function(_amount, _source_x = undefined)
     if (_push == 0) _push = -1;
 
     pHP = max(0, pHP - _amount);
+    if (pHP > 0) audio_play_sound(sfxPTakeDamage, 1, false);
     global.demo_took_damage = true;
     damage_knockback_speed_x = _push * damage_knockback_speed;
     damage_knockback_timer = damage_knockback_duration;
@@ -73,6 +75,259 @@ coin_count = coin_max;
 // =====================================
 move_speed = 4.4;
 
+// Single footstep SFX, repeated at the running cadence.
+footstep_interval = 0.28;
+footstep_timer = 0;
+footstep_last_x = x;
+
+// Avoid a landing sound on spawn and track the wall-slide loop per player.
+sfx_was_grounded = true;
+wall_slide_sound = -1;
+stop_wall_slide_sfx = function()
+{
+    if (wall_slide_sound != -1 && audio_is_playing(wall_slide_sound))
+    {
+        audio_stop_sound(wall_slide_sound);
+    }
+    wall_slide_sound = -1;
+};
+
+slide_sound = -1;
+stop_slide_sfx = function()
+{
+    if (slide_sound != -1 && audio_is_playing(slide_sound))
+    {
+        audio_stop_sound(slide_sound);
+    }
+    slide_sound = -1;
+};
+
+stop_movement_sfx = function()
+{
+    stop_wall_slide_sfx();
+    stop_slide_sfx();
+};
+
+// One nearby-wire ambience loop, shared across all three wire hazard types.
+electric_wires_sound = -1;
+// Rooms can delay one wire group until a platform is reached and silence it at the lab.
+electric_wires_delayed_object = noone;
+electric_wires_activation_platform = noone;
+electric_wires_lab_door = undefined;
+electric_wires_lab_door_progress = undefined;
+electric_wires_second_unlocked = true;
+electric_wires_lab_entered = false;
+electric_wires_range = 480;
+electric_wires_delayed_range = 224;
+electric_wires_fade_duration = 0.6;
+electric_wires_fade_remaining = 0;
+stop_electric_wires_sfx = function()
+{
+    if (electric_wires_sound != -1 && audio_is_playing(electric_wires_sound))
+    {
+        audio_stop_sound(electric_wires_sound);
+    }
+    electric_wires_sound = -1;
+    electric_wires_fade_remaining = 0;
+};
+
+fade_electric_wires_sfx = function()
+{
+    if (electric_wires_sound != -1 && audio_is_playing(electric_wires_sound)
+        && electric_wires_fade_remaining <= 0)
+    {
+        electric_wires_fade_remaining = electric_wires_fade_duration;
+        audio_sound_gain(electric_wires_sound, 0, electric_wires_fade_duration * 1000);
+    }
+};
+
+update_electric_wires_sfx = function()
+{
+    // Audio fades use elapsed real time, matching the audio engine's gain ramp.
+    if (electric_wires_fade_remaining > 0)
+    {
+        electric_wires_fade_remaining = max(
+            0, electric_wires_fade_remaining - max(0, delta_time / 1000000)
+        );
+        if (electric_wires_fade_remaining <= 0) stop_electric_wires_sfx();
+    }
+
+    if (!electric_wires_second_unlocked
+        && instance_exists(electric_wires_activation_platform))
+    {
+        var _platform = electric_wires_activation_platform;
+        var _feet_y = y + ground_check_y_offset;
+        if (x >= _platform.bbox_left && x <= _platform.bbox_right
+            && abs(_feet_y - _platform.bbox_top) <= 8 && phy_speed_y >= 0)
+        {
+            electric_wires_second_unlocked = true;
+        }
+    }
+
+    if (is_struct(electric_wires_lab_door))
+    {
+        var _door = electric_wires_lab_door;
+        var _progress = (x - _door.x) * _door.direction;
+        var _crossed = is_undefined(electric_wires_lab_door_progress)
+            ? true
+            : (electric_wires_lab_door_progress < 0 && _progress >= 0)
+                || (electric_wires_lab_door_progress >= 0 && _progress < 0);
+        electric_wires_lab_door_progress = _progress;
+        if (_crossed && bbox_bottom >= _door.top && bbox_top <= _door.bottom)
+        {
+            // Entering silences the wires; leaving restores their proximity audio.
+            electric_wires_lab_entered = _progress >= 0;
+        }
+    }
+
+    if (electric_wires_lab_entered)
+    {
+        fade_electric_wires_sfx();
+        return;
+    }
+
+    var _gain = 0;
+    var _wire_objects = [o_Block_wires, o_Block_wires_left, o_Block_wires_right];
+    for (var _i = 0; _i < array_length(_wire_objects); _i++)
+    {
+        if (_wire_objects[_i] == electric_wires_delayed_object
+            && !electric_wires_second_unlocked) continue;
+        if (instance_exists(_wire_objects[_i]))
+        {
+            var _range = _wire_objects[_i] == electric_wires_delayed_object
+                ? electric_wires_delayed_range : electric_wires_range;
+            var _distance = distance_to_object(_wire_objects[_i]);
+            _gain = max(_gain, clamp(1 - _distance / max(1, _range), 0, 1));
+        }
+    }
+
+    if (_gain > 0)
+    {
+        if (electric_wires_sound == -1 || !audio_is_playing(electric_wires_sound))
+        {
+            electric_wires_sound = audio_play_sound(sfxElectricWires, 0, true);
+        }
+        electric_wires_fade_remaining = 0;
+        audio_sound_gain(electric_wires_sound, _gain, 0);
+    }
+    else
+    {
+        fade_electric_wires_sfx();
+    }
+};
+
+// Local lava ambience fades with distance from the visible lava surface.
+molten_lava_sound = -1;
+stop_molten_lava_sfx = function()
+{
+    if (molten_lava_sound != -1 && audio_is_playing(molten_lava_sound))
+    {
+        audio_stop_sound(molten_lava_sound);
+    }
+    molten_lava_sound = -1;
+};
+
+update_molten_lava_sfx = function()
+{
+    var _range = 320;
+    var _distance = instance_exists(oMoltenLava) ? distance_to_object(oMoltenLava) : _range;
+    if (_distance < _range)
+    {
+        if (molten_lava_sound == -1 || !audio_is_playing(molten_lava_sound))
+        {
+            molten_lava_sound = audio_play_sound(sfxMoltenLava, 0, true);
+        }
+        audio_sound_gain(molten_lava_sound, clamp(1 - _distance / _range, 0, 1), 0);
+    }
+    else
+    {
+        stop_molten_lava_sfx();
+    }
+};
+
+// Use one loop for the paired grinder banks, with volume based on proximity.
+gear_grinder_sound = -1;
+stop_gear_grinder_sfx = function()
+{
+    if (gear_grinder_sound != -1 && audio_is_playing(gear_grinder_sound))
+    {
+        audio_stop_sound(gear_grinder_sound);
+    }
+    gear_grinder_sound = -1;
+};
+
+update_gear_grinder_sfx = function()
+{
+    var _range = 320;
+    var _distance = _range;
+    var _grinders = [o_GrinderLeft, o_GrinderRight];
+    for (var _i = 0; _i < array_length(_grinders); _i++)
+    {
+        if (instance_exists(_grinders[_i]))
+        {
+            _distance = min(_distance, distance_to_object(_grinders[_i]));
+        }
+    }
+    if (_distance < _range)
+    {
+        if (gear_grinder_sound == -1 || !audio_is_playing(gear_grinder_sound))
+        {
+            gear_grinder_sound = audio_play_sound(sfxGearGrinder, 0, true);
+        }
+        audio_sound_gain(gear_grinder_sound, clamp(1 - _distance / _range, 0, 1), 0);
+    }
+    else
+    {
+        stop_gear_grinder_sfx();
+    }
+};
+
+// Follow the ambush after its broken door disappears, until its enemies are gone.
+ambush_alarm_sound = -1;
+ambush_alarm_doors = [];
+ambush_alarm_enemies = [];
+stop_ambush_alarm_sfx = function()
+{
+    if (ambush_alarm_sound != -1 && audio_is_playing(ambush_alarm_sound))
+    {
+        audio_stop_sound(ambush_alarm_sound);
+    }
+    ambush_alarm_sound = -1;
+};
+
+start_ambush_alarm_sfx = function(_door)
+{
+    array_push(ambush_alarm_doors, _door);
+    if (ambush_alarm_sound == -1 || !audio_is_playing(ambush_alarm_sound))
+    {
+        ambush_alarm_sound = audio_play_sound(sfxAlarm, 1, true);
+    }
+};
+
+update_ambush_alarm_sfx = function()
+{
+    for (var _i = array_length(ambush_alarm_doors) - 1; _i >= 0; _i--)
+    {
+        if (!instance_exists(ambush_alarm_doors[_i])) array_delete(ambush_alarm_doors, _i, 1);
+    }
+    for (var _i = array_length(ambush_alarm_enemies) - 1; _i >= 0; _i--)
+    {
+        if (!instance_exists(ambush_alarm_enemies[_i])) array_delete(ambush_alarm_enemies, _i, 1);
+    }
+
+    if (array_length(ambush_alarm_doors) + array_length(ambush_alarm_enemies) > 0)
+    {
+        if (ambush_alarm_sound == -1 || !audio_is_playing(ambush_alarm_sound))
+        {
+            ambush_alarm_sound = audio_play_sound(sfxAlarm, 1, true);
+        }
+    }
+    else
+    {
+        stop_ambush_alarm_sfx();
+    }
+};
+
 slide_exit_timer = 0;
 slide_exit_delay = 0;
 
@@ -100,6 +355,7 @@ use_syringe = function(_revive)
 		        global.demo_used_healing = true;
     }
 
+    audio_play_sound(sfxPHeal, 1, false);
     return true;
 };
 
@@ -305,6 +561,7 @@ weapon_fire_timer = 0;
 sword_swing_timer = 0;
 sword_swing_pending_hit = false;
 sword_swing_facing = 1;
+sword_slash_sound_index = 0;
 
 // Dark Repulsor tuning. Angles are degrees; distances are pixels;
 // durations are seconds. Smaller swing_duration means a faster swing.
@@ -608,3 +865,59 @@ if (variable_global_exists("demo_travel_state"))
 
 // Chip enemy: player debuffs and wall-projectile response.
 chip_player_setup();
+
+grinder_dying = false;
+grinder_elapsed = 0;
+grinder_pull_duration = 0.35;
+grinder_crush_duration = 0.30;
+
+grinder_start_x = 0;
+grinder_start_y = 0;
+grinder_target_x = 0;
+grinder_target_y = 0;
+grinder_pivot_x = 0;
+grinder_pivot_y = 0;
+grinder_gear_depth = 0;
+
+begin_grinder_death = function(_gear)
+{
+    if (grinder_dying || pHP <= 0) return;
+
+    grinder_dying = true;
+    grinder_elapsed = 0;
+
+    grinder_start_x = x;
+    grinder_start_y = y;
+
+    // Remember the body's centre relative to its origin.
+    grinder_pivot_x = (bbox_left + bbox_right) * 0.5 - x;
+    grinder_pivot_y = (bbox_top + bbox_bottom) * 0.5 - y;
+
+    var _pull_direction =
+        (_gear.object_index == o_GrinderLeft) ? -1 : 1;
+
+    grinder_target_x =
+        (_gear.bbox_left + _gear.bbox_right) * 0.5
+        - grinder_pivot_x
+        + 32 * _pull_direction;
+
+    grinder_target_y =
+        (_gear.bbox_top + _gear.bbox_bottom) * 0.5
+        - grinder_pivot_y;
+
+    grinder_gear_depth = _gear.depth;
+
+    // Draw the body behind the teeth as it is pulled inward.
+    depth = grinder_gear_depth + 1;
+    image_speed = 0;
+
+    is_slamming = false;
+    dash_active = false;
+    chip_wall_holding_now = false;
+
+    phy_speed_x = 0;
+    phy_speed_y = 0;
+    phy_active = false;
+
+    global.demo_took_damage = true;
+};

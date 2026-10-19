@@ -1,6 +1,10 @@
 if (break_requested && !broken)
 {
     broken = true;
+    audio_play_sound(sfxDoorBreaking, 1, false);
+
+    var _alarm_player = instance_nearest(x, y, o_Player);
+    if (instance_exists(_alarm_player)) _alarm_player.start_ambush_alarm_sfx(id);
 
     physics_remove_fixture(id, door_fixture);
     door_fixture = -1;
@@ -40,14 +44,19 @@ if (broken)
     if (flash_elapsed >= flash_duration)
     {
         var _group = ambush_group;
+        var _alarm_player = instance_nearest(x, y, o_Player);
 
         with (o_DoorEnemySpawn)
         {
             if (ambush_group == _group)
             {
-                instance_create_layer(
+                var _spawned_enemy = instance_create_layer(
                     x, y, "Instances", enemy_object
                 );
+                if (instance_exists(_alarm_player))
+                {
+                    array_push(_alarm_player.ambush_alarm_enemies, _spawned_enemy);
+                }
 
                 instance_destroy();
             }

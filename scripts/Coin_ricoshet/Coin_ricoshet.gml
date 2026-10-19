@@ -43,6 +43,12 @@ function coin_ricochet(
     // CHAIN STATE
     // =====================================
 
+    // One penetration per shot path. Split branches copy the remaining budget.
+    // The optional future item grants one enemy penetration per shot path.
+    var _enemy_piercing = variable_instance_exists(id, "item_coin_enemy_piercing")
+        && variable_instance_get(id, "item_coin_enemy_piercing");
+    var _chain = { walls_left: 1, enemies_left: _enemy_piercing ? 1 : 0 };
+
     var _current_coin =
         _coin;
 
@@ -51,6 +57,8 @@ function coin_ricochet(
 
     var _perfect_threshold =
         0.05;
+
+    var _chain_perfect_apex = false;
 
 
     // =====================================
@@ -80,6 +88,7 @@ function coin_ricochet(
         if (_coin_y_speed <= _perfect_threshold)
         {
             _coin_shot_count = 4;
+            _chain_perfect_apex = true;
 
             perfect_apex_flash_timer =
                 perfect_apex_flash_duration;
@@ -93,7 +102,7 @@ function coin_ricochet(
 
 
         // =================================
-        // EVERY COIN DOUBLES DAMAGE
+        // EVERY COIN MULTIPLIES DAMAGE BY 1.65
         // =================================
 
         _current_damage *= (1.65);
@@ -432,45 +441,39 @@ function coin_ricochet(
                 }
 
 
-                var _enemy_visual =
-                    instance_create_layer(
-                        0,
-                        0,
-                        "Instances",
-                        o_HitscanVisual
-                    );
+                // This branch spends its own budget, without changing siblings.
+                var _branch = {
+                    walls_left: _chain.walls_left,
+                    enemies_left: _chain.enemies_left
+                };
 
-                _enemy_visual.line_x1 =
-                    _last_x;
+                var _end_x = _shot_x[shot_index];
+                var _end_y = _shot_y[shot_index];
 
-                _enemy_visual.line_y1 =
-                    _last_y;
-
-                _enemy_visual.line_x2 =
-                    _shot_x[shot_index];
-
-                _enemy_visual.line_y2 =
-                    _shot_y[shot_index];
-
-
-                // Target may already have died from
-                // one of the other split shots.
-                if (instance_exists(_target))
+                // With the item, continue beyond the selected enemy along the ray.
+                if (_branch.enemies_left > 0)
                 {
-                    instance_create_depth(
-                        _shot_x[shot_index], _shot_y[shot_index],
-                        -10000, o_ShotImpact,
-                        {
-                            impact_direction: point_direction(
-                                _last_x, _last_y, _shot_x[shot_index], _shot_y[shot_index]
-                            ),
-                            impact_enemy: true
-                        }
+                    var _direction = point_direction(
+                        _last_x, _last_y, _end_x, _end_y
                     );
-                    _target.take_damage(
-                        _current_damage
-                    );
+                    _end_x = _last_x + lengthdir_x(_range, _direction);
+                    _end_y = _last_y + lengthdir_y(_range, _direction);
                 }
+
+                var _trace = coin_chain_trace(
+                    _last_x, _last_y,
+                    _end_x, _end_y,
+                    _current_damage, _branch
+                );
+
+                var _enemy_visual = instance_create_layer(
+                    0, 0, "Instances", o_HitscanVisual
+                );
+                _enemy_visual.line_x1 = _last_x;
+                _enemy_visual.line_y1 = _last_y;
+                _enemy_visual.line_x2 = _trace.end_x;
+                _enemy_visual.line_y2 = _trace.end_y;
+
             }
 
 
@@ -486,32 +489,28 @@ function coin_ricochet(
 
         if (_next_coin != noone)
         {
-            var _next_x =
-                _next_coin.x;
-
-            var _next_y =
-                _next_coin.y;
-
-
-            var _chain_visual =
-                instance_create_layer(
-                    0,
-                    0,
-                    "Instances",
-                    o_HitscanVisual
+            if (instance_exists(_next_coin))
+            {
+                var _chain_trace = coin_chain_trace(
+                    _last_x, _last_y, _next_coin.x, _next_coin.y,
+                    _current_damage, _chain
                 );
 
-            _chain_visual.line_x1 =
-                _last_x;
+                var _chain_visual = instance_create_layer(
+                    0, 0, "Instances", o_HitscanVisual
+                );
+                _chain_visual.line_x1 = _last_x;
+                _chain_visual.line_y1 = _last_y;
+                _chain_visual.line_x2 = _chain_trace.end_x;
+                _chain_visual.line_y2 = _chain_trace.end_y;
 
-            _chain_visual.line_y1 =
-                _last_y;
-
-            _chain_visual.line_x2 =
-                _next_x;
-
-            _chain_visual.line_y2 =
-                _next_y;
+                // A blocked link cannot activate the coin behind the obstacle.
+                if (!_chain_trace.reached) _next_coin = noone;
+            }
+            else
+            {
+                _next_coin = noone;
+            }
         }
 
 
@@ -542,4 +541,107 @@ function coin_ricochet(
     ds_list_destroy(
         _coins
     );
+
+    // One cue for the entire shot, regardless of how many coins it chained.
+    audio_play_sound(_chain_perfect_apex ? sfxBulletFlash : sfxRicochet, 1, false);
+}
+
+
+// The continuation carries its budget; each split branch receives its own copy.
+// Repeated pixels inside one wall consume only one hit per ray.
+function coin_chain_trace(_sx, _sy, _ex, _ey, _damage, _chain)
+{
+    var _seen = ds_list_create();
+    var _hits = ds_list_create();
+    var _steps = max(1, ceil(point_distance(_sx, _sy, _ex, _ey)));
+    var _end_x = _ex;
+    var _end_y = _ey;
+    var _stopped = false;
+
+    for (var _step = 0; _step <= _steps; _step++)
+    {
+        var _fraction = _step / _steps;
+        var _px = lerp(_sx, _ex, _fraction);
+        var _py = lerp(_sy, _ey, _fraction);
+        ds_list_clear(_hits);
+
+        collision_point_list(
+            _px, _py,
+            [o_Block, o_Door_UNB, o_Door_Breakable,
+                o_Chute_Breakable, oEnemyParent],
+            false, true, _hits, false
+        );
+
+        for (var _i = 0; _i < ds_list_size(_hits); _i++)
+        {
+            var _hit = _hits[| _i];
+            if (!instance_exists(_hit)) continue;
+            if (ds_list_find_index(_seen, _hit) != -1) continue;
+
+            var _object = _hit.object_index;
+            var _enemy = _object == oEnemyParent
+                || object_is_ancestor(_object, oEnemyParent);
+            var _big_door = _object == o_Door_UNB
+                || object_is_ancestor(_object, o_Door_UNB);
+            var _damageable_door = variable_instance_exists(_hit, "door_take_damage");
+
+            // Fully open doors and already broken panels do not block the ray.
+            if (_big_door && _hit.door_state == 2) continue;
+            if (_damageable_door && (_hit.broken || _hit.break_requested)) continue;
+
+            ds_list_add(_seen, _hit);
+
+            instance_create_depth(
+                _px, _py, -10000, o_ShotImpact,
+                {
+                    impact_direction: point_direction(_sx, _sy, _ex, _ey),
+                    impact_enemy: _enemy
+                }
+            );
+
+            if (_enemy)
+            {
+                // The item allows one enemy penetration. Lethal hits still count.
+                _hit.take_damage(_damage);
+                if (_chain.enemies_left > 0)
+                    _chain.enemies_left--;
+                else
+                    _stopped = true;
+            }
+            else
+            {
+                if (_object == o_Block_Breakable)
+                    _hit.take_damage(_damage);
+                else if (_damageable_door)
+                    _hit.door_take_damage(_damage);
+
+                // Large closed doors stay bulletproof.
+                if (_big_door)
+                {
+                    _stopped = true;
+                }
+                else if (_chain.walls_left > 0)
+                {
+                    _chain.walls_left--;
+                }
+                else
+                {
+                    _stopped = true;
+                }
+            }
+
+            if (_stopped)
+            {
+                _end_x = _px;
+                _end_y = _py;
+                break;
+            }
+        }
+
+        if (_stopped) break;
+    }
+
+    ds_list_destroy(_hits);
+    ds_list_destroy(_seen);
+    return { end_x: _end_x, end_y: _end_y, reached: !_stopped };
 }

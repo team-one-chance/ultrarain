@@ -1,6 +1,7 @@
 // Only explode on death; ordinary removal during transitions is silent.
 if (pHP <= 0)
 {
+    audio_play_sound(sfxPDeath, 1, false);
     if (!instance_exists(oGameOver))
     {
         // Stay within GameMaker's drawable layer range (-16000 to 16000).

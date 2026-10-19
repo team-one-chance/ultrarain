@@ -1,22 +1,47 @@
-var _hidden = (scrap_state == 0 && !scrap_emerged)
-    ? clamp(ceil((scrap_release_y - (y - 24 * scrap_size)) / scrap_size), 0, 48)
-    : 0;
-if (_hidden > 0) {
-    // Reveal the robot below the hatch instead of popping in its entire body.
-    if (_hidden < 48) {
-        draw_sprite_part_ext(scrap_draw_sprite, scrap_variant, 0, _hidden, 48, 48 - _hidden,
-            x - 24 * image_xscale, y - 24 * scrap_size + _hidden * scrap_size,
-            image_xscale, image_yscale, image_blend, image_alpha);
-    }
-} else {
-    draw_sprite_ext(scrap_draw_sprite, scrap_variant, x, y,
-        image_xscale, image_yscale, image_angle, image_blend, image_alpha);
-}
+// Render the rotated sprite into a small transparent buffer, then crop it.
+// This retains its rotation while the lava progressively hides the body.
+if (!surface_exists(scrap_surface)) scrap_surface = surface_create(128, 128);
+if (!surface_exists(scrap_surface)) exit;
+if (scrap_draw_camera == -1)
+    scrap_draw_camera = camera_create_view(0, 0, 128, 128);
+
+var _world = matrix_get(matrix_world);
+var _view = matrix_get(matrix_view);
+var _projection = matrix_get(matrix_projection);
 var _old_alpha = draw_get_alpha();
 var _old_color = draw_get_color();
-for (var _i = 0; _i < array_length(scrap_sparks); _i++) {
+
+surface_set_target(scrap_surface);
+camera_apply(scrap_draw_camera);
+matrix_set(matrix_world, matrix_build_identity());
+draw_clear_alpha(c_black, 0);
+draw_set_alpha(1);
+draw_set_color(c_white);
+draw_sprite_ext(scrap_draw_sprite, scrap_variant, 64, 64,
+    image_xscale, image_yscale, scrap_draw_angle, image_blend, 1);
+surface_reset_target();
+matrix_set(matrix_world, _world);
+matrix_set(matrix_view, _view);
+matrix_set(matrix_projection, _projection);
+
+var _top = 0;
+var _bottom = 128;
+if (scrap_state == 0 && !scrap_emerged)
+    _top = clamp(ceil(scrap_release_y - (y - 64)), 0, 128);
+if (scrap_state == 3)
+    _bottom = clamp(floor(scrap_lava_y - (y - 64)), 0, 128);
+
+draw_set_alpha(1);
+draw_set_color(c_white);
+if (_bottom > _top)
+{
+    draw_surface_part(scrap_surface, 0, _top, 128, _bottom - _top,
+        x - 64, y - 64 + _top);
+}
+
+for (var _i = 0; _i < array_length(scrap_sparks); _i++)
+{
     var _spark = scrap_sparks[_i];
-    if (_spark.life <= 0) continue;
     draw_set_alpha(clamp(_spark.life / 0.12, 0, 1));
     draw_set_color(_spark.color);
     draw_line_width(round(_spark.x), round(_spark.y),

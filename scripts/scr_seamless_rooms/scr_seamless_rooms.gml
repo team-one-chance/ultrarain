@@ -12,6 +12,7 @@ function seamless_capture(_player, _gate, _destination)
         "dash_chain_jump_bonus", "dash_chain_max", "dash_chain_speed_per_dash", "dash_chain_timer", "dash_chain_window",
         "dash_cooldown", "dash_current_speed", "dash_decay", "dash_direction", "dash_iframe_is_ground",
         "dash_iframe_timer", "dash_speed", "dash_started_moving", "dash_stationary_speed", "dmg_cooldown",
+        "electric_wires_lab_entered", "electric_wires_second_unlocked",
         "enemy_knock", "ground_check_x_offset", "ground_check_y_offset", "ground_dash_cooldown_timer", "ground_dash_iframe_duration",
         "image_alpha", "image_angle", "image_blend", "image_index", "image_speed",
         "image_xscale", "image_yscale", "is_ledge_climbing", "is_mantle_lunging", "is_slamming",
@@ -35,7 +36,7 @@ function seamless_capture(_player, _gate, _destination)
         "slide_double_boost_stage2_multiplier", "slide_double_boost_stage3_duration", "slide_double_boost_timer", "slide_double_jump_direction", "slide_double_jump_launch_multiplier",
         "slide_double_jump_timer", "slide_double_jump_window", "slide_exit_delay", "slide_exit_timer", "slide_jump_speed",
         "slide_movespeed_multiplier", "slide_speed_multiplier", "slide_time", "sprite_index", "sword_config",
-        "sword_swing_facing", "sword_swing_pending_hit", "sword_swing_timer", "syringe_count", "syringe_max",
+        "sword_slash_sound_index", "sword_swing_facing", "sword_swing_pending_hit", "sword_swing_timer", "syringe_count", "syringe_max",
         "take_damage", "timerf3", "trap_bounce_pending", "trap_bounce_speed", "trap_knockback_speed_x",
         "trap_knockback_timer", "use_syringe", "visible", "wall_jump_forced_direction", "wall_jump_lock_duration",
         "wall_jump_lock_time", "wall_jump_x", "wall_jump_y", "wall_slide_active", "wall_slide_decel",
@@ -51,6 +52,23 @@ function seamless_capture(_player, _gate, _destination)
         if (is_method(_value)) continue;
         variable_struct_set(_values, _name, _value);
     }
+    var _parallax_snapshot = undefined;
+    var _parallax = instance_find(o_Parallax, 0);
+
+    if (instance_exists(_parallax))
+    {
+        if (_parallax.parallax_ready)
+        {
+            _parallax_snapshot = {
+                anchor_offset_x:
+                    _parallax.parallax_camera_start_x - _gate.x,
+
+                anchor_offset_y:
+                    _parallax.parallax_camera_start_y - _gate.y
+            };
+        }
+    }
+
     var _cam = view_camera[0];
     return {
         destination_room: _destination,
@@ -66,6 +84,7 @@ function seamless_capture(_player, _gate, _destination)
         camera_width: camera_get_view_width(_cam),
         camera_height: camera_get_view_height(_cam),
         camera_angle: camera_get_view_angle(_cam),
+        parallax: _parallax_snapshot,
         values: _values
     };
 }
@@ -137,6 +156,27 @@ function seamless_restore(_player, _arrival, _transfer)
     camera_set_view_pos(_cam,
         _arrival.x + _transfer.camera_offset_x,
         _arrival.y + _transfer.camera_offset_y);
+		    // Continue parallax from the source room's reference point.
+    if (variable_struct_exists(_transfer, "parallax"))
+    {
+        if (!is_undefined(_transfer.parallax))
+        {
+            var _parallax = instance_find(o_Parallax, 0);
+
+            if (instance_exists(_parallax))
+            {
+                _parallax.parallax_camera_start_x =
+                    _arrival.x
+                    + _transfer.parallax.anchor_offset_x;
+
+                _parallax.parallax_camera_start_y =
+                    _arrival.y
+                    + _transfer.parallax.anchor_offset_y;
+
+                _parallax.parallax_ready = true;
+            }
+        }
+    }
     var _camera_object = instance_find(o_CAMERA, 0);
     if (!instance_exists(_camera_object))
         _camera_object = instance_create_depth(0, 0, -100, o_CAMERA);
