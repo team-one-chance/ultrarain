@@ -61,9 +61,45 @@ if (reading)
         }
     }
 
-    // Capture typing, including Backspace.
-    keyboard_string = string_copy(keyboard_string, 1, 64);
-    command_input = keyboard_string;
+    if (os_type == os_linux)
+    {
+        // Use key presses on Linux: the runner may not populate keyboard_string.
+        // Commands are case-insensitive ASCII, so collect letters in lowercase.
+        for (var _letter = ord("A"); _letter <= ord("Z"); _letter++)
+        {
+            if (keyboard_check_pressed(_letter))
+            {
+                command_input += string_lower(chr(_letter));
+            }
+        }
+
+        for (var _digit = ord("0"); _digit <= ord("9"); _digit++)
+        {
+            if (keyboard_check_pressed(_digit))
+            {
+                command_input += chr(_digit);
+            }
+        }
+
+        if (keyboard_check_pressed(vk_space)) command_input += " ";
+        // GameMaker's period key code, plus the numpad decimal key.
+        if (keyboard_check_pressed(190) || keyboard_check_pressed(vk_decimal))
+        {
+            command_input += ".";
+        }
+
+        command_input = string_copy(command_input, 1, 64);
+        if (keyboard_check_pressed(vk_backspace))
+        {
+            command_input = string_copy(command_input, 1, max(0, string_length(command_input) - 1));
+        }
+    }
+    else
+    {
+        // Native text input handles keyboard layouts and Backspace elsewhere.
+        keyboard_string = string_copy(keyboard_string, 1, 64);
+        command_input = keyboard_string;
+    }
 
     if (keyboard_check_pressed(vk_enter))
     {
