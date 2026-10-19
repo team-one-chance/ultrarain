@@ -1,6 +1,14 @@
 // Avoid treating terminal command typing as lighting shortcuts.
 var _allow_toggles = true;
-if (instance_exists(o_Player)) _allow_toggles = o_Player.hacking_controller == noone;
+var _player = instance_find(o_Player, 0);
+
+if (instance_exists(_player))
+{
+    if (variable_instance_exists(_player, "hacking_controller"))
+    {
+        _allow_toggles = _player.hacking_controller == noone;
+    }
+}
 if (_allow_toggles)
 {
     if (keyboard_check_pressed(ord("N")))

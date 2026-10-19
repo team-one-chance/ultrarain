@@ -1,0 +1,12 @@
+[mcp_servers.gms]
+command = "gms-mcp"
+args = []
+
+[mcp_servers.gms.env]
+PYTHONUNBUFFERED = "1"
+GM_PROJECT_ROOT = "."
+GMS_MCP_ENABLE_DIRECT = "0"
+GMS_MCP_REQUIRE_DRY_RUN = "1"
+GMS_MCP_READ_ONLY = "1"
+GMS_MCP_TOOLSETS = "core"
+GMS_MCP_DEFAULT_TIMEOUT_SECONDS = "600"
