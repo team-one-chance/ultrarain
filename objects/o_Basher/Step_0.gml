@@ -117,12 +117,15 @@ if (basher_active_pair == -1 && basher_step_pause_remaining <= 0)
 {
     // Request a step BEFORE a support foot reaches its limit. Preferred
     // contacts and landing targets use the same reachable-ground solver.
-    var _lookahead = _direction * max(1, min(_cfg.stride_distance,
+    var _lookahead = _direction * _cfg.reach_anticipation * max(1, min(_cfg.stride_distance,
         _cfg.walk_speed * (_cfg.step_duration + _cfg.step_pause + _dt)));
     for (var _attempt = 0; _attempt < 2; ++_attempt)
     {
         var _candidate_pair = (_attempt == 0) ? basher_pair : 1 - basher_pair;
-        var _needs_step = _reach_blocked[_candidate_pair];
+        // Waiting mode retains emergency support steps to avoid a deadlock.
+        // With waiting and anticipation both off, stride alone triggers steps.
+        var _needs_step = (_cfg.body_wait_for_legs || _cfg.reach_anticipation > 0)
+            && _reach_blocked[_candidate_pair];
         for (var _i = 0; _i < 4; ++_i)
         {
             if (_cfg.legs[_i].pair != _candidate_pair) continue;
@@ -130,7 +133,7 @@ if (basher_active_pair == -1 && basher_step_pause_remaining <= 0)
             if (is_undefined(_home)) continue;
             var _leg = basher_legs[_i];
             if (abs(_leg.foot_x - _home.tx) >= max(1, _cfg.stride_distance) - 0.01) _needs_step = true;
-            if (_direction != 0)
+            if (_direction != 0 && _cfg.reach_anticipation > 0)
             {
                 var _future_distance = point_distance(x + _lookahead + _cfg.legs[_i].hip[0],
                     y + _cfg.legs[_i].hip[1], _leg.foot_x, _leg.foot_y);

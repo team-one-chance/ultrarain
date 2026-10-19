@@ -87,7 +87,7 @@ for (var _i = 0; _i < array_length(basher_controls); ++_i)
     var _control = basher_controls[_i];
     if (_control.page != basher_tuner_page) continue;
     if (variable_struct_exists(_control, "toggle") && _control.toggle) continue;
-    var _top = (basher_tuner_page == 1) ? 282 + _row * 31 : 250 + _row * 35;
+    var _top = (basher_tuner_page == 1) ? 282 + _row * 28 : 250 + _row * 35;
     var _value = variable_struct_get(global.basher_tuning, _control.key);
     var _fraction = clamp((_value - _control.lo) / (_control.hi - _control.lo), 0, 1);
     draw_set_color(c_white);

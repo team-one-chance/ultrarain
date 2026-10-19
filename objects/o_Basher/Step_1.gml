@@ -76,8 +76,8 @@ if (_pressed && _inside)
         var _control = basher_controls[_i];
         if (_control.page != basher_tuner_page) continue;
         if (variable_struct_exists(_control, "toggle") && _control.toggle) continue;
-        var _top = (basher_tuner_page == 1) ? 282 + _row * 31 : 250 + _row * 35;
-        if (point_in_rectangle(_mx, _my, 16, _top, 344, _top + (basher_tuner_page == 1 ? 30 : 32))) basher_tuner_drag = _i;
+        var _top = (basher_tuner_page == 1) ? 282 + _row * 28 : 250 + _row * 35;
+        if (point_in_rectangle(_mx, _my, 16, _top, 344, _top + (basher_tuner_page == 1 ? 27 : 32))) basher_tuner_drag = _i;
         _row++;
     }
 }

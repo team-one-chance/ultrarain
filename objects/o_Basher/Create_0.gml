@@ -175,9 +175,10 @@ basher_controls = [
     { key: "foot_reach", label: "Foot reach", page: 0, lo: 0.3, hi: 1.7, tick: 0.01, value: 1 },
     { key: "foot_spacing", label: "Foot spacing", page: 0, lo: 0.3, hi: 1.8, tick: 0.01, value: 1 },
     { key: "foot_shift", label: "Feet left / right", page: 0, lo: -20, hi: 20, tick: 0.5, value: 0 },
-    { key: "walk_speed", label: "Walking speed", page: 1, lo: 0, hi: 160, tick: 1, value: 48 },
-    { key: "stride_distance", label: "Stride distance", page: 1, lo: 2, hi: 24, tick: 0.5, value: 8 },
-    { key: "step_lead", label: "Step lead", page: 1, lo: 0, hi: 20, tick: 0.5, value: 6 },
+    { key: "walk_speed", label: "Walking speed", page: 1, lo: 0, hi: 360, tick: 1, value: 48 },
+    { key: "stride_distance", label: "Stride distance", page: 1, lo: 2, hi: 120, tick: 0.5, value: 8 },
+    { key: "step_lead", label: "Step lead", page: 1, lo: 0, hi: 120, tick: 0.5, value: 6 },
+    { key: "reach_anticipation", label: "Early reach trigger (0 = off)", page: 1, lo: 0, hi: 1, tick: 0.01, value: 1 },
     { key: "step_height", label: "Step height", page: 1, lo: 0, hi: 20, tick: 0.5, value: 6 },
     { key: "step_duration", label: "Step duration (seconds)", page: 1, lo: 0.06, hi: 0.6, tick: 0.01, value: 0.16 },
     { key: "step_pause", label: "Pause between steps (seconds)", page: 1, lo: 0, hi: 0.8, tick: 0.01, value: 0 },
@@ -285,6 +286,7 @@ basher_apply_tuning = function()
     _cfg.step_arc = _t.step_arc;
     _cfg.step_smoothing = _t.step_smoothing;
     _cfg.body_wait_for_legs = _t.body_wait_for_legs >= 0.5;
+    _cfg.reach_anticipation = _t.reach_anticipation;
     _cfg.walk_speed = _t.walk_speed * _t.leg_scale;
     _cfg.upper_pivot = [_t.upper_pivot_x, _t.upper_pivot_y];
     _cfg.upper_end = [_t.upper_end_x, _t.upper_end_y];
