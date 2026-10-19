@@ -266,6 +266,22 @@ run_action = function(_action)
             time_paused = false;
             time_rate = 1;
             resume_game();
+            with (o_SeamlessTravel)
+            {
+                pending = undefined;
+                transition_cooldown = 0;
+
+                // A restart creates fresh fixtures; it is not a saved-room return.
+                if (variable_instance_exists(id, "physics_visited_rooms"))
+                {
+                    var _key = room_get_name(room);
+                    if (variable_struct_exists(physics_visited_rooms, _key))
+                    {
+                        variable_struct_remove(physics_visited_rooms, _key);
+                    }
+                }
+            }
+            room_persistent = false;
             room_restart();
             return;
         case 20: instance_create_depth(cursor_position[0], cursor_position[1], 0, oEnemy_TEMP); break;

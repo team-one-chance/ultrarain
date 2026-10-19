@@ -12,8 +12,8 @@
   "name":"o_Lighting",
   "overriddenProperties":[],
   "parent":{
-    "name":"ULTRA RAIN",
-    "path":"ULTRA RAIN.yyp",
+    "name":"Lights",
+    "path":"folders/Objects/Walls_und_Doors/Lights.yy",
   },
   "parentObjectId":null,
   "persistent":false,

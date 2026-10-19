@@ -39,9 +39,9 @@
   "managed": true,
   "name": "o_RobotDropHatch",
   "overriddenProperties": [],
-  "parent": {
-    "name": "ULTRA RAIN",
-    "path": "ULTRA RAIN.yyp",
+  "parent":{
+    "name":"Objects",
+    "path":"folders/Objects.yy",
   },
   "parentObjectId": null,
   "persistent": false,
