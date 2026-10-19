@@ -59,6 +59,14 @@ function coin_ricochet(
         0.05;
 
     var _chain_perfect_apex = false;
+	
+	var _rounding_level = item_get_level(id, "coin_rounding");
+	
+	show_debug_message(
+    "COIN ITEM CHECK"
+    + " | player=" + string(id)
+    + " | rounding level=" + string(_rounding_level)
+);
 
 
     // =====================================
@@ -78,7 +86,7 @@ function coin_ricochet(
         // THIS COIN'S SHOT COUNT
         // =================================
 
-        var _coin_shot_count = 1;
+        var _coin_shot_count = 2;
 
         var _coin_y_speed =
             abs(_current_coin.phy_speed_y);
@@ -87,8 +95,9 @@ function coin_ricochet(
         // PERFECT APEX
         if (_coin_y_speed <= _perfect_threshold)
         {
-            _coin_shot_count = 4;
+            _coin_shot_count = 5;
             _chain_perfect_apex = true;
+			_current_damage += 8
 
             perfect_apex_flash_timer =
                 perfect_apex_flash_duration;
@@ -97,7 +106,8 @@ function coin_ricochet(
         // NORMAL APEX
         else if (_coin_y_speed <= _split_threshold)
         {
-            _coin_shot_count = 2;
+            _coin_shot_count = 3;
+			_current_damage += 5
         }
 
 
@@ -105,15 +115,21 @@ function coin_ricochet(
         // EVERY COIN MULTIPLIES DAMAGE BY 1.65
         // =================================
 
-        _current_damage *= (1.65);
+var _damage_before_multiplier = _current_damage;
+var _damage_before_rounding = _damage_before_multiplier * 1.65;
 
+_current_damage = coin_round_damage(
+    _damage_before_rounding,
+    _rounding_level
+);
 
-        show_debug_message(
-            "COIN CHAIN | damage="
-            + string(_current_damage)
-            + " | shots="
-            + string(_coin_shot_count)
-        );
+show_debug_message(
+    "COIN ROUNDING"
+    + " | level=" + string(_rounding_level)
+    + " | incoming=" + string(_damage_before_multiplier)
+    + " | multiplied=" + string(_damage_before_rounding)
+    + " | rounded=" + string(_current_damage)
+);
 
 
         // =================================

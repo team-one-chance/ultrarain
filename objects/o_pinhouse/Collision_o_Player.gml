@@ -1,3 +1,4 @@
+item_add_level(other, "coin_anchor", 1, 1);
 // Give item to player.
 other.item_coin_anchor = true;
 
