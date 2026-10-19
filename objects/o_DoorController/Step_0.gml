@@ -116,29 +116,23 @@ if (player_near && keyboard_check_pressed(ord("E")))
         linked_door = instance_nearest(x, y, o_Door_UNB);
 
         wire_connections = [-1, -1, -1, -1];
-// Each wire independently gets a random color.
-// 0 = green, 1 = yellow, 2 = blue, 3 = red.
-left_order = [
-    irandom(3),
-    irandom(3),
-    irandom(3),
-    irandom(3)
-];
-
-// Same colors on the right, shuffled by the existing code.
-right_order = [
-    left_order[0],
-    left_order[1],
-    left_order[2],
-    left_order[3]
-];
+        wire_connect_flash = [0, 0, 0, 0];
+        wire_complete_timer = 0;
+        // Use each color exactly once on each side.
+        left_order = [0, 1, 2, 3];
+        right_order = [0, 1, 2, 3];
         drag_wire = -1;
 
-        // Shuffle the four right-side sockets.
+        // Independently shuffle both sides without introducing duplicates.
         for (var i = 3; i > 0; i--)
         {
             var j = irandom(i);
-            var temporary = right_order[i];
+            var temporary = left_order[i];
+            left_order[i] = left_order[j];
+            left_order[j] = temporary;
+
+            j = irandom(i);
+            temporary = right_order[i];
             right_order[i] = right_order[j];
             right_order[j] = temporary;
         }
@@ -200,6 +194,39 @@ if (controller_state == 2)
     }
     else
     {
+        for (var i = 0; i < 4; i++)
+        {
+            wire_connect_flash[i] = max(0, wire_connect_flash[i] - _dt);
+        }
+
+        // Keep the last successful connection visible before closing the panel.
+        if (wire_complete_timer > 0)
+        {
+            wire_complete_timer = max(0, wire_complete_timer - _dt);
+            if (wire_complete_timer == 0)
+            {
+                hacker.hacking_controller = noone;
+                hacker = noone;
+                controller_state = 3;
+                stop_wire_flash_sfx();
+
+                if (instance_exists(linked_door))
+                {
+                    with (linked_door)
+                    {
+                        door_open();
+                    }
+                }
+                else
+                {
+                    show_debug_message(
+                        "Wire puzzle complete, but no door was found"
+                    );
+                }
+            }
+            exit;
+        }
+
         // Briefly reveal the colors at irregular intervals.
         wire_flash_timer -= _dt;
         wire_flash_time = max(0, wire_flash_time - _dt);
@@ -285,6 +312,7 @@ if (!_occupied
 && right_order[row] == left_order[drag_wire])
 {
     wire_connections[drag_wire] = row;
+    wire_connect_flash[drag_wire] = wire_connect_flash_duration;
 }
 
                     break;
@@ -307,24 +335,9 @@ if (!_occupied
 
             if (_complete)
             {
-                hacker.hacking_controller = noone;
-                hacker = noone;
-                controller_state = 3;
+                wire_complete_timer = wire_connect_flash_duration;
+                wire_flash_time = 0;
                 stop_wire_flash_sfx();
-
-                if (instance_exists(linked_door))
-                {
-                    with (linked_door)
-                    {
-                        door_open();
-                    }
-                }
-                else
-                {
-                    show_debug_message(
-                        "Wire puzzle complete, but no door was found"
-                    );
-                }
             }
         }
     }

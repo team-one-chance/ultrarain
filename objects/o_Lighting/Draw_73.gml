@@ -128,105 +128,152 @@ if (bloom_enabled && bloom_strength > 0 && surface_exists(application_surface)
         camera_set_view_size(bloom_camera, _bw, _bh);
         var _old_filter = gpu_get_texfilter();
         gpu_set_texfilter(true);
-        gpu_set_blendmode_ext(bm_one, bm_zero);
-        surface_set_target(bloom_surface_a);
-        camera_apply(bloom_camera);
-        draw_clear_alpha(c_black, 1);
-        if (bloom_scene_enabled)
+        // Reuse the buffers for separate groups so their blur radii stay independent.
+        for (var _bloom_pass = 0; _bloom_pass < 4; _bloom_pass++)
         {
-            shader_set(sh_BloomExtract);
-            shader_set_uniform_f(bloom_threshold_uniform, clamp(bloom_threshold, 0, 0.99));
-            draw_surface_stretched(application_surface, 0, 0, _bw, _bh);
+            var _pass_radius = bloom_radius;
+            var _pass_strength = clamp(bloom_strength, 0, 1);
+            var _sprite_source = noone;
+            if (_bloom_pass == 1)
+            {
+                _sprite_source = o_MedkitPickup;
+                _pass_radius = medkit_bloom_radius;
+                _pass_strength *= max(0, medkit_bloom_strength);
+            }
+            else if (_bloom_pass == 2)
+            {
+                _sprite_source = oLavaMolten;
+                _pass_radius = lava_bloom_radius;
+                _pass_strength *= max(0, lava_bloom_strength);
+            }
+            else if (_bloom_pass == 3)
+            {
+                _sprite_source = o_pinhouse;
+                _pass_radius = pinhouse_bloom_radius;
+                _pass_strength *= max(0, pinhouse_bloom_strength);
+            }
+            if (_pass_strength <= 0) continue;
+            if (_sprite_source != noone && !instance_exists(_sprite_source)) continue;
+            gpu_set_blendmode_ext(bm_one, bm_zero);
+            surface_set_target(bloom_surface_a);
+            camera_apply(bloom_camera);
+            draw_clear_alpha(c_black, 1);
+            if (_bloom_pass == 0 && bloom_scene_enabled)
+            {
+                shader_set(sh_BloomExtract);
+                shader_set_uniform_f(bloom_threshold_uniform, clamp(bloom_threshold, 0, 0.99));
+                draw_surface_stretched(application_surface, 0, 0, _bw, _bh);
+                shader_reset();
+            }
+            bloom_view_x = _cx;
+            bloom_view_y = _cy;
+            bloom_scale_x = _bw / _vw;
+            bloom_scale_y = _bh / _vh;
+            if (_bloom_pass == 0)
+            {
+                // Add a wider shot source only to the bloom buffer, in screen coordinates.
+                gpu_set_blendmode(bm_normal);
+                with (o_HitscanVisual)
+                {
+                    if (emissive && _renderer.hitscan_bloom_strength > 0)
+                    {
+                        draw_set_color(line_color);
+                        draw_set_alpha(clamp(_renderer.hitscan_bloom_strength, 0, 1));
+                        draw_line_width(
+                            (line_x1 - _cx) * _bw / _vw, (line_y1 - _cy) * _bh / _vh,
+                            (line_x2 - _cx) * _bw / _vw, (line_y2 - _cy) * _bh / _vh,
+                            max(1, _renderer.hitscan_bloom_width) * _bh / _vh
+                        );
+                    }
+                }
+                // Bloom comes from glowing sources, never from the wide illumination cones.
+                gpu_set_blendmode(bm_add);
+                with (o_light_ceil_long)
+                    _renderer.draw_lamp_bloom(id, _renderer.ceiling_light);
+                with (o_light_ceil_long_strong)
+                    _renderer.draw_lamp_bloom(id, _renderer.ceiling_light_strong);
+                with (o_light_ceil_long_ow)
+                    _renderer.draw_lamp_bloom(id, _renderer.ceiling_light,
+                        image_index < 1 ? _renderer.ceiling_flicker.dim_multiplier : 1);
+                with (o_DoorController)
+                    _renderer.draw_bloom_point((bbox_left + bbox_right) * 0.5, (bbox_top + bbox_bottom) * 0.5,
+                        controller_state == 0 ? _renderer.terminal_idle_color : _renderer.terminal_used_color,
+                        _renderer.terminal_bloom_strength);
+                with (o_DemoTerminal)
+                    _renderer.draw_bloom_point((bbox_left + bbox_right) * 0.5, (bbox_top + bbox_bottom) * 0.5,
+                        _renderer.demo_terminal_color, _renderer.terminal_bloom_strength);
+                with (o_ShotImpact)
+                {
+                    for (var _i = 0; _i < array_length(particles); _i++)
+                    {
+                        var _p = particles[_i];
+                        if (_p.dust) continue;
+                        var _fade = clamp(_p.life / _p.duration, 0, 1);
+                        var _angle = point_direction(0, 0, _p.vx, _p.vy);
+                        _renderer.draw_bloom_line(_p.px, _p.py,
+                            _p.px - lengthdir_x(spark_tail_length * _fade, _angle),
+                            _p.py - lengthdir_y(spark_tail_length * _fade, _angle),
+                            spark_color_start, spark_width, _fade);
+                    }
+                }
+                with (o_Block_wires)
+                {
+                    for (var _i = 0; _i < array_length(wire_arcs); _i++)
+                    {
+                        var _arc = wire_arcs[_i];
+                        _renderer.draw_bloom_point(x + _arc.anchor_x * image_xscale,
+                            y + _arc.anchor_y * image_yscale, _renderer.wire_color, 0.6);
+                    }
+                }
+            }
+            else
+            {
+                // Sprite opacity is preserved; strength is applied after the blur.
+                gpu_set_blendmode(bm_add);
+                camera_apply(_cam);
+                with (_sprite_source)
+                {
+                    if (visible && sprite_index != -1)
+                        draw_sprite_ext(sprite_index, image_index, x, y, image_xscale, image_yscale,
+                            image_angle, image_blend, image_alpha);
+                }
+                camera_apply(bloom_camera);
+            }
+            draw_set_color(c_white);
+            draw_set_alpha(1);
+            gpu_set_blendmode_ext(bm_one, bm_zero);
+            surface_reset_target();
+
+            surface_set_target(bloom_surface_b);
+            camera_apply(bloom_camera);
+            draw_clear_alpha(c_black, 1);
+            shader_set(sh_BloomBlur);
+            shader_set_uniform_f(bloom_step_uniform, max(0, _pass_radius) * 0.5 / _vw, 0);
+            draw_surface_stretched(bloom_surface_a, 0, 0, _bw, _bh);
             shader_reset();
-        }
-        bloom_view_x = _cx;
-        bloom_view_y = _cy;
-        bloom_scale_x = _bw / _vw;
-        bloom_scale_y = _bh / _vh;
-        // Add a wider shot source only to the bloom buffer, in screen coordinates.
-        gpu_set_blendmode(bm_normal);
-        with (o_HitscanVisual)
-        {
-            if (emissive && _renderer.hitscan_bloom_strength > 0)
-            {
-                draw_set_color(line_color);
-                draw_set_alpha(clamp(_renderer.hitscan_bloom_strength, 0, 1));
-                draw_line_width(
-                    (line_x1 - _cx) * _bw / _vw, (line_y1 - _cy) * _bh / _vh,
-                    (line_x2 - _cx) * _bw / _vw, (line_y2 - _cy) * _bh / _vh,
-                    max(1, _renderer.hitscan_bloom_width) * _bh / _vh
-                );
-            }
-        }
-        // Bloom comes from glowing sources, never from the wide illumination cones.
-        gpu_set_blendmode(bm_add);
-        with (o_light_ceil_long)
-            _renderer.draw_lamp_bloom(id, _renderer.ceiling_light);
-        with (o_light_ceil_long_strong)
-            _renderer.draw_lamp_bloom(id, _renderer.ceiling_light_strong);
-        with (o_light_ceil_long_ow)
-            _renderer.draw_lamp_bloom(id, _renderer.ceiling_light,
-                image_index < 1 ? _renderer.ceiling_flicker.dim_multiplier : 1);
-        with (o_DoorController)
-            _renderer.draw_bloom_point((bbox_left + bbox_right) * 0.5, (bbox_top + bbox_bottom) * 0.5,
-                controller_state == 0 ? _renderer.terminal_idle_color : _renderer.terminal_used_color,
-                _renderer.terminal_bloom_strength);
-        with (o_DemoTerminal)
-            _renderer.draw_bloom_point((bbox_left + bbox_right) * 0.5, (bbox_top + bbox_bottom) * 0.5,
-                _renderer.demo_terminal_color, _renderer.terminal_bloom_strength);
-        with (o_ShotImpact)
-        {
-            for (var _i = 0; _i < array_length(particles); _i++)
-            {
-                var _p = particles[_i];
-                if (_p.dust) continue;
-                var _fade = clamp(_p.life / _p.duration, 0, 1);
-                var _angle = point_direction(0, 0, _p.vx, _p.vy);
-                _renderer.draw_bloom_line(_p.px, _p.py,
-                    _p.px - lengthdir_x(spark_tail_length * _fade, _angle),
-                    _p.py - lengthdir_y(spark_tail_length * _fade, _angle),
-                    spark_color_start, spark_width, _fade);
-            }
-        }
-        with (o_Block_wires)
-        {
-            for (var _i = 0; _i < array_length(wire_arcs); _i++)
-            {
-                var _arc = wire_arcs[_i];
-                _renderer.draw_bloom_point(x + _arc.anchor_x * image_xscale,
-                    y + _arc.anchor_y * image_yscale, _renderer.wire_color, 0.6);
-            }
-        }
-        draw_set_color(c_white);
-        draw_set_alpha(1);
-        gpu_set_blendmode_ext(bm_one, bm_zero);
-        surface_reset_target();
+            surface_reset_target();
 
-        surface_set_target(bloom_surface_b);
-        camera_apply(bloom_camera);
-        draw_clear_alpha(c_black, 1);
-        shader_set(sh_BloomBlur);
-        shader_set_uniform_f(bloom_step_uniform, max(0, bloom_radius) * 0.5 / _vw, 0);
-        draw_surface_stretched(bloom_surface_a, 0, 0, _bw, _bh);
-        shader_reset();
-        surface_reset_target();
+            surface_set_target(bloom_surface_a);
+            camera_apply(bloom_camera);
+            draw_clear_alpha(c_black, 1);
+            shader_set(sh_BloomBlur);
+            shader_set_uniform_f(bloom_step_uniform, 0, max(0, _pass_radius) * 0.5 / _vh);
+            draw_surface_stretched(bloom_surface_b, 0, 0, _bw, _bh);
+            shader_reset();
+            surface_reset_target();
 
-        surface_set_target(bloom_surface_a);
-        camera_apply(bloom_camera);
-        draw_clear_alpha(c_black, 1);
-        shader_set(sh_BloomBlur);
-        shader_set_uniform_f(bloom_step_uniform, 0, max(0, bloom_radius) * 0.5 / _vh);
-        draw_surface_stretched(bloom_surface_b, 0, 0, _bw, _bh);
-        shader_reset();
-        surface_reset_target();
-
-        matrix_set(matrix_world, _world);
-        matrix_set(matrix_view, _view);
-        matrix_set(matrix_projection, _projection);
-        gpu_set_blendmode(bm_add);
-        draw_set_alpha(clamp(bloom_strength, 0, 1));
-        draw_surface_stretched(bloom_surface_a, _cx, _cy, _vw, _vh);
-        gpu_set_blendmode(bm_normal);
+            matrix_set(matrix_world, _world);
+            matrix_set(matrix_view, _view);
+            matrix_set(matrix_projection, _projection);
+            gpu_set_blendmode(bm_add);
+            // Add whole and fractional contributions so strengths above 1 are effective.
+            for (var _remaining = _pass_strength; _remaining > 0; _remaining -= 1)
+            {
+                draw_set_alpha(min(1, _remaining));
+                draw_surface_stretched(bloom_surface_a, _cx, _cy, _vw, _vh);
+            }
+            gpu_set_blendmode(bm_normal);
+        }
         gpu_set_texfilter(_old_filter);
     }
 }

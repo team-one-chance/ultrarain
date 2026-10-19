@@ -29,6 +29,9 @@ right_order = [0, 1, 2, 3];
 // For each left wire, stores its connected right row.
 // -1 means unconnected.
 wire_connections = [-1, -1, -1, -1];
+wire_connect_flash = [0, 0, 0, 0];
+wire_connect_flash_duration = 0.45;
+wire_complete_timer = 0;
 
 drag_wire = -1;
 wire_flash_timer = 0;

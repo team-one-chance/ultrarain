@@ -45,9 +45,23 @@ if (!instance_exists(_arrival))
     exit;
 }
 var _old_player = instance_find(o_Player, 0);
+// Keep each room's acoustic setup and encounter state in that room. In
+// particular, the tutorial lab's wire settings must not leak into other rooms.
+var _room_audio = {};
+var _room_audio_fields = [
+    "electric_wires_delayed_object", "electric_wires_activation_platform",
+    "electric_wires_lab_door", "electric_wires_second_unlocked",
+    "electric_wires_lab_entered", "ambush_alarm_doors", "ambush_alarm_enemies"
+];
 
 if (instance_exists(_old_player))
 {
+    for (var _i = 0; _i < array_length(_room_audio_fields); _i++)
+    {
+        var _name = _room_audio_fields[_i];
+        variable_struct_set(_room_audio, _name,
+            variable_instance_get(_old_player, _name));
+    }
     // Remove the stored player's old chip visuals.
     with (o_ChipAttachment)
     {
@@ -73,5 +87,11 @@ var _player = instance_create_depth(
 );
 
 seamless_restore(_player, _arrival, _transfer);
+var _audio_names = variable_struct_get_names(_room_audio);
+for (var _i = 0; _i < array_length(_audio_names); _i++)
+{
+    var _name = _audio_names[_i];
+    variable_instance_set(_player, _name, variable_struct_get(_room_audio, _name));
+}
 _player.depth = layer_get_depth(layer_get_id("Instances")) - 1;
 transition_cooldown = 0.3;

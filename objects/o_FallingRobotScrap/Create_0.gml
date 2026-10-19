@@ -24,6 +24,21 @@ scrap_hit_player = false;
 scrap_contact_debugged = false;
 scrap_damage = 50;
 scrap_fall_speed_before = 0;
+scrap_impact_played = false;
+
+scrap_play_impact_sfx = function()
+{
+    // Settling piles and resting contacts must stay quiet.
+    if (scrap_impact_played || !scrap_emerged || scrap_state != 0
+        || abs(scrap_fall_speed_before) < 100) return;
+    scrap_impact_played = true;
+    var _player = instance_find(o_Player, 0);
+    if (!instance_exists(_player)) return;
+    if (_player.scrap_impact_sound != -1
+        && audio_is_playing(_player.scrap_impact_sound)) return;
+    _player.scrap_impact_sound = world_sfx_play(sfxLandingNoSlam, x, y,
+        clamp(abs(scrap_fall_speed_before) / 600, 0.2, 0.55), 0.8, 480);
+};
 
 // 0 incoming, 1 grinding, 2 physical crushed scrap, 3 lava sinking.
 scrap_state = 0;
@@ -147,6 +162,13 @@ scrap_find_surface = function(_types, _surface_offset = 0)
 
 scrap_start_grind = function(_hit)
 {
+    var _player = instance_find(o_Player, 0);
+    if (instance_exists(_player) && (_player.scrap_crush_sound == -1
+        || !audio_is_playing(_player.scrap_crush_sound)))
+    {
+        _player.scrap_crush_sound = world_sfx_play(sfxDoorBreaking,
+            _hit.hit_x, _hit.top_y, 0.35, 0.85, 480);
+    }
     scrap_stop_physics();
     scrap_can_damage = false;
     scrap_state = 1;

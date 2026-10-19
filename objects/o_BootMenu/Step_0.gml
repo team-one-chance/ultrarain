@@ -32,8 +32,10 @@ switch (boot_state)
     // Waiting for Enter.
     case 0:
     {
-        if (keyboard_check_pressed(vk_enter))
+        if (!audio_is_playing(sfxInitOpen) && keyboard_check_pressed(vk_enter))
         {
+            audio_play_sound(sfxInitEnter1, 1, false);
+
             boot_add_line(
                 "> exit sleep.exe",
                 console_white
@@ -60,6 +62,8 @@ switch (boot_state)
     {
         if (state_elapsed >= 0.9)
         {
+            audio_play_sound(sfxInitError, 1, false);
+
             boot_add_line(
                 "[FATAL] rules.exe Overwrite forbidden",
                 console_red
@@ -79,14 +83,17 @@ switch (boot_state)
     // Crash, then briefly hold the overwriting message.
     case 2:
     {
-        // Add this line only when crossing 0.65 seconds.
-        if (_previous_elapsed < 0.65
-        && state_elapsed >= 0.65)
+        // Reveal the line and start its cue together once Enter1 finishes.
+        if (!overwrite_started && state_elapsed >= 0.65
+        && !audio_is_playing(sfxInitEnter1))
         {
+			overwrite_started = true;
 			boot_add_line(
 				"> rules.exe overwriting...",
-				c_yellow
+				c_yellow,
+				false
 		);
+            transition_sound = audio_play_sound(sfxInitTrans1, 1, false);
         }
 
 		if (state_elapsed >= 3.65)
@@ -302,6 +309,8 @@ case 4:
 {
     if (keyboard_check_pressed(vk_enter))
     {
+        audio_play_sound(sfxInitEnter2, 1, false);
+
         boot_add_line(
             "> rules.exe renamed into freewill.exe",
             console_green
@@ -401,6 +410,11 @@ case 5:
 
     if (state_elapsed >= 2.0)
     {
+        if (line_sound != -1 && audio_is_playing(line_sound))
+        {
+            audio_stop_sound(line_sound);
+        }
+        audio_play_sound(sfxInitSpawn, 1, false);
         boot_set_state(6);
     }
 

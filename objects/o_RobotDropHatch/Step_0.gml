@@ -15,15 +15,7 @@ switch (hatch_stage) {
         if (!hatch_open_sound_played)
         {
             hatch_open_sound_played = true;
-            if (instance_exists(o_Player))
-            {
-                var _distance = distance_to_object(o_Player);
-                if (_distance < 480)
-                {
-                    var _sound = audio_play_sound(sfxDropperHatchOpen, 1, false);
-                    audio_sound_gain(_sound, clamp(1 - _distance / 480, 0, 1), 0);
-                }
-            }
+            world_sfx_play(sfxDropperHatchOpen, x, hatch_lip_y, 0.65, 1, 480);
         }
         // Appear and quickly slide the two shutters into the frame.
         hatch_alpha = clamp(hatch_age / 0.04, 0, 1);

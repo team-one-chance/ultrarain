@@ -12,6 +12,7 @@ if (variable_global_exists("dev_resume_input") && global.dev_resume_input)
 // WASD controls only the camera while freecam is active.
 if (variable_global_exists("dev_freecam") && global.dev_freecam)
 {
+    stop_movement_sfx();
     phy_speed_x = 0;
     phy_speed_y = 0;
     exit;
@@ -21,6 +22,8 @@ chip_player_tick();
 
 if (grinder_dying)
 {
+    stop_movement_sfx();
+    update_gear_grinder_sfx();
     var _dt = (
         variable_global_exists("dev_delta_time")
         ? global.dev_delta_time

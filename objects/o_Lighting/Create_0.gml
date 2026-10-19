@@ -60,9 +60,16 @@ bloom_enabled = true;
 bloom_scene_enabled = false; // Broad lit surfaces otherwise create a foggy wash.
 lamp_bloom_strength = 0.65;
 terminal_bloom_strength = 0.5;
+medkit_bloom_strength = 1;
+medkit_bloom_radius = 2;
+pinhouse_bloom_strength = 1;
+pinhouse_bloom_radius = 5;
+lava_bloom_strength = 1.5;
+lava_bloom_radius = 15;
+// Sprite strengths: 0 disables, 1 is normal, values above 1 brighten further.
 bloom_threshold = 0.55;
-bloom_strength = 0.30;
-bloom_radius = 4;
+bloom_strength = 5;
+bloom_radius = 15;
 // Extra emission width feeds the blur; the visible shot remains one pixel wide.
 hitscan_bloom_width = 6;
 hitscan_bloom_strength = 0.9;

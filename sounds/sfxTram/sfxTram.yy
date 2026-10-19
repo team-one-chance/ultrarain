@@ -10,7 +10,7 @@
   "compression":0,
   "compressionQuality":4,
   "conversionMode":0,
-  "duration":1.77,
+  "duration":5.0,
   "exportDir":"",
   "name":"sfxTram",
   "parent":{
@@ -21,6 +21,6 @@
   "resourceType":"GMSound",
   "resourceVersion":"2.0",
   "sampleRate":44100,
-  "soundFile":"sfxTram.wav",
+  "soundFile":"sfxTram.ogg",
   "volume":1.0,
 }

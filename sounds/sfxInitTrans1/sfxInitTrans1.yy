@@ -1,6 +1,6 @@
 {
   "$GMSound":"v2",
-  "%Name":"sfxTyping",
+  "%Name":"sfxInitTrans1",
   "audioGroupId":{
     "name":"audiogroup_default",
     "path":"audiogroups/audiogroup_default",
@@ -10,17 +10,17 @@
   "compression":0,
   "compressionQuality":4,
   "conversionMode":0,
-  "duration":0.0,
+  "duration":1.740703,
   "exportDir":"",
-  "name":"sfxTyping",
+  "name":"sfxInitTrans1",
   "parent":{
-    "name":"SFX",
-    "path":"folders/SFX.yy",
+    "name":"sfxInit",
+    "path":"folders/SFX/sfxInit.yy",
   },
   "preload":false,
   "resourceType":"GMSound",
   "resourceVersion":"2.0",
   "sampleRate":44100,
-  "soundFile":"",
+  "soundFile":"sfxInitTrans1.wav",
   "volume":1.0,
 }
