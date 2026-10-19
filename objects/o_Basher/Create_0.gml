@@ -237,7 +237,7 @@ if (!variable_global_exists("basher_tuning"))
         catch (_error) { show_debug_message("Basher tuner: using defaults for unreadable settings."); }
     }
     global.basher_tuning_revision = 0;
-    global.basher_tuner_open = true;
+    global.basher_tuner_open = false;
     global.basher_tuner_target = id;
     global.basher_tuner_motion = 0;
 }
