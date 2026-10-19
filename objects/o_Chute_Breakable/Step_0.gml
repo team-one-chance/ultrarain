@@ -1,7 +1,7 @@
 if (break_requested && !broken)
 {
     broken = true;
-    audio_play_sound(sfxDoorBreaking, 1, false);
+    world_sfx_play(sfxDoorBreaking, x, y, 0.8);
 
     var _alarm_player = instance_nearest(x, y, o_Player);
     if (instance_exists(_alarm_player)) _alarm_player.start_ambush_alarm_sfx(id);

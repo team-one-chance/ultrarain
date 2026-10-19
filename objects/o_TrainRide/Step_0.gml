@@ -5,6 +5,12 @@ if (!ride_started)
     if (!instance_exists(_boarding_player)) exit;
     if (!train_find_entrance()) exit;
 
+    if (!train_boarding_unlocked())
+    {
+        boarding_requested = false;
+        exit;
+    }
+
     var _inside =
         _boarding_player.x >= train_left + 80
         && _boarding_player.x <= train_right - 80
@@ -85,9 +91,9 @@ else
 
 if (tram_sound == -1 || !audio_is_playing(tram_sound))
 {
-    tram_sound = audio_play_sound(sfxTram, 1, true);
+    tram_sound = audio_play_sound(sfxTram, 0, true, 0);
 }
-audio_sound_gain(tram_sound, clamp(scenery_speed / max(1, scenery_max_speed), 0, 1), 0);
+audio_sound_gain(tram_sound, clamp(scenery_speed / max(1, scenery_max_speed), 0, 1) * 0.65, 80);
 
 tunnel_scroll = scenery_distance mod tunnel_repeat_width;
 if (tunnel_a != -1) layer_x(tunnel_a, tunnel_a_base_x - tunnel_scroll);

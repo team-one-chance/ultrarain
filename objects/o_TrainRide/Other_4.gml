@@ -1,3 +1,6 @@
+// Bind the boarding lock after all room instances exist, before any Step input.
+train_find_entrance();
+
 if (station_layer_2 != -1)
 {
     // Instance positions will control movement.
