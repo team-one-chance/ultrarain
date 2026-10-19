@@ -181,7 +181,9 @@ function seamless_restore(_player, _arrival, _transfer)
         _camera_object = instance_create_depth(0, 0, -100, o_CAMERA);
     _camera_object.camera = _cam;
     _camera_object.seamless_hold_frames = 1;
-	function seamless_rebuild_room_physics()
+}
+
+function seamless_rebuild_room_physics()
 {
     // Walls, floors and surviving breakable blocks.
     with (o_Block)
@@ -312,5 +314,4 @@ function seamless_restore(_player, _arrival, _transfer)
             physics_fixture_delete(_fix);
         }
     }
-}
 }

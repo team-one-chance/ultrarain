@@ -79,12 +79,17 @@ if (instance_exists(_old_player))
 }
 
 // Create builds a fresh physics body before we restore any properties.
+// Tutorial Create resets fresh-run history; a seamless return is the same run.
+var _took_damage = global.demo_took_damage;
+var _used_healing = global.demo_used_healing;
 var _player = instance_create_depth(
     _arrival.x,
     _arrival.y,
     0,
     o_Player
 );
+global.demo_took_damage = _took_damage;
+global.demo_used_healing = _used_healing;
 
 seamless_restore(_player, _arrival, _transfer);
 var _audio_names = variable_struct_get_names(_room_audio);

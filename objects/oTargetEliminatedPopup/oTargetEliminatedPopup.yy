@@ -1,4 +1,4 @@
-﻿{
+{
   "$GMObject":"",
   "%Name":"oTargetEliminatedPopup",
   "eventList":[

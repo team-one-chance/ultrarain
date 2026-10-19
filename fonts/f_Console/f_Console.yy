@@ -119,8 +119,8 @@
   "maintainGms1Font":false,
   "name":"f_Console",
   "parent":{
-    "name":"ULTRA RAIN",
-    "path":"ULTRA RAIN.yyp",
+    "name":"Sprites",
+    "path":"folders/Sprites.yy",
   },
   "pointRounding":0,
   "ranges":[

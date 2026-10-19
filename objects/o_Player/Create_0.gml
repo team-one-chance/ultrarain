@@ -943,3 +943,5 @@ begin_grinder_death = function(_gear)
 
     global.demo_took_damage = true;
 };
+
+inventory = {};
