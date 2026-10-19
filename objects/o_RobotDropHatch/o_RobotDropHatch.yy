@@ -11,18 +11,7 @@
       "isDnD": false,
       "name": "",
       "resourceType": "GMEvent",
-      "resourceVersion": "2.0"
-    },
-    {
-      "$GMEvent": "v1",
-      "%Name": "",
-      "collisionObjectId": null,
-      "eventNum": 0,
-      "eventType": 3,
-      "isDnD": false,
-      "name": "",
-      "resourceType": "GMEvent",
-      "resourceVersion": "2.0"
+      "resourceVersion": "2.0",
     },
     {
       "$GMEvent": "v1",
@@ -33,15 +22,26 @@
       "isDnD": false,
       "name": "",
       "resourceType": "GMEvent",
-      "resourceVersion": "2.0"
+      "resourceVersion": "2.0",
+    },
+    {
+      "$GMEvent": "v1",
+      "%Name": "",
+      "collisionObjectId": null,
+      "eventNum": 0,
+      "eventType": 3,
+      "isDnD": false,
+      "name": "",
+      "resourceType": "GMEvent",
+      "resourceVersion": "2.0",
     }
   ],
   "managed": true,
   "name": "o_RobotDropHatch",
   "overriddenProperties": [],
-  "parent": {
-    "name": "Walls_und_Doors",
-    "path": "folders/Objects/Walls_und_Doors.yy"
+  "parent":{
+    "name":"Objects",
+    "path":"folders/Objects.yy",
   },
   "parentObjectId": null,
   "persistent": false,
@@ -61,7 +61,10 @@
   "resourceType": "GMObject",
   "resourceVersion": "2.0",
   "solid": false,
-  "spriteId": null,
+  "spriteId": {
+    "name": "s_RobotDropHatch",
+    "path": "sprites/s_RobotDropHatch/s_RobotDropHatch.yy",
+  },
   "spriteMaskId": null,
-  "visible": true
+  "visible": true,
 }
