@@ -1,1 +1,1 @@
-depth = oMoltenLava.depth +2;
+depth = o_Player.depth + 2;

@@ -118,15 +118,42 @@ function seamless_restore(_player, _arrival, _transfer)
                 variable_instance_get(_player, _name) + _shift_y);
     }
 
-    // Rebuild with this room's fixture handle, never the old room's handle.
-    _player.player_set_collider(_player.player_collider_short);
-    _player.phy_position_x = _arrival.x + _transfer.player_offset_x;
-    _player.phy_position_y = _arrival.y + _transfer.player_offset_y;
-    _player.phy_speed_x = _transfer.velocity_x;
+// Arrive with the short body first, then check the destination.
+var _arrive_short =
+    _player.player_collider_short || _player.is_sliding;
+
+_player.player_set_collider(true);
+
+_player.phy_position_x =
+    _arrival.x + _transfer.player_offset_x;
+
+_player.phy_position_y =
+    _arrival.y + _transfer.player_offset_y;
+
+if (!_arrive_short && _player.player_can_stand())
+{
+    _player.player_set_collider(false);
+}
+
+// Match the arrival pose before the first Draw event.
+if (_player.player_collider_short)
+{
+    var _facing = _player.slide_direction;
+
+    if (_facing == 0) _facing = _player.aim_facing;
+    if (_facing == 0) _facing = 1;
+
+    _player.sprite_index = _facing > 0
+        ? s_Player_Slide_Right
+        : s_Player_Slide_Left;
+
+    _player.image_xscale = 1;
+}
+    /*_player.phy_speed_x = _transfer.velocity_x;
     _player.phy_speed_y = _transfer.velocity_y;
     _player.phy_fixed_rotation = true;
     _player.hacking_controller = noone;
-    _player.pinned_coin = noone;
+    _player.pinned_coin = noone;*/
 
     // Replace this room's old player attachments with the incoming ones.
     with (o_ChipAttachment)

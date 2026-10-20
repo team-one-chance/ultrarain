@@ -1,6 +1,6 @@
 // Place one controller per room. enabled and ambient_color are editor properties.
 // Ambient channels: 255 = original scene brightness.
-depth = -13000;
+depth = -250;
 // Cone rendering mode is configured here.
 cone_shader_enabled = true;
 cone_dither_strength = 1;
