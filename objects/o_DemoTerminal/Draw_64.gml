@@ -46,7 +46,7 @@ draw_set_color(make_color_rgb(130, 145, 140));
 draw_text(
     _px + 32,
     _py + _ph - 118,
-    "To restart: VRAIN initiate restart.exe"
+    "To restart: vrain initiate restart.exe"
 );
 
 // Command input, using the menu's console font.
