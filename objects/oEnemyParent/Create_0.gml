@@ -16,6 +16,28 @@ nav_grid = mp_grid_create(
 enemy_path = path_add();
 repath_timer = 0;
 
+nav_grid_dirty = true;
+nav_refresh = function()
+{
+    if (!nav_grid_dirty) return;
+    mp_grid_clear_all(nav_grid);
+    var _wall_padding = 12;
+    var _wall_objects = [o_Block, o_Door_UNB, o_Door_Breakable, o_Chute_Breakable];
+    for (var _i = 0; _i < array_length(_wall_objects); _i++)
+    {
+        with (_wall_objects[_i])
+        {
+            if (variable_instance_exists(id, "broken") && broken) continue;
+            if (object_index == o_Door_UNB && door_state == 2) continue;
+            mp_grid_add_rectangle(other.nav_grid,
+                bbox_left - _wall_padding, bbox_top - _wall_padding,
+                bbox_right + _wall_padding, bbox_bottom + _wall_padding);
+        }
+    }
+    nav_grid_dirty = false;
+};
+
+
 
 // =====================================
 // KNOCKBACK/ GLOBAL OR UNIQUE DPENDING ON YOUR NEEDS

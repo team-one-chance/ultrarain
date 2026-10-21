@@ -149,11 +149,11 @@ if (_player.player_collider_short)
 
     _player.image_xscale = 1;
 }
-    /*_player.phy_speed_x = _transfer.velocity_x;
+    _player.phy_speed_x = _transfer.velocity_x;
     _player.phy_speed_y = _transfer.velocity_y;
     _player.phy_fixed_rotation = true;
     _player.hacking_controller = noone;
-    _player.pinned_coin = noone;*/
+    _player.pinned_coin = noone;
 
     // Replace this room's old player attachments with the incoming ones.
     with (o_ChipAttachment)
@@ -212,6 +212,11 @@ if (_player.player_collider_short)
 
 function seamless_rebuild_room_physics()
 {
+    // Wire sensors are separate objects, not children of o_Block.
+    with (o_Block_wires) wire_bind_physics();
+    with (o_Block_wires_left) wire_bind_physics();
+    with (o_Block_wires_right) wire_bind_physics();
+
     // Walls, floors and surviving breakable blocks.
     with (o_Block)
     {

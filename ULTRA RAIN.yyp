@@ -228,6 +228,7 @@
   },
   "name": "ULTRA RAIN",
   "resources": [
+    {"id":{"name":"o_Checkpoint","path":"objects/o_Checkpoint/o_Checkpoint.yy",},},
     {
       "id": {
         "name": "f_Console",
@@ -587,6 +588,12 @@
         "name": "oMoltenLava",
         "path": "objects/oMoltenLava/oMoltenLava.yy",
       }
+    },
+    {
+      "id": {
+        "name": "oEnemyExplosion",
+        "path": "objects/oEnemyExplosion/oEnemyExplosion.yy",
+      },
     },
     {
       "id": {
@@ -1792,6 +1799,12 @@
       "id": {
         "name": "ts_pwr",
         "path": "tilesets/ts_pwr/ts_pwr.yy",
+      }
+    },
+    {
+      "id": {
+        "name": "o_TutorialCheckpoint",
+        "path": "objects/o_TutorialCheckpoint/o_TutorialCheckpoint.yy",
       }
     },
   ],

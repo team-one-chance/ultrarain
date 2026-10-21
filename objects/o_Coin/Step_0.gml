@@ -43,7 +43,7 @@ if (is_pinned)
 {
     // Pinned coin:
     // ANY contact with level geometry destroys it.
-    if (place_meeting(x, y, o_Block || o_Block_scary))
+    if (place_meeting(x, y, [o_Block, o_Block_scary]))
     {
         instance_destroy();
     }

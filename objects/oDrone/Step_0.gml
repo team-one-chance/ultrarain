@@ -128,6 +128,7 @@ if (!drone_engaged)
 
         if (repath_timer <= 0)
         {
+            nav_refresh();
             var path_found = mp_grid_path(
                 nav_grid,
                 enemy_path,
@@ -258,6 +259,7 @@ if (!drone_engaged)
 
             if (repath_timer <= 0)
             {
+                nav_refresh();
                 var orbit_path_found = mp_grid_path(
                     nav_grid,
                     enemy_path,

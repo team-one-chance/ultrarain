@@ -13,45 +13,50 @@ wire_arcs = [];
 // GET STRETCHED SIZE
 // =====================================
 
-// Fit the fixture to the sprite's collision bounds,
-// accounting for its origin and signed scale.
-var _left =
-    (sprite_get_bbox_left(sprite_index)
-    - sprite_get_xoffset(sprite_index)) * image_xscale;
+// Reuse the exact sensor shape when returning to a persistent room.
+wire_bind_physics = function()
+{
+    // Fit the fixture to the sprite's collision bounds,
+    // accounting for its origin and signed scale.
+    var _left =
+        (sprite_get_bbox_left(sprite_index)
+        - sprite_get_xoffset(sprite_index)) * image_xscale;
 
-var _right =
-    (sprite_get_bbox_right(sprite_index) + 1
-    - sprite_get_xoffset(sprite_index)) * image_xscale;
+    var _right =
+        (sprite_get_bbox_right(sprite_index) + 1
+        - sprite_get_xoffset(sprite_index)) * image_xscale;
 
-var _top =
-    (sprite_get_bbox_top(sprite_index)
-    - sprite_get_yoffset(sprite_index)) * image_yscale;
+    var _top =
+        (sprite_get_bbox_top(sprite_index)
+        - sprite_get_yoffset(sprite_index)) * image_yscale;
 
-var _bottom =
-    (sprite_get_bbox_bottom(sprite_index) + 1
-    - sprite_get_yoffset(sprite_index)) * image_yscale;
+    var _bottom =
+        (sprite_get_bbox_bottom(sprite_index) + 1
+        - sprite_get_yoffset(sprite_index)) * image_yscale;
 
-// One room pixel of extra forgiveness on each edge.
-var _half_w = max(0.5, abs(_right - _left) * 0.5 - 1);
-var _half_h = max(0.5, abs(_bottom - _top) * 0.5 - 1);
+    // One room pixel of extra forgiveness on each edge.
+    var _half_w = max(0.5, abs(_right - _left) * 0.5 - 1);
+    var _half_h = max(0.5, abs(_bottom - _top) * 0.5 - 1);
 
-var fix = physics_fixture_create();
+    var fix = physics_fixture_create();
 
-physics_fixture_set_box_shape(fix, _half_w, _half_h);
-physics_fixture_set_density(fix, 0);
+    physics_fixture_set_box_shape(fix, _half_w, _half_h);
+    physics_fixture_set_density(fix, 0);
 
-// Detect contact without pushing the player or coin away.
-physics_fixture_set_sensor(fix, true);
-physics_fixture_set_collision_group(fix, 0);
+    // Detect contact without pushing the player or coin away.
+    physics_fixture_set_sensor(fix, true);
+    physics_fixture_set_collision_group(fix, 0);
 
-physics_fixture_bind_ext(
-    fix,
-    id,
-    (_left + _right) * 0.5,
-    (_top + _bottom) * 0.5
-);
+    physics_fixture_bind_ext(
+        fix,
+        id,
+        (_left + _right) * 0.5,
+        (_top + _bottom) * 0.5
+    );
 
-physics_fixture_delete(fix);
+    physics_fixture_delete(fix);
+};
+wire_bind_physics();
 
 wire_contact_lights = [];
 
