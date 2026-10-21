@@ -66,7 +66,7 @@
     },
     "name":"s_Player_Run",
     "playback":1,
-    "playbackSpeed":14.0,
+    "playbackSpeed":12.0,
     "playbackSpeedType":0,
     "resourceType":"GMSequence",
     "resourceVersion":"2.0",
