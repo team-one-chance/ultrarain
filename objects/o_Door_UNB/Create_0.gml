@@ -174,6 +174,7 @@ door_close = function()
     }
 
     door_state = 3;
+    with (oDrone) nav_grid_dirty = true;
     world_sfx_play(sfxDoorClose, x, y, 0.75);
     image_index = image_number - 1;
     image_speed = -1;

@@ -1,6 +1,7 @@
 if (break_requested && !broken)
 {
     broken = true;
+    with (oDrone) nav_grid_dirty = true;
     world_sfx_play(sfxDoorBreaking, x, y, 0.8);
 
     var _alarm_player = instance_nearest(x, y, o_Player);
@@ -56,6 +57,11 @@ if (broken)
                 if (instance_exists(_alarm_player))
                 {
                     array_push(_alarm_player.ambush_alarm_enemies, _spawned_enemy);
+                }
+                if (room == LE_TUTORIAL_WIP && ambush_group == 0
+                && instance_exists(o_TutorialCheckpoint))
+                {
+                    array_push(o_TutorialCheckpoint.big_room_enemies, _spawned_enemy);
                 }
 
                 instance_destroy();

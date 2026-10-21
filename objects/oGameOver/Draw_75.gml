@@ -44,10 +44,10 @@ draw_set_color(red);
 draw_rectangle(button_left, button_top, button_right, button_bottom, true);
 draw_set_color(button_hover ? c_black : white);
 draw_text_transformed(centre_x, (button_top + button_bottom) * 0.5,
-    "RESTART", 0.85 * ui_scale, 0.85 * ui_scale, 0);
+    room == LE_TUTORIAL_WIP ? "RETRY" : "RESTART", 0.85 * ui_scale, 0.85 * ui_scale, 0);
 draw_set_color(make_color_rgb(140, 155, 150));
 draw_text_transformed(centre_x, panel_bottom - 14 * ui_scale,
-    "CLICK RESTART / PRESS ENTER", 0.45 * ui_scale, 0.45 * ui_scale, 0);
+    room == LE_TUTORIAL_WIP ? "CLICK RETRY / PRESS ENTER" : "CLICK RESTART / PRESS ENTER", 0.45 * ui_scale, 0.45 * ui_scale, 0);
 
 draw_set_font(old_font);
 draw_set_color(old_colour);

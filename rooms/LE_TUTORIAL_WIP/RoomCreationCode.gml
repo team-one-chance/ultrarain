@@ -1,5 +1,7 @@
 physics_world_update_speed(180);
 
+instance_create_layer(0, 0, "Instances", o_TutorialCheckpoint);
+
 // Keep the tall wire wall quiet until its top platform is reached.
 // Lab03's upper doorway is under the sign at (4128, 736), beside the wire wall.
 with (o_Player)
