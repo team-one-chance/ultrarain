@@ -80,7 +80,7 @@ else
 }
 /*
 // Destroy when touching an enemy
-if (place_meeting(x, y, oEnemy_TEMP))
+if (place_meeting(x, y, oEnemy_Scout))
 {
     instance_destroy();
 }
