@@ -146,7 +146,7 @@ menu_actions = function()
     {
         case 1: return [1, 2, 3, 4, 99];
         case 2: return [5, 6, 7, 8, 9, 99];
-        case 3: return [20, 21, 22, 23, 24, 99];
+        case 3: return [20, 25, 21, 22, 23, 24, 99];
         case 4: return [30, 31, 34, 33, 36, 35, 32, 99];
         case 5: return [0, 99];
     }
@@ -175,11 +175,12 @@ menu_label = function(_action)
         case 9: return "Restart room";
         case 10: return "Close menu";
 		case 11: return "Freecam [F6]: " + (global.dev_freecam ? "ON" : "OFF");
-        case 20: return "Spawn grunt at captured cursor";
+        case 20: return "Spawn scout at captured cursor";
         case 21: return "Spawn drone at captured cursor";
         case 22: return "Spawn miniboss at captured cursor";
         case 23: return "Freeze enemy AI: " + (global.dev_freeze_enemies ? "ON" : "OFF");
         case 24: return "Clear all enemies";
+        case 25: return "Spawn scout (mini) at captured cursor";
         case 30: return "Simulation pause [F4]: " + (time_paused ? "ON" : "OFF");
         case 31: return "Advance one frame [F5]";
         case 32: return "Speed: 100%" + (time_rate == 1 ? " (selected)" : "");
@@ -285,9 +286,10 @@ run_action = function(_action)
             room_persistent = false;
             room_restart();
             return;
-        case 20: instance_create_depth(cursor_position[0], cursor_position[1], 0, oEnemy_TEMP); break;
+        case 20: instance_create_depth(cursor_position[0], cursor_position[1], 0, oEnemy_Scout); break;
         case 21: instance_create_depth(cursor_position[0], cursor_position[1], 0, oDrone); break;
         case 22: instance_create_depth(cursor_position[0], cursor_position[1], 0, oMiniBoss); break;
+        case 25: instance_create_depth(cursor_position[0], cursor_position[1], 0, oEnemy_Scout_mini); break;
         case 24:
             with (oEnemyParent) instance_destroy();
             with (oEnemyDroneBullet) instance_destroy();
