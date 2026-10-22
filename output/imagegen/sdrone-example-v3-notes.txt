@@ -1,0 +1,7 @@
+Asset: sDroneExampleV3
+Native size: 62 x 41 pixels (29.17% wider and 28.125% taller than 48 x 32).
+Generation: built-in image_gen, using the current sDrone frame as design reference.
+Final conversion: nearest-neighbor reduction, mirrored native pixels, 10-color palette,
+opaque silhouette with a one-pixel boundary, straight beam highlights, mirrored
+fasteners, and brighter two-pixel red eyes. Transparent exterior.
+The repeatable native-pixel finishing source is refine-drone-v3.ps1.

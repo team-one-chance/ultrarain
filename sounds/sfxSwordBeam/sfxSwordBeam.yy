@@ -14,8 +14,8 @@
   "exportDir":"",
   "name":"sfxSwordBeam",
   "parent":{
-    "name":"SFX",
-    "path":"folders/SFX.yy",
+    "name":"SwordGun",
+    "path":"folders/SFX/sfxPlayer/SwordGun.yy",
   },
   "preload":false,
   "resourceType":"GMSound",

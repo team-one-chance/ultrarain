@@ -14,8 +14,8 @@
   "exportDir":"",
   "name":"sfxInitBG",
   "parent":{
-    "name":"sfxInit",
-    "path":"folders/SFX/sfxInit.yy",
+    "name":"sfxInitialize",
+    "path":"folders/SFX/sfxInitialize.yy",
   },
   "preload":false,
   "resourceType":"GMSound",

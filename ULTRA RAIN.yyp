@@ -124,6 +124,17 @@
     },
     {
       "$GMFolder": "",
+      "%Name": "sfxInitialize",
+      "folderPath": "folders/SFX/sfxInitialize.yy",
+      "name": "sfxInitialize",
+      "resourceType": "GMFolder",
+      "resourceVersion": "2.0",
+    },
+    {
+      "$GMFolder": "",
+      "%Name": "sfxPlayer",
+      "folderPath": "folders/SFX/sfxPlayer.yy",
+      "name": "sfxPlayer",
       "%Name": "shaders",
       "folderPath": "folders/shaders.yy",
       "name": "shaders",
@@ -132,6 +143,9 @@
     },
     {
       "$GMFolder": "",
+      "%Name": "SwordGun",
+      "folderPath": "folders/SFX/sfxPlayer/SwordGun.yy",
+      "name": "SwordGun",
       "%Name": "Sprites",
       "folderPath": "folders/Sprites.yy",
       "name": "Sprites",
@@ -140,6 +154,9 @@
     },
     {
       "$GMFolder": "",
+      "%Name": "shaders",
+      "folderPath": "folders/shaders.yy",
+      "name": "shaders",
       "%Name": "Sprite",
       "folderPath": "folders/Sprites/Sprite.yy",
       "name": "Sprite",
@@ -148,6 +165,9 @@
     },
     {
       "$GMFolder": "",
+      "%Name": "Sprites",
+      "folderPath": "folders/Sprites.yy",
+      "name": "Sprites",
       "%Name": "Enemies",
       "folderPath": "folders/Sprites/Sprite/Enemies.yy",
       "name": "Enemies",
@@ -156,6 +176,9 @@
     },
     {
       "$GMFolder": "",
+      "%Name": "Sprite",
+      "folderPath": "folders/Sprites/Sprite.yy",
+      "name": "Sprite",
       "%Name": "Scout",
       "folderPath": "folders/Sprites/Sprite/Enemies/Scout.yy",
       "name": "Scout",
@@ -843,6 +866,24 @@
     },
     {
       "id": {
+        "name": "sfxDroneDeath",
+        "path": "sounds/sfxDroneDeath/sfxDroneDeath.yy",
+      }
+    },
+    {
+      "id": {
+        "name": "sfxDroneHit",
+        "path": "sounds/sfxDroneHit/sfxDroneHit.yy",
+      }
+    },
+    {
+      "id": {
+        "name": "sfxDroneShoot",
+        "path": "sounds/sfxDroneShoot/sfxDroneShoot.yy",
+      }
+    },
+    {
+      "id": {
         "name": "sfxDropperHatchOpen",
         "path": "sounds/sfxDropperHatchOpen/sfxDropperHatchOpen.yy",
       }
@@ -1079,6 +1120,12 @@
       "id": {
         "name": "sfxWallSlide",
         "path": "sounds/sfxWallSlide/sfxWallSlide.yy",
+      }
+    },
+    {
+      "id": {
+        "name": "Ari",
+        "path": "sprites/Ari/Ari.yy",
       }
     },
     {
@@ -1467,6 +1514,12 @@
     },
     {
       "id": {
+        "name": "Sam",
+        "path": "sprites/Sam/Sam.yy",
+      }
+    },
+    {
+      "id": {
         "name": "sBasherBody",
         "path": "sprites/sBasherBody/sBasherBody.yy",
       }
@@ -1505,6 +1558,18 @@
       "id": {
         "name": "sDrone",
         "path": "sprites/sDrone/sDrone.yy",
+      }
+    },
+    {
+      "id": {
+        "name": "sDroneBeta",
+        "path": "sprites/sDroneBeta/sDroneBeta.yy",
+      }
+    },
+    {
+      "id": {
+        "name": "sDroneMoreFrames",
+        "path": "sprites/sDroneMoreFrames/sDroneMoreFrames.yy",
       }
     },
     {
@@ -1803,6 +1868,14 @@
     },
     {
       "id": {
+        "name": "oDroneExplosion",
+        "path": "objects/oDroneExplosion/oDroneExplosion.yy",
+      }
+    },
+    {
+      "id": {
+        "name": "oDroneWreckage",
+        "path": "objects/oDroneWreckage/oDroneWreckage.yy",
         "name": "o_TutorialCheckpoint",
         "path": "objects/o_TutorialCheckpoint/o_TutorialCheckpoint.yy",
       }
@@ -1811,6 +1884,12 @@
   "resourceType": "GMProject",
   "resourceVersion": "2.0",
   "RoomOrderNodes": [
+    {
+      "roomId": {
+        "name": "TESTING",
+        "path": "rooms/TESTING/TESTING.yy",
+      }
+    },
     {
       "roomId": {
         "name": "LE_MENU",
@@ -1842,14 +1921,7 @@
       }
     },
     {
-      "children": [
-        {
-          "roomId": {
-            "name": "TESTING",
-            "path": "rooms/TESTING/TESTING.yy",
-          }
-        },
-      ],
+      "children": [],
       "groupName": "testing_ALWAYS_LAST",
     }
   ],
