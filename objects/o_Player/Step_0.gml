@@ -1,4 +1,7 @@
 // Track actual movement so pushing against a wall does not make footsteps.
+gun_reticle_flash_timer = max(0, gun_reticle_flash_timer
+    - (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) / 1000000);
+
 var _footstep_moved = abs(x - footstep_last_x) > 0.1;
 footstep_last_x = x;
 
@@ -2053,6 +2056,7 @@ if (weapon_type == "pistol")
         );
 
         weapon_fire_timer = pistol_cooldown * chip_attack_multiplier();
+        gun_reticle_flash_timer = gun_reticle_flash_duration;
     }
 }
 else if (weapon_type == "sword")

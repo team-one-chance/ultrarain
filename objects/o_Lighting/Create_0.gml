@@ -71,6 +71,7 @@ player_bloom_feather = 0.04;
 player_bloom_min_brightness = 0.45;
 lava_bloom_strength = 1.0; // Independent of the subtle scene bloom strength.
 lava_bloom_radius = 12;
+lava_bloom_occluder_layer = "dark_outsidevent";
 bloom_threshold = 0.55;
 bloom_strength = 0.30;
 bloom_radius = 4;
@@ -197,6 +198,31 @@ draw_light_cone = function(_lamp, _config, _brightness = 1)
             }
         }
         draw_primitive_end();
+    }
+};
+
+// Draw black through the cover's alpha to attenuate only the lava bloom buffer.
+// The caller supplies the world camera and normal alpha blending.
+draw_lava_bloom_occluder = function()
+{
+    var _layer = layer_get_id(lava_bloom_occluder_layer);
+    if (_layer == -1) return;
+    if (!layer_get_visible(_layer)) return;
+
+    var _elements = layer_get_all_elements(_layer);
+    var _offset_x = layer_get_x(_layer);
+    var _offset_y = layer_get_y(_layer);
+    for (var _i = 0; _i < array_length(_elements); _i++)
+    {
+        var _element = _elements[_i];
+        if (layer_get_element_type(_element) != layerelementtype_sprite) continue;
+        var _sprite = layer_sprite_get_sprite(_element);
+        if (_sprite == -1) continue;
+        draw_sprite_ext(_sprite, layer_sprite_get_index(_element),
+            _offset_x + layer_sprite_get_x(_element),
+            _offset_y + layer_sprite_get_y(_element),
+            layer_sprite_get_xscale(_element), layer_sprite_get_yscale(_element),
+            layer_sprite_get_angle(_element), c_black, layer_sprite_get_alpha(_element));
     }
 };
 

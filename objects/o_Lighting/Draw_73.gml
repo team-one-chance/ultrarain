@@ -378,6 +378,8 @@ if (bloom_enabled && (bloom_strength > 0 || scout_bloom_strength > 0 || player_b
                         image_xscale, image_yscale, image_angle, image_blend, image_alpha);
                 }
             }
+            // Covered lava must not generate a halo outside the cover.
+            draw_lava_bloom_occluder();
             surface_reset_target();
 
             gpu_set_blendmode_ext(bm_one, bm_zero);
@@ -397,6 +399,10 @@ if (bloom_enabled && (bloom_strength > 0 || scout_bloom_strength > 0 || player_b
             shader_set_uniform_f(bloom_step_uniform, 0, max(0, lava_bloom_radius) * 0.5 / _vh);
             draw_surface_stretched(bloom_surface_b, 0, 0, _bw, _bh);
             shader_reset();
+            // Clip blur spill as well, respecting the cover's live visibility and alpha.
+            gpu_set_blendmode(bm_normal);
+            camera_apply(_cam);
+            draw_lava_bloom_occluder();
             surface_reset_target();
 
             matrix_set(matrix_world, _world);
