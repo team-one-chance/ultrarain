@@ -320,3 +320,40 @@ draw_set_valign(weapons_old_valign);
 chip_draw_player_hud();
 
 item_draw_hud(id);
+
+// Draw above world lighting so the gun crosshair stays clear in every room.
+var _show_gun_reticle = (weapon_type == "pistol" || weapon_type == "sword")
+&& pHP > 0 && !grinder_dying
+&& hacking_controller == noone
+&& !(variable_global_exists("dev_freecam") && global.dev_freecam)
+&& !(variable_global_exists("basher_tuner_capture_mouse") && global.basher_tuner_capture_mouse);
+window_set_cursor(_show_gun_reticle ? cr_none : cr_default);
+if (_show_gun_reticle)
+{
+    var _reticle_old_color = draw_get_color();
+    var _reticle_old_alpha = draw_get_alpha();
+    var _rx = device_mouse_x_to_gui(0);
+    var _ry = device_mouse_y_to_gui(0);
+    var _flash = clamp(gun_reticle_flash_timer / gun_reticle_flash_duration, 0, 1);
+    // Perfect-apex ricochets trigger Bullet Flash and deserve a stronger hit cue.
+    var _bullet_flash = perfect_apex_flash_timer > 0;
+    var _bullet_pulse = clamp(perfect_apex_flash_timer / perfect_apex_flash_duration, 0, 1);
+    var _size = gun_reticle_radius * max(1 + _flash, 1 + 2 * _bullet_pulse);
+    var _gap = _size * 0.3;
+    var _reticle_color = _bullet_flash ? c_white
+        : (_flash > 0 ? c_yellow : make_color_rgb(0, 186, 225));
+    var _outline_color = _bullet_flash ? c_red : c_black;
+
+    draw_set_alpha(1);
+    for (var _pass = 0; _pass < 2; _pass++)
+    {
+        draw_set_color(_pass == 0 ? _outline_color : _reticle_color);
+        var _width = _pass == 0 ? (_bullet_flash ? 6 : 4) : (_bullet_flash ? 3 : 2);
+        draw_line_width(_rx - _size, _ry, _rx - _gap, _ry, _width);
+        draw_line_width(_rx + _gap, _ry, _rx + _size, _ry, _width);
+        draw_line_width(_rx, _ry - _size, _rx, _ry - _gap, _width);
+        draw_line_width(_rx, _ry + _gap, _rx, _ry + _size, _width);
+    }
+    draw_set_alpha(_reticle_old_alpha);
+    draw_set_color(_reticle_old_color);
+}

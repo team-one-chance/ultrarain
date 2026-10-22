@@ -15,6 +15,7 @@ if (variable_global_exists("dev_freeze_enemies") && global.dev_freeze_enemies) e
 // =====================================
 
 var dt = (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) / 1000000;
+drone_shot_flash_timer = max(0, drone_shot_flash_timer - dt);
 var slam_locked = enemy_slam_step(dt);
 var player = instance_nearest(
     x,

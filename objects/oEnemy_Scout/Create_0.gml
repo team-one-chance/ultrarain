@@ -253,6 +253,29 @@ scout_stop_timer = 0;
 scout_facing = 1;
 scout_stun_elapsed = 0;
 scout_was_stunned = false;
+scout_roll_sound = -1;
+scout_charge_sound = -1;
+scout_stop_charge_sound = function()
+{
+    if (scout_charge_sound != -1)
+    {
+        audio_stop_sound(scout_charge_sound);
+        scout_charge_sound = -1;
+    }
+};
+scout_stop_roll_sound = function()
+{
+    if (scout_roll_sound != -1)
+    {
+        audio_stop_sound(scout_roll_sound);
+        scout_roll_sound = -1;
+    }
+};
+scout_walk_sounds = [sfxScoutWalk1, sfxScoutWalk2, sfxScoutWalk3, sfxScoutWalk4];
+scout_footstep_index = -1;
+scout_last_walk_sound_index = -1;
+scout_walk_sound_repeat_count = 0;
+scout_attack_sound_cycle = -1;
 scout_animation_duration = function(_sprite)
 {
     var _fps = sprite_get_speed(_sprite);
@@ -276,6 +299,9 @@ scout_animation_finished = function(_sprite)
 scout_base_take_damage = take_damage;
 take_damage = function(_damage, _knockback_dir = 0, _knockback_force = 0, _is_sword = false)
 {
+    var _hp_before = ehp;
+    // Stop this Scout's roll cue immediately when the sword parries its charge.
+    if (_is_sword && attack_state == 3) scout_stop_roll_sound();
     // Every hit restarts the reaction, including hits during ouch itself.
     // Higher-priority actions consume the hit without queuing a later reaction.
     scout_hit_pending = !is_climbing && attack_state != 3 && attack_state != 4
@@ -289,6 +315,12 @@ take_damage = function(_damage, _knockback_dir = 0, _knockback_force = 0, _is_sw
     }
     scout_base_take_damage(_damage, _knockback_dir,
         is_climbing ? 0 : _knockback_force, _is_sword);
+    if (instance_exists(id) && ehp > 0 && ehp < _hp_before
+        && !(attack_state == 5 && stun_timer > 0)
+        && slam_stun_timer <= 0 && slam_knockback_timer <= 0)
+    {
+        world_sfx_play(sfxScoutHit, x, y);
+    }
 };
 
 // Match the planted bite's visible bounds, independently of animation frames.

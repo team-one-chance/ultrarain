@@ -2,7 +2,7 @@
   "$GMSprite":"v2",
   "%Name":"sDrone_hit",
   "bboxMode":1,
-  "bbox_bottom":31,
+  "bbox_bottom":37,
   "bbox_left":0,
   "bbox_right":54,
   "bbox_top":0,
@@ -25,7 +25,7 @@
   ],
   "gridX":32,
   "gridY":32,
-  "height":32,
+  "height":38,
   "HTile":false,
   "layers":[
     {"$GMImageLayer":"","%Name":"3309fd67-64cd-4b4d-83b0-5fff8e9ab60e","blendMode":0,"displayName":"Layer 1","isLocked":false,"name":"3309fd67-64cd-4b4d-83b0-5fff8e9ab60e","opacity":100.0,"resourceType":"GMImageLayer","resourceVersion":"2.0","visible":true,},

@@ -290,6 +290,7 @@ freeze_world = function()
         if (id != other.id) array_push(other.paused_instances, id);
     physics_pause_enable(true);
     instance_deactivate_all(true);
+    window_set_cursor(cr_default);
     world_frozen = true;
 };
 
