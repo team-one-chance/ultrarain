@@ -4,7 +4,7 @@
   "bboxMode":1,
   "bbox_bottom":31,
   "bbox_left":0,
-  "bbox_right":31,
+  "bbox_right":54,
   "bbox_top":0,
   "collisionKind":1,
   "collisionTolerance":0,
@@ -12,14 +12,24 @@
   "edgeFiltering":false,
   "For3D":false,
   "frames":[
-    {"$GMSpriteFrame":"v1","%Name":"725cf497-a994-45de-978b-a3f99ce7d67f","name":"725cf497-a994-45de-978b-a3f99ce7d67f","resourceType":"GMSpriteFrame","resourceVersion":"2.0",},
+    {"$GMSpriteFrame":"v1","%Name":"f92be74a-6ace-4ac4-8f18-1ada21f975f9","name":"f92be74a-6ace-4ac4-8f18-1ada21f975f9","resourceType":"GMSpriteFrame","resourceVersion":"2.0",},
+    {"$GMSpriteFrame":"v1","%Name":"1a395995-f9dd-4217-b2a5-39f43bc86c5b","name":"1a395995-f9dd-4217-b2a5-39f43bc86c5b","resourceType":"GMSpriteFrame","resourceVersion":"2.0",},
+    {"$GMSpriteFrame":"v1","%Name":"52446570-64ee-44ce-84fb-69790443d01b","name":"52446570-64ee-44ce-84fb-69790443d01b","resourceType":"GMSpriteFrame","resourceVersion":"2.0",},
+    {"$GMSpriteFrame":"v1","%Name":"88ee7306-d7ba-4213-9c09-9ed477180af6","name":"88ee7306-d7ba-4213-9c09-9ed477180af6","resourceType":"GMSpriteFrame","resourceVersion":"2.0",},
+    {"$GMSpriteFrame":"v1","%Name":"f1faadf6-a8e5-42f3-adba-3a0928684f89","name":"f1faadf6-a8e5-42f3-adba-3a0928684f89","resourceType":"GMSpriteFrame","resourceVersion":"2.0",},
+    {"$GMSpriteFrame":"v1","%Name":"629a9cfe-9ea3-4d29-b1de-0050303145ea","name":"629a9cfe-9ea3-4d29-b1de-0050303145ea","resourceType":"GMSpriteFrame","resourceVersion":"2.0",},
+    {"$GMSpriteFrame":"v1","%Name":"7f22eb1e-c647-4f30-aab1-1f0770f2fa9d","name":"7f22eb1e-c647-4f30-aab1-1f0770f2fa9d","resourceType":"GMSpriteFrame","resourceVersion":"2.0",},
+    {"$GMSpriteFrame":"v1","%Name":"0132b6ff-75c7-4f7a-a0a8-6cb88e63fc76","name":"0132b6ff-75c7-4f7a-a0a8-6cb88e63fc76","resourceType":"GMSpriteFrame","resourceVersion":"2.0",},
+    {"$GMSpriteFrame":"v1","%Name":"c5acd5bd-c6f4-4f90-a6df-7edf63625ad5","name":"c5acd5bd-c6f4-4f90-a6df-7edf63625ad5","resourceType":"GMSpriteFrame","resourceVersion":"2.0",},
+    {"$GMSpriteFrame":"v1","%Name":"acb74b3c-6763-43f4-8e75-4dcaf4a42caa","name":"acb74b3c-6763-43f4-8e75-4dcaf4a42caa","resourceType":"GMSpriteFrame","resourceVersion":"2.0",},
   ],
   "gridX":32,
   "gridY":32,
   "height":32,
   "HTile":false,
   "layers":[
-    {"$GMImageLayer":"","%Name":"d34cc90a-ee94-4e53-801c-514e46b7aa0c","blendMode":0,"displayName":"default","isLocked":false,"name":"d34cc90a-ee94-4e53-801c-514e46b7aa0c","opacity":100.0,"resourceType":"GMImageLayer","resourceVersion":"2.0","visible":true,},
+    {"$GMImageLayer":"","%Name":"3309fd67-64cd-4b4d-83b0-5fff8e9ab60e","blendMode":0,"displayName":"Layer 1","isLocked":false,"name":"3309fd67-64cd-4b4d-83b0-5fff8e9ab60e","opacity":100.0,"resourceType":"GMImageLayer","resourceVersion":"2.0","visible":true,},
+    {"$GMImageLayer":"","%Name":"509fdf7e-1ef0-41c5-9420-1ae3b88857bf","blendMode":0,"displayName":"Shield","isLocked":false,"name":"509fdf7e-1ef0-41c5-9420-1ae3b88857bf","opacity":100.0,"resourceType":"GMImageLayer","resourceVersion":"2.0","visible":true,},
   ],
   "name":"sDrone_hit",
   "nineSlice":{
@@ -68,7 +78,7 @@
     },
     "eventStubScript":null,
     "eventToFunction":{},
-    "length":1.0,
+    "length":10.0,
     "lockOrigin":false,
     "moments":{
       "$KeyframeStore<MomentsEventKeyframe>":"",
@@ -88,8 +98,35 @@
     "tracks":[
       {"$GMSpriteFramesTrack":"","builtinName":0,"events":[],"inheritsTrackColour":true,"interpolation":1,"isCreationTrack":false,"keyframes":{"$KeyframeStore<SpriteFrameKeyframe>":"","Keyframes":[
             {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{
-                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"725cf497-a994-45de-978b-a3f99ce7d67f","path":"sprites/sDrone_hit/sDrone_hit.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
-              },"Disabled":false,"id":"13736c9e-267a-46c8-b799-97d2b2d06944","IsCreationKey":false,"Key":0.0,"Length":1.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
+                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"f92be74a-6ace-4ac4-8f18-1ada21f975f9","path":"sprites/sDrone_hit/sDrone_hit.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
+              },"Disabled":false,"id":"f870eacb-fdb6-4d79-a9ce-9f589a484725","IsCreationKey":false,"Key":0.0,"Length":1.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
+            {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{
+                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"1a395995-f9dd-4217-b2a5-39f43bc86c5b","path":"sprites/sDrone_hit/sDrone_hit.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
+              },"Disabled":false,"id":"c53805ab-5193-4c51-8a9c-d3057a2c5ac4","IsCreationKey":false,"Key":1.0,"Length":1.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
+            {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{
+                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"52446570-64ee-44ce-84fb-69790443d01b","path":"sprites/sDrone_hit/sDrone_hit.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
+              },"Disabled":false,"id":"25b013d0-04ce-4d53-80ad-75892d7b3aff","IsCreationKey":false,"Key":2.0,"Length":1.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
+            {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{
+                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"88ee7306-d7ba-4213-9c09-9ed477180af6","path":"sprites/sDrone_hit/sDrone_hit.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
+              },"Disabled":false,"id":"c29b070a-85ae-491b-b507-996435c2a5c0","IsCreationKey":false,"Key":3.0,"Length":1.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
+            {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{
+                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"f1faadf6-a8e5-42f3-adba-3a0928684f89","path":"sprites/sDrone_hit/sDrone_hit.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
+              },"Disabled":false,"id":"f257b0f0-5e42-42dd-b721-de9fa4cb5cda","IsCreationKey":false,"Key":4.0,"Length":1.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
+            {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{
+                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"629a9cfe-9ea3-4d29-b1de-0050303145ea","path":"sprites/sDrone_hit/sDrone_hit.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
+              },"Disabled":false,"id":"16e98959-6c42-4ad4-94ba-dd48648ca4f3","IsCreationKey":false,"Key":5.0,"Length":1.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
+            {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{
+                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"7f22eb1e-c647-4f30-aab1-1f0770f2fa9d","path":"sprites/sDrone_hit/sDrone_hit.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
+              },"Disabled":false,"id":"9085b70b-c276-4f1f-8df3-8772ffdc72c7","IsCreationKey":false,"Key":6.0,"Length":1.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
+            {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{
+                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"0132b6ff-75c7-4f7a-a0a8-6cb88e63fc76","path":"sprites/sDrone_hit/sDrone_hit.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
+              },"Disabled":false,"id":"d060b3fa-3b94-4c1f-8c43-0a9e6e9648e1","IsCreationKey":false,"Key":7.0,"Length":1.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
+            {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{
+                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"c5acd5bd-c6f4-4f90-a6df-7edf63625ad5","path":"sprites/sDrone_hit/sDrone_hit.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
+              },"Disabled":false,"id":"86b310dc-d0d1-4a05-9dee-70a0d49e4aaa","IsCreationKey":false,"Key":8.0,"Length":1.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
+            {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{
+                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"acb74b3c-6763-43f4-8e75-4dcaf4a42caa","path":"sprites/sDrone_hit/sDrone_hit.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
+              },"Disabled":false,"id":"d5caa2e1-bbb8-451a-99a7-7b87ef581a4d","IsCreationKey":false,"Key":9.0,"Length":1.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
           ],"resourceType":"KeyframeStore<SpriteFrameKeyframe>","resourceVersion":"2.0",},"modifiers":[],"name":"frames","resourceType":"GMSpriteFramesTrack","resourceVersion":"2.0","spriteId":null,"trackColour":0,"tracks":[],"traits":0,},
     ],
     "visibleRange":null,
@@ -105,5 +142,5 @@
   },
   "type":0,
   "VTile":false,
-  "width":32,
+  "width":55,
 }

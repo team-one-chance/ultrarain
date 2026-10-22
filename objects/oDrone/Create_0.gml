@@ -68,6 +68,8 @@ drone_fire_shot = function()
     var _sx = (bbox_left + bbox_right) * 0.5;
     var _sy = (bbox_top + bbox_bottom) * 0.5;
 
+    world_sfx_play(sfxDroneShoot, _sx, _sy);
+
     var _trace = drone_trace(
         _sx, _sy,
         drone_shot_angle,
@@ -136,6 +138,8 @@ take_damage = function(
     _is_sword = false
 )
 {
+    var _hp_before = ehp;
+
     if (_damage > 0)
     {
         drone_shot_pause_timer = max(
@@ -150,6 +154,11 @@ take_damage = function(
         _knockback_force,
         _is_sword
     );
+
+    if (instance_exists(id) && ehp > 0 && ehp < _hp_before)
+    {
+        world_sfx_play(sfxDroneHit, x, y);
+    }
 };
 
 drone_frame_start_x = x;
