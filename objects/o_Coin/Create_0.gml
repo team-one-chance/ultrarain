@@ -1,3 +1,4 @@
+depth = o_Player.depth -1;
 split_threshold = 0.75;
 
 // Play once whenever a coin is thrown.

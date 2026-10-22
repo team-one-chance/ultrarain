@@ -19,7 +19,61 @@ if (world_frozen && surface_exists(paused_surface))
     draw_surface_stretched(paused_surface, 0, 0, _gw, _gh);
 }
 
-if (opened)
+if (opened && map_open)
+{
+    draw_set_color(make_color_rgb(12, 16, 22));
+    draw_rectangle(0, 0, _gw, _gh, false);
+    var _layout = map_layout();
+    var _ox = _layout.x - map_center_x * _layout.scale;
+    var _oy = _layout.y - map_center_y * _layout.scale;
+    map_bake_cache();
+    draw_set_color(make_color_rgb(30, 36, 44));
+    draw_rectangle(_ox, _oy, _ox + room_width * _layout.scale, _oy + room_height * _layout.scale, false);
+    if (map_cache_ready && surface_exists(map_cache_surface))
+    {
+        draw_set_color(c_white);
+        draw_surface_ext(map_cache_surface,
+            _ox + map_bounds[0] * _layout.scale, _oy + map_bounds[1] * _layout.scale,
+            _layout.scale / map_cache_scale, _layout.scale / map_cache_scale, 0, c_white, 1);
+    }
+    draw_set_color(c_gray);
+    draw_rectangle(_ox, _oy, _ox + room_width * _layout.scale, _oy + room_height * _layout.scale, true);
+    if (!is_undefined(map_player))
+    {
+        var _px = _ox + map_player[0] * _layout.scale;
+        var _py = _oy + map_player[1] * _layout.scale;
+        draw_set_color(c_black);
+        draw_circle(_px, _py, 7, false);
+        draw_set_color(c_aqua);
+        draw_circle(_px, _py, 5, false);
+    }
+    var _mx = device_mouse_x_to_gui(0);
+    var _my = device_mouse_y_to_gui(0);
+    var _tx = (_mx - _ox) / _layout.scale;
+    var _ty = (_my - _oy) / _layout.scale;
+    var _valid = _tx >= 0 && _tx < room_width && _ty >= 0 && _ty < room_height;
+    draw_set_color(_valid ? c_aqua : c_gray);
+    draw_line(_mx - 8, _my, _mx + 8, _my);
+    draw_line(_mx, _my - 8, _mx, _my + 8);
+    draw_set_color(make_color_rgb(20, 24, 32));
+    draw_rectangle(0, 0, _gw, 80, false);
+    draw_rectangle(0, _gh - 32, _gw, _gh, false);
+    gpu_set_texfilter(true);
+    var _ts = min(0.65, _gw / 1100);
+    draw_set_color(c_aqua);
+    draw_text_transformed(16, 10, "TELEPORT MAP / " + room_get_name(room), _ts, _ts, 0);
+    draw_set_color(c_white);
+    draw_text_transformed(16, 36, "Scroll zoom | Middle drag | Home fit | R rebuild | Esc back | F1 close", _ts, _ts, 0);
+    var _map_status = "Preparing map... (Esc to cancel)";
+    if (map_cache_ready)
+    {
+        if (is_undefined(map_player)) _map_status = "No player in this room";
+        else _map_status = "Click to teleport | " + string(floor(_tx)) + ", " + string(floor(_ty))
+            + " | Zoom " + string(round(map_zoom * 100)) + "%";
+    }
+    draw_text_transformed(16, _gh - 28, _map_status, _ts, _ts, 0);
+}
+else if (opened)
 {
     draw_set_color(c_black);
     draw_set_alpha(0.65);

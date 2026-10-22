@@ -118,10 +118,37 @@ function seamless_restore(_player, _arrival, _transfer)
                 variable_instance_get(_player, _name) + _shift_y);
     }
 
-    // Rebuild with this room's fixture handle, never the old room's handle.
-    _player.player_set_collider(_player.player_collider_short);
-    _player.phy_position_x = _arrival.x + _transfer.player_offset_x;
-    _player.phy_position_y = _arrival.y + _transfer.player_offset_y;
+// Arrive with the short body first, then check the destination.
+var _arrive_short =
+    _player.player_collider_short || _player.is_sliding;
+
+_player.player_set_collider(true);
+
+_player.phy_position_x =
+    _arrival.x + _transfer.player_offset_x;
+
+_player.phy_position_y =
+    _arrival.y + _transfer.player_offset_y;
+
+if (!_arrive_short && _player.player_can_stand())
+{
+    _player.player_set_collider(false);
+}
+
+// Match the arrival pose before the first Draw event.
+if (_player.player_collider_short)
+{
+    var _facing = _player.slide_direction;
+
+    if (_facing == 0) _facing = _player.aim_facing;
+    if (_facing == 0) _facing = 1;
+
+    _player.sprite_index = _facing > 0
+        ? s_Player_Slide_Right
+        : s_Player_Slide_Left;
+
+    _player.image_xscale = 1;
+}
     _player.phy_speed_x = _transfer.velocity_x;
     _player.phy_speed_y = _transfer.velocity_y;
     _player.phy_fixed_rotation = true;
@@ -185,6 +212,11 @@ function seamless_restore(_player, _arrival, _transfer)
 
 function seamless_rebuild_room_physics()
 {
+    // Wire sensors are separate objects, not children of o_Block.
+    with (o_Block_wires) wire_bind_physics();
+    with (o_Block_wires_left) wire_bind_physics();
+    with (o_Block_wires_right) wire_bind_physics();
+
     // Walls, floors and surviving breakable blocks.
     with (o_Block)
     {

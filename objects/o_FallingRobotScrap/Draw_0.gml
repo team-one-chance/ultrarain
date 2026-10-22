@@ -1,4 +1,30 @@
 // Render the rotated sprite into a small transparent buffer, then crop it.
+if (keyboard_check_pressed(vk_f8))
+{
+    var _lava = instance_nearest(x, y, oMoltenLava);
+    var _lava_front = instance_nearest(x, y, oLavaFromTheMolten);
+
+    show_debug_message(
+        "SCRAP DRAW"
+        + " | state=" + string(scrap_state)
+        + " | depth=" + string(depth)
+        + " | normal=" + string(scrap_normal_depth)
+    );
+
+    if (instance_exists(_lava))
+    {
+        show_debug_message(
+            "LAVA depth=" + string(_lava.depth)
+        );
+    }
+
+    if (instance_exists(_lava_front))
+    {
+        show_debug_message(
+            "LAVA FRONT depth=" + string(_lava_front.depth)
+        );
+    }
+}
 // This retains its rotation while the lava progressively hides the body.
 if (!surface_exists(scrap_surface)) scrap_surface = surface_create(128, 128);
 if (!surface_exists(scrap_surface)) exit;

@@ -40,6 +40,7 @@ take_damage = function(_damage)
     if (block_hp > 0) return;
 
     broken = true;
+    with (oDrone) nav_grid_dirty = true;
 
     var _layer = layer_get_id(vent_cover_layer);
 

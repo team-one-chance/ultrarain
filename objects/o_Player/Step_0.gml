@@ -426,86 +426,117 @@ var mantle_held =
 
 if (!on_ground
 && !is_ledge_climbing
+&& !is_sliding
 && wall_jump_lock_time <= 0
 && coyote_timer <= 0)
 {
-    // ---------------------------------
-    // LEFT LEDGE
-    // ---------------------------------
+    var _mantle_direction = 0;
+    var _mantle_block = noone;
+    var _mantle_floor = 0;
 
-    // Must hold W AND move toward the wall.
-    if (left_ledge
-   // && mantle_held
-    && move < 0)
+    if (left_ledge && move < 0)
     {
-        is_ledge_climbing = true;
-
-        ledge_direction = -1;
-        ledge_climb_timer = 0;
-
-        ledge_start_x = phy_position_x;
-        ledge_start_y = phy_position_y;
-
-        // Move left onto platform
-        ledge_target_x =
-            phy_position_x
-            - ledge_climb_forward;
-
-        // Keeping your current mantle target
-        // behaviour for now.
-        ledge_target_y =
-            left_wall_lower.bbox_top
-            - ground_check_y_offset;
-
-        phy_speed_x = 0;
-        phy_speed_y = 0;
-
-        is_slamming = false;
-        is_sliding = false;
-
-        slide_direction = 0;
-        slide_exit_timer = 0;
-
-        image_index = 0;
+        _mantle_direction = -1;
+        _mantle_block = left_block;
+        _mantle_floor = left_ledge_top;
+    }
+    else if (right_ledge && move > 0)
+    {
+        _mantle_direction = 1;
+        _mantle_block = right_block;
+        _mantle_floor = right_ledge_top;
     }
 
-
-    // ---------------------------------
-    // RIGHT LEDGE
-    // ---------------------------------
-
-    else if (right_ledge
-   // && mantle_held
-    && move > 0)
+    if (instance_exists(_mantle_block))
     {
-        is_ledge_climbing = true;
+        // Preserve the normal mantle destination by default.
+        var _target_x = phy_position_x
+            + _mantle_direction * ledge_climb_forward;
 
-        ledge_direction = 1;
+        var _target_y =
+            _mantle_floor - ground_check_y_offset;
+
+        var _vent_entry = false;
+
+        var _entrance_edge = _mantle_direction > 0
+            ? _mantle_block.bbox_left
+            : _mantle_block.bbox_right;
+
+        // Search inward for a supported position where the ENTIRE
+        // 59 x 27 slide body fits. Stop at the first clear position.
+        for (var _inset = 31; _inset <= 96; _inset++)
+        {
+            var _test_x = _entrance_edge
+                + _mantle_direction * _inset;
+
+            // Feet sit one pixel above the platform.
+            var _test_y = _mantle_floor - 1;
+
+            // Match the fixture's actual horizontal offset of +0.5.
+            var _short_clear = collision_rectangle(
+                _test_x - 29,
+                _test_y - 27,
+                _test_x + 30,
+                _test_y,
+                o_Block,
+                false,
+                true
+            ) == noone;
+
+            var _supported = collision_point(
+                _test_x,
+                _mantle_floor + 1,
+                o_Block,
+                false,
+                true
+            ) != noone;
+
+            if (!_short_clear || !_supported) continue;
+
+            var _standing_blocked = collision_rectangle(
+                _test_x - 13,
+                _test_y - 59,
+                _test_x + 14,
+                _test_y - 28,
+                o_Block,
+                false,
+                true
+            ) != noone;
+
+            if (_standing_blocked)
+            {
+                _vent_entry = true;
+                _target_x = _test_x;
+                _target_y = _test_y;
+            }
+
+            break;
+        }
+
+        is_ledge_climbing = true;
+        ledge_direction = _mantle_direction;
         ledge_climb_timer = 0;
 
         ledge_start_x = phy_position_x;
         ledge_start_y = phy_position_y;
 
-        // Move right onto platform
-        ledge_target_x =
-            phy_position_x
-            + ledge_climb_forward;
+        ledge_target_x = _target_x;
+        ledge_target_y = _target_y;
 
-        // Keeping your current mantle target
-        // behaviour for now.
-        ledge_target_y =
-            right_wall_lower.bbox_top
-            - ground_check_y_offset;
+        if (_vent_entry)
+        {
+            player_set_collider(true);
+        }
 
         phy_speed_x = 0;
         phy_speed_y = 0;
 
         is_slamming = false;
         is_sliding = false;
+        is_mantle_lunging = false;
 
         slide_direction = 0;
         slide_exit_timer = 0;
-
         image_index = 0;
     }
 }
@@ -518,6 +549,22 @@ if (!on_ground
 
 if (is_ledge_climbing)
 {
+    // Check headroom at the mantle destination before moving there.
+    var _mantle_needs_slide = collision_rectangle(
+        ledge_target_x - 13,
+        ledge_target_y - 59,
+        ledge_target_x + 13,
+        ledge_target_y - 28,
+        o_Block,
+        false,
+        true
+    ) != noone;
+
+    if (_mantle_needs_slide && !player_collider_short)
+    {
+        player_set_collider(true);
+    }
+
     // Prevent normal movement from pulling us down
     phy_speed_x = 0;
     phy_speed_y = 0;
@@ -565,35 +612,57 @@ if (is_ledge_climbing)
     // PHASE 2 - MOVE ONTO PLATFORM
     // =================================
 
+else
+{
+    if (_mantle_needs_slide)
+    {
+        // Change the body BEFORE teleporting into the vent.
+        player_set_collider(true);
+
+        is_sliding = true;
+        is_mantle_lunging = false;
+        slide_direction = ledge_direction;
+        slide_exit_timer = 0;
+
+        sprite_index = slide_direction > 0
+            ? s_Player_Slide_Right
+            : s_Player_Slide_Left;
+
+        image_xscale = 1;
+        image_index = 0;
+
+        // Direct teleport. No movement through the wall.
+        phy_position_x = ledge_target_x;
+        phy_position_y = ledge_target_y;
+
+        phy_speed_x = 0;
+        phy_speed_y = 0;
+
+        // Run the existing low-exit completion below.
+        climb_progress = 1;
+    }
     else
     {
-        var forward_progress =
-            (climb_progress - 0.6)
-            / 0.4;
+        // Normal mantle keeps its animated forward movement.
+        var forward_progress = clamp(
+            (climb_progress - 0.6) / 0.4,
+            0,
+            1
+        );
 
         forward_progress =
-            clamp(
-                forward_progress,
-                0,
-                1
-            );
-
-        // Smoothstep
-        forward_progress =
-            forward_progress
-            * forward_progress
+            forward_progress * forward_progress
             * (3 - 2 * forward_progress);
 
-        phy_position_y =
-            ledge_target_y;
+        phy_position_y = ledge_target_y;
 
-        phy_position_x =
-            lerp(
-                ledge_start_x,
-                ledge_target_x,
-                forward_progress
-            );
+        phy_position_x = lerp(
+            ledge_start_x,
+            ledge_target_x,
+            forward_progress
+        );
     }
+}
 
 
     // =================================
@@ -627,10 +696,34 @@ if (is_ledge_climbing)
         // It does not matter which side
         // the ledge was on.
 
-        if (keyboard_check(ord("W"))
-        && move != 0)
-        {
-            is_mantle_lunging = true;
+// Low exits become a slide, regardless of Ctrl input.
+if (_mantle_needs_slide || !player_can_stand())
+{
+    player_set_collider(true);
+
+    is_sliding = true;
+    is_mantle_lunging = false;
+    is_slamming = false;
+
+    slide_direction = ledge_direction;
+    slide_exit_timer = 0;
+
+    dash_active = false;
+    dash_direction = 0;
+    dash_current_speed = 0;
+    dash_burst_timer = 0;
+
+    phy_speed_x =
+        slide_direction * _chip_move_speed * slide_speed_multiplier;
+
+    phy_speed_y = 0;
+    on_ground = true;
+    coyote_timer = 0;
+}
+else if (keyboard_check(ord("W"))
+&& move != 0)
+{
+    is_mantle_lunging = true;
             audio_play_sound(sfxJump, 1, false);
 
             mantle_lunge_direction =
@@ -681,75 +774,97 @@ if (is_ledge_climbing)
 // =====================================
 // SLIDING INPUT
 // =====================================
+// =====================================
+// SLIDING INPUT / EXIT / COLLIDER
+// =====================================
 
-var slide_held =
-    keyboard_check(vk_control);
+var slide_held = keyboard_check(vk_control);
 
+var _slide_check_direction = is_sliding
+    ? slide_direction
+    : move;
 
-// Don't start sliding during a mantle
+// Check at the short body's centre height.
+// Its horizontal half-width is approximately 30 pixels.
+var _slide_wall_blocked = false;
+
+if (_slide_check_direction != 0)
+{
+    _slide_wall_blocked = collision_line(
+        x,
+        y - 13,
+        x + _slide_check_direction * 31,
+        y - 13,
+        o_Block,
+        false,
+        true
+    ) != noone;
+}
+
+// Start only while grounded and with space ahead.
 if (!is_sliding
 && !is_ledge_climbing
 && slide_held
 && on_ground
-&& move != 0)
+&& move != 0
+&& !_slide_wall_blocked)
 {
     is_sliding = true;
-	if (!player_collider_short)
-{
     player_set_collider(true);
-}
-	
-	dash_active = false;
-	dash_direction = 0;
-	dash_current_speed = 0;
-	dash_burst_timer = 0;
+
+    dash_active = false;
+    dash_direction = 0;
+    dash_current_speed = 0;
+    dash_burst_timer = 0;
 
     slide_direction = move;
-
     slide_exit_timer = 0;
 }
 
-
-
-// =====================================
-// SLIDE EXIT
-// =====================================
-
+// Airborne movement or a wall ends the active slide.
+// A low ceiling can still require the short body afterward.
 if (is_sliding)
 {
-if (!slide_held)
+var _can_stand_now = player_can_stand();
+
+var _stop_slide =
+    _slide_wall_blocked
+    || (_can_stand_now && (!on_ground || !slide_held));
+
+if (_stop_slide)
 {
-    // Only stand up if there is actually room.
-    if (player_can_stand())
-    {
-        is_sliding = false;
+    show_debug_message(
+        "SLIDE CANCEL"
+        + " | airborne=" + string(!on_ground)
+        + " | wall=" + string(_slide_wall_blocked)
+        + " | ctrl=" + string(slide_held)
+        + " | can_stand=" + string(player_can_stand())
+        + " | direction=" + string(slide_direction)
+    );
+
+    is_sliding = false;
         slide_direction = 0;
         slide_exit_timer = 0;
 
-        player_set_collider(false);
+        if (_slide_wall_blocked)
+        {
+            phy_speed_x = 0;
+        }
     }
 }
 
-else if (!on_ground)
+// Keep the collider and pose consistent even after slide cancellation.
+if (is_sliding)
 {
-    is_sliding = false;
-    slide_direction = 0;
-    slide_exit_timer = 0;
-
-    if (player_collider_short
-    && player_can_stand())
+    if (!player_collider_short)
     {
-        player_set_collider(false);
+        player_set_collider(true);
     }
 }
-
-    else
-    {
-        slide_exit_timer = 0;
-    }
+else if (player_collider_short && player_can_stand())
+{
+    player_set_collider(false);
 }
-
-
 // =====================================
 // WALL-JUMP CONTROL LOCK TIMER
 // =====================================
@@ -812,19 +927,19 @@ sprite_index = s_Player_wallHold_Right;
     }
 }
 
-else if (is_sliding)
+else if (player_collider_short)
 {
-    if (slide_direction == 1)
-    {
-        sprite_index = s_Player_Slide_Right;
-        image_xscale = 1;
-    }
+    var _low_facing = is_sliding
+        ? slide_direction
+        : aim_facing;
 
-    else if (slide_direction == -1)
-    {
-        sprite_index = s_Player_Slide_Left;
-        image_xscale = 1;
-    }
+    if (_low_facing == 0) _low_facing = 1;
+
+    sprite_index = _low_facing > 0
+        ? s_Player_Slide_Right
+        : s_Player_Slide_Left;
+
+    image_xscale = 1;
 }
 
 
@@ -1472,6 +1587,8 @@ if (!on_ground
 && wall_holding
 && coyote_timer <= 0
 && !is_slamming
+&& !is_sliding
+&& !player_collider_short
 && wall_jump_lock_time <= 0)
 {
     // Start wall slide when falling

@@ -42,6 +42,70 @@ if (!opened)
     exit;
 }
 
+if (map_open)
+{
+    if (keyboard_check_pressed(vk_escape) || keyboard_check_pressed(vk_backspace))
+    {
+        map_open = false;
+        exit;
+    }
+    if (keyboard_check_pressed(ord("R"))) map_rebuild();
+    if (!map_scan_ready) map_update_scan();
+    if (!map_cache_ready || !surface_exists(map_cache_surface)) exit;
+    var _mx = device_mouse_x_to_gui(0);
+    var _my = device_mouse_y_to_gui(0);
+    var _layout = map_layout();
+    var _inside = _mx >= 0 && _mx < display_get_gui_width()
+        && _my >= 80 && _my < display_get_gui_height() - 32;
+    if (keyboard_check_pressed(vk_home))
+    {
+        map_zoom = 1;
+        map_center_x = (map_bounds[0] + map_bounds[2]) * 0.5;
+        map_center_y = (map_bounds[1] + map_bounds[3]) * 0.5;
+    }
+    else if (_inside)
+    {
+        var _wheel = mouse_wheel_up() - mouse_wheel_down();
+        if (_wheel != 0)
+        {
+            var _anchor_x = map_center_x + (_mx - _layout.x) / _layout.scale;
+            var _anchor_y = map_center_y + (_my - _layout.y) / _layout.scale;
+            map_zoom = clamp(map_zoom * power(map_zoom_step, _wheel), 1, map_zoom_max);
+            _layout = map_layout();
+            map_center_x = _anchor_x - (_mx - _layout.x) / _layout.scale;
+            map_center_y = _anchor_y - (_my - _layout.y) / _layout.scale;
+        }
+        if (mouse_check_button(mb_middle))
+        {
+            map_center_x -= (_mx - map_mouse_x) / _layout.scale;
+            map_center_y -= (_my - map_mouse_y) / _layout.scale;
+        }
+    }
+    map_mouse_x = _mx;
+    map_mouse_y = _my;
+    _layout = map_layout();
+    var _tx = map_center_x + (_mx - _layout.x) / _layout.scale;
+    var _ty = map_center_y + (_my - _layout.y) / _layout.scale;
+    if (_inside && _tx >= 0 && _tx < room_width && _ty >= 0 && _ty < room_height
+        && mouse_check_button_pressed(mb_left) && !is_undefined(map_player))
+    {
+        thaw_world();
+        teleport_player([_tx, _ty]);
+        // Return from freecam and frame the destination immediately.
+        global.dev_freecam = false;
+        freecam_restore_layers();
+        var _cam = view_camera[0];
+        if (_cam != -1)
+            camera_set_view_pos(_cam,
+                clamp(_tx - camera_get_view_width(_cam) * 0.5, 0, max(0, room_width - camera_get_view_width(_cam))),
+                clamp(_ty - camera_get_view_height(_cam) / 1.4, 0, max(0, room_height - camera_get_view_height(_cam))));
+        resume_game();
+        update_time();
+        update_enemy_freeze();
+    }
+    exit;
+}
+
 if (keyboard_check_pressed(vk_escape) || keyboard_check_pressed(vk_backspace) || keyboard_check_pressed(vk_left))
 {
     if (page != 0) { page = 0; selected = 0; }

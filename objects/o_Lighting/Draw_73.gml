@@ -98,7 +98,8 @@ with (o_HitscanVisual)
     if (emissive) draw_emissive_streak();
 }
 // Extract bright scene pixels, blur horizontally and vertically, then add the glow.
-if (bloom_enabled && bloom_strength > 0 && surface_exists(application_surface)
+if (bloom_enabled && (bloom_strength > 0 || scout_bloom_strength > 0 || player_bloom_strength > 0 || lava_bloom_strength > 0)
+&& surface_exists(application_surface)
 && shader_is_compiled(sh_BloomExtract) && shader_is_compiled(sh_BloomBlur))
 {
     var _bw = max(1, ceil(surface_get_width(application_surface) * clamp(bloom_resolution, 0.125, 1)));
@@ -135,6 +136,7 @@ if (bloom_enabled && bloom_strength > 0 && surface_exists(application_surface)
         if (bloom_scene_enabled)
         {
             shader_set(sh_BloomExtract);
+            shader_set_uniform_f(bloom_gain_uniform, 1);
             shader_set_uniform_f(bloom_threshold_uniform, clamp(bloom_threshold, 0, 0.99));
             draw_surface_stretched(application_surface, 0, 0, _bw, _bh);
             shader_reset();
@@ -226,6 +228,128 @@ if (bloom_enabled && bloom_strength > 0 && surface_exists(application_surface)
         gpu_set_blendmode(bm_add);
         draw_set_alpha(clamp(bloom_strength, 0, 1));
         draw_surface_stretched(bloom_surface_a, _cx, _cy, _vw, _vh);
+        // Separate Scout glow: gain is applied AFTER blur, independently of scene bloom.
+        if (instance_exists(oEnemy_Scout) && scout_bloom_strength > 0)
+        {
+            draw_set_alpha(1);
+            draw_set_color(c_white);
+            gpu_set_blendmode(bm_normal);
+            surface_set_target(bloom_surface_a);
+            camera_apply(bloom_camera);
+            draw_clear_alpha(c_black, 1);
+            shader_set(sh_BloomExtract);
+            shader_set_uniform_f(bloom_gain_uniform, 1);
+            shader_set_uniform_f(bloom_threshold_uniform, clamp(scout_bloom_threshold, 0, 0.99));
+            gpu_set_texfilter(false);
+            with (oEnemy_Scout)
+            {
+                var _source_x = (bbox_left + bbox_right) * 0.5
+                    - scout_facing * sprite_get_width(sprite_index) * scout_scale * 0.5;
+                var _source_y = bbox_bottom + 1 - sprite_get_height(sprite_index) * scout_scale;
+                draw_sprite_ext(sprite_index, image_index,
+                    (_source_x - _renderer.bloom_view_x) * _renderer.bloom_scale_x,
+                    (_source_y - _renderer.bloom_view_y) * _renderer.bloom_scale_y,
+                    scout_facing * scout_scale * _renderer.bloom_scale_x,
+                    scout_scale * _renderer.bloom_scale_y,
+                    image_angle, image_blend,
+                    image_alpha);
+            }
+            gpu_set_texfilter(true);
+            shader_reset();
+            surface_reset_target();
+
+            gpu_set_blendmode_ext(bm_one, bm_zero);
+            surface_set_target(bloom_surface_b);
+            camera_apply(bloom_camera);
+            draw_clear_alpha(c_black, 1);
+            shader_set(sh_BloomBlur);
+            shader_set_uniform_f(bloom_step_uniform, max(0, scout_bloom_radius) * 0.5 / _vw, 0);
+            draw_surface_stretched(bloom_surface_a, 0, 0, _bw, _bh);
+            shader_reset();
+            surface_reset_target();
+
+            surface_set_target(bloom_surface_a);
+            camera_apply(bloom_camera);
+            draw_clear_alpha(c_black, 1);
+            shader_set(sh_BloomBlur);
+            shader_set_uniform_f(bloom_step_uniform, 0, max(0, scout_bloom_radius) * 0.5 / _vh);
+            draw_surface_stretched(bloom_surface_b, 0, 0, _bw, _bh);
+            shader_reset();
+            surface_reset_target();
+
+            matrix_set(matrix_world, _world);
+            matrix_set(matrix_view, _view);
+            matrix_set(matrix_projection, _projection);
+            gpu_set_blendmode(bm_add);
+            draw_set_alpha(1);
+            shader_set(sh_BloomExtract);
+            // All pixels pass; this draw only applies unclamped RGB gain.
+            shader_set_uniform_f(bloom_threshold_uniform, -1);
+            shader_set_uniform_f(bloom_gain_uniform, max(0, scout_bloom_strength));
+            draw_surface_stretched(bloom_surface_a, _cx, _cy, _vw, _vh);
+            shader_reset();
+        }
+        // Select cyan pixels from the exact head/IK rig pose drawn in the world.
+        if (instance_exists(o_Player) && player_bloom_strength > 0
+        && shader_is_compiled(sh_PlayerGlowExtract))
+        {
+            draw_set_alpha(1);
+            draw_set_color(c_white);
+            gpu_set_blendmode(bm_normal);
+            surface_set_target(bloom_surface_a);
+            camera_apply(bloom_camera);
+            draw_clear_alpha(c_black, 1);
+            // Use the world camera because the player Draw event uses room coordinates.
+            camera_apply(_cam);
+            shader_set(sh_PlayerGlowExtract);
+            shader_set_uniform_f(player_glow_color_uniform,
+                color_get_red(player_bloom_color) / 255,
+                color_get_green(player_bloom_color) / 255,
+                color_get_blue(player_bloom_color) / 255);
+            shader_set_uniform_f(player_glow_tolerance_uniform, max(0, player_bloom_tolerance));
+            shader_set_uniform_f(player_glow_feather_uniform, max(0.001, player_bloom_feather));
+            shader_set_uniform_f(player_glow_brightness_uniform, clamp(player_bloom_min_brightness, 0, 0.99));
+            gpu_set_texfilter(false);
+            with (o_Player)
+            {
+                // Draw_0 only calculates and renders the pose; it advances no gameplay state.
+                if (visible) event_perform(ev_draw, 0);
+            }
+            gpu_set_texfilter(true);
+            shader_reset();
+            surface_reset_target();
+
+            gpu_set_blendmode_ext(bm_one, bm_zero);
+            surface_set_target(bloom_surface_b);
+            camera_apply(bloom_camera);
+            draw_clear_alpha(c_black, 1);
+            shader_set(sh_BloomBlur);
+            shader_set_uniform_f(bloom_step_uniform, max(0, player_bloom_radius) * 0.5 / _vw, 0);
+            draw_surface_stretched(bloom_surface_a, 0, 0, _bw, _bh);
+            shader_reset();
+            surface_reset_target();
+
+            surface_set_target(bloom_surface_a);
+            camera_apply(bloom_camera);
+            draw_clear_alpha(c_black, 1);
+            shader_set(sh_BloomBlur);
+            shader_set_uniform_f(bloom_step_uniform, 0, max(0, player_bloom_radius) * 0.5 / _vh);
+            draw_surface_stretched(bloom_surface_b, 0, 0, _bw, _bh);
+            shader_reset();
+            surface_reset_target();
+
+            matrix_set(matrix_world, _world);
+            matrix_set(matrix_view, _view);
+            matrix_set(matrix_projection, _projection);
+            gpu_set_blendmode(bm_add);
+            draw_set_alpha(1);
+            shader_set(sh_BloomExtract);
+            // All pixels pass; this draw only applies unclamped RGB gain.
+            shader_set_uniform_f(bloom_threshold_uniform, -1);
+            shader_set_uniform_f(bloom_gain_uniform, max(0, player_bloom_strength));
+            draw_surface_stretched(bloom_surface_a, _cx, _cy, _vw, _vh);
+            shader_reset();
+        }
         // Reuse the bloom buffers for a separate, stronger lava-only glow.
         if (instance_exists(oLavaFromTheMolten) && lava_bloom_strength > 0)
         {

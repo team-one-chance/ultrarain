@@ -86,7 +86,7 @@ function coin_ricochet(
         // THIS COIN'S SHOT COUNT
         // =================================
 
-        var _coin_shot_count = 2;
+        var _coin_shot_count = 1;
 
         var _coin_y_speed =
             abs(_current_coin.phy_speed_y);
@@ -95,7 +95,7 @@ function coin_ricochet(
         // PERFECT APEX
         if (_coin_y_speed <= _perfect_threshold)
         {
-            _coin_shot_count = 5;
+            _coin_shot_count = 4;
             _chain_perfect_apex = true;
 			_current_damage += 8
 
@@ -106,7 +106,7 @@ function coin_ricochet(
         // NORMAL APEX
         else if (_coin_y_speed <= _split_threshold)
         {
-            _coin_shot_count = 3;
+            _coin_shot_count = 2;
 			_current_damage += 5
         }
 

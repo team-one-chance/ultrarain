@@ -1,6 +1,6 @@
 // Place one controller per room. enabled and ambient_color are editor properties.
 // Ambient channels: 255 = original scene brightness.
-depth = -13000;
+depth = -250;
 // Cone rendering mode is configured here.
 cone_shader_enabled = true;
 cone_dither_strength = 1;
@@ -59,6 +59,16 @@ bloom_enabled = true;
 bloom_scene_enabled = false; // Broad lit surfaces otherwise create a foggy wash.
 lamp_bloom_strength = 0.65;
 terminal_bloom_strength = 0.5;
+scout_bloom_strength = 1.5; // Independent glow gain after blur; values above 1 amplify.
+scout_bloom_radius = 2; // Tighter halo keeps the red details readable.
+scout_bloom_threshold = 0.55; // Keep the dark body out of the glow buffer.
+// Player cyan accents: match hue, preserving the original sharp rig rendering.
+player_bloom_strength = 2.0; // Independent post-blur gain; 0 disables.
+player_bloom_radius = 0.5; // Tight halo around the thin face strip and arm accent.
+player_bloom_color = make_color_rgb(0, 186, 225);
+player_bloom_tolerance = 0.08;
+player_bloom_feather = 0.04;
+player_bloom_min_brightness = 0.45;
 lava_bloom_strength = 1.0; // Independent of the subtle scene bloom strength.
 lava_bloom_radius = 12;
 bloom_threshold = 0.55;
@@ -72,7 +82,12 @@ bloom_camera = -1;
 bloom_surface_a = -1;
 bloom_surface_b = -1;
 bloom_threshold_uniform = shader_get_uniform(sh_BloomExtract, "u_threshold");
+bloom_gain_uniform = shader_get_uniform(sh_BloomExtract, "u_gain");
 bloom_step_uniform = shader_get_uniform(sh_BloomBlur, "u_step");
+player_glow_color_uniform = shader_get_uniform(sh_PlayerGlowExtract, "u_glow_color");
+player_glow_tolerance_uniform = shader_get_uniform(sh_PlayerGlowExtract, "u_tolerance");
+player_glow_feather_uniform = shader_get_uniform(sh_PlayerGlowExtract, "u_feather");
+player_glow_brightness_uniform = shader_get_uniform(sh_PlayerGlowExtract, "u_min_brightness");
 // N switches between normal rendering and the preferred pixelation size.
 pixelation_enabled = true;
 pixelation_size = 1.0;

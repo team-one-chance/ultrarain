@@ -116,9 +116,9 @@
     },
     {
       "$GMFolder": "",
-      "%Name": "sfxEnemy",
-      "folderPath": "folders/SFX/sfxEnemy.yy",
-      "name": "sfxEnemy",
+      "%Name": "sfxInit",
+      "folderPath": "folders/SFX/sfxInit.yy",
+      "name": "sfxInit",
       "resourceType": "GMFolder",
       "resourceVersion": "2.0",
     },
@@ -135,19 +135,6 @@
       "%Name": "sfxPlayer",
       "folderPath": "folders/SFX/sfxPlayer.yy",
       "name": "sfxPlayer",
-      "resourceType": "GMFolder",
-      "resourceVersion": "2.0",
-    },
-    {
-      "$GMFolder": "",
-      "%Name": "SwordGun",
-      "folderPath": "folders/SFX/sfxPlayer/SwordGun.yy",
-      "name": "SwordGun",
-      "resourceType": "GMFolder",
-      "resourceVersion": "2.0",
-    },
-    {
-      "$GMFolder": "",
       "%Name": "shaders",
       "folderPath": "folders/shaders.yy",
       "name": "shaders",
@@ -156,6 +143,9 @@
     },
     {
       "$GMFolder": "",
+      "%Name": "SwordGun",
+      "folderPath": "folders/SFX/sfxPlayer/SwordGun.yy",
+      "name": "SwordGun",
       "%Name": "Sprites",
       "folderPath": "folders/Sprites.yy",
       "name": "Sprites",
@@ -164,9 +154,34 @@
     },
     {
       "$GMFolder": "",
+      "%Name": "shaders",
+      "folderPath": "folders/shaders.yy",
+      "name": "shaders",
       "%Name": "Sprite",
       "folderPath": "folders/Sprites/Sprite.yy",
       "name": "Sprite",
+      "resourceType": "GMFolder",
+      "resourceVersion": "2.0",
+    },
+    {
+      "$GMFolder": "",
+      "%Name": "Sprites",
+      "folderPath": "folders/Sprites.yy",
+      "name": "Sprites",
+      "%Name": "Enemies",
+      "folderPath": "folders/Sprites/Sprite/Enemies.yy",
+      "name": "Enemies",
+      "resourceType": "GMFolder",
+      "resourceVersion": "2.0",
+    },
+    {
+      "$GMFolder": "",
+      "%Name": "Sprite",
+      "folderPath": "folders/Sprites/Sprite.yy",
+      "name": "Sprite",
+      "%Name": "Scout",
+      "folderPath": "folders/Sprites/Sprite/Enemies/Scout.yy",
+      "name": "Scout",
       "resourceType": "GMFolder",
       "resourceVersion": "2.0",
     },
@@ -236,6 +251,7 @@
   },
   "name": "ULTRA RAIN",
   "resources": [
+    {"id":{"name":"o_Checkpoint","path":"objects/o_Checkpoint/o_Checkpoint.yy",},},
     {
       "id": {
         "name": "f_Console",
@@ -538,8 +554,14 @@
     },
     {
       "id": {
-        "name": "oEnemy_TEMP",
-        "path": "objects/oEnemy_TEMP/oEnemy_TEMP.yy",
+        "name": "oEnemy_Scout_mini",
+        "path": "objects/oEnemy_Scout_mini/oEnemy_Scout_mini.yy",
+      }
+    },
+    {
+      "id": {
+        "name": "oEnemy_Scout",
+        "path": "objects/oEnemy_Scout/oEnemy_Scout.yy",
       }
     },
     {
@@ -589,6 +611,12 @@
         "name": "oMoltenLava",
         "path": "objects/oMoltenLava/oMoltenLava.yy",
       }
+    },
+    {
+      "id": {
+        "name": "oEnemyExplosion",
+        "path": "objects/oEnemyExplosion/oEnemyExplosion.yy",
+      },
     },
     {
       "id": {
@@ -780,6 +808,12 @@
       "id": {
         "name": "sh_ItemOutline",
         "path": "shaders/sh_ItemOutline/sh_ItemOutline.yy",
+      }
+    },
+    {
+      "id": {
+        "name": "sh_PlayerGlowExtract",
+        "path": "shaders/sh_PlayerGlowExtract/sh_PlayerGlowExtract.yy",
       }
     },
     {
@@ -1384,6 +1418,78 @@
     },
     {
       "id": {
+        "name": "s_Scout_attack",
+        "path": "sprites/s_Scout_attack/s_Scout_attack.yy",
+      }
+    },
+    {
+      "id": {
+        "name": "s_Scout_attackEnter",
+        "path": "sprites/s_Scout_attackEnter/s_Scout_attackEnter.yy",
+      }
+    },
+    {
+      "id": {
+        "name": "s_Scout_charge",
+        "path": "sprites/s_Scout_charge/s_Scout_charge.yy",
+      }
+    },
+    {
+      "id": {
+        "name": "s_Scout_chargeStop",
+        "path": "sprites/s_Scout_chargeStop/s_Scout_chargeStop.yy",
+      }
+    },
+    {
+      "id": {
+        "name": "s_Scout_climb",
+        "path": "sprites/s_Scout_climb/s_Scout_climb.yy",
+      }
+    },
+    {
+      "id": {
+        "name": "s_Scout_idle",
+        "path": "sprites/s_Scout_idle/s_Scout_idle.yy",
+      }
+    },
+    {
+      "id": {
+        "name": "s_Scout_ouch",
+        "path": "sprites/s_Scout_ouch/s_Scout_ouch.yy",
+      }
+    },
+    {
+      "id": {
+        "name": "s_Scout_roll",
+        "path": "sprites/s_Scout_roll/s_Scout_roll.yy",
+      }
+    },
+    {
+      "id": {
+        "name": "s_Scout_stun",
+        "path": "sprites/s_Scout_stun/s_Scout_stun.yy",
+      }
+    },
+    {
+      "id": {
+        "name": "s_Scout_stunEnter",
+        "path": "sprites/s_Scout_stunEnter/s_Scout_stunEnter.yy",
+      }
+    },
+    {
+      "id": {
+        "name": "s_Scout_stunExit",
+        "path": "sprites/s_Scout_stunExit/s_Scout_stunExit.yy",
+      }
+    },
+    {
+      "id": {
+        "name": "s_Scout_walk",
+        "path": "sprites/s_Scout_walk/s_Scout_walk.yy",
+      }
+    },
+    {
+      "id": {
         "name": "s_SecurityCamera",
         "path": "sprites/s_SecurityCamera/s_SecurityCamera.yy",
       }
@@ -1770,6 +1876,8 @@
       "id": {
         "name": "oDroneWreckage",
         "path": "objects/oDroneWreckage/oDroneWreckage.yy",
+        "name": "o_TutorialCheckpoint",
+        "path": "objects/o_TutorialCheckpoint/o_TutorialCheckpoint.yy",
       }
     },
   ],
