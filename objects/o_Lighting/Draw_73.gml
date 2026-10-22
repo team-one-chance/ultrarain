@@ -228,8 +228,8 @@ if (bloom_enabled && (bloom_strength > 0 || scout_bloom_strength > 0 || player_b
         gpu_set_blendmode(bm_add);
         draw_set_alpha(clamp(bloom_strength, 0, 1));
         draw_surface_stretched(bloom_surface_a, _cx, _cy, _vw, _vh);
-        // Separate Scout glow: gain is applied AFTER blur, independently of scene bloom.
-        if (instance_exists(oEnemy_Scout) && scout_bloom_strength > 0)
+        // Shared Scout/Drone glow: gain is applied AFTER blur, independently of scene bloom.
+        if ((instance_exists(oEnemy_Scout) || instance_exists(oDrone)) && scout_bloom_strength > 0)
         {
             draw_set_alpha(1);
             draw_set_color(c_white);
@@ -251,6 +251,17 @@ if (bloom_enabled && (bloom_strength > 0 || scout_bloom_strength > 0 || player_b
                     (_source_y - _renderer.bloom_view_y) * _renderer.bloom_scale_y,
                     scout_facing * scout_scale * _renderer.bloom_scale_x,
                     scout_scale * _renderer.bloom_scale_y,
+                    image_angle, image_blend,
+                    image_alpha);
+            }
+            with (oDrone)
+            {
+                // Match the sprite pose drawn by oEnemyParent, including attack shake.
+                draw_sprite_ext(sprite_index, image_index,
+                    (x + attack_shake_x - _renderer.bloom_view_x) * _renderer.bloom_scale_x,
+                    (y + attack_shake_y - _renderer.bloom_view_y) * _renderer.bloom_scale_y,
+                    image_xscale * _renderer.bloom_scale_x,
+                    image_yscale * _renderer.bloom_scale_y,
                     image_angle, image_blend,
                     image_alpha);
             }
