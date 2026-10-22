@@ -1,5 +1,6 @@
 // Enemy death tuning: compact orange fireball and short-lived metal chips.
 if (!variable_instance_exists(id, "fx_miniboss")) fx_miniboss = false;
+if (!variable_instance_exists(id, "fx_scout_size")) fx_scout_size = 0;
 fx_duration = 0.42;
 fx_flash_duration = 0.09;
 fx_flash_radius = 12;
@@ -15,6 +16,13 @@ fx_launch_scale = 1;
 fx_debris_scale = 1;
 fx_ring_width = 1;
 fx_spark_length = 9;
+
+// The orange fireball (65% of ring radius) reaches 125% of the scout's size.
+if (fx_scout_size > 0)
+{
+    fx_burst_radius = max(fx_burst_radius, fx_scout_size * 1.25 / (2 * 0.65));
+    fx_flash_radius = max(fx_flash_radius, fx_scout_size * 0.32);
+}
 
 // Demo boss finale: larger shockwave and white ignition, without a long sequence.
 if (fx_miniboss)
