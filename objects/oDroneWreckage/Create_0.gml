@@ -7,6 +7,7 @@ if (!variable_instance_exists(id, "wreck_angle")) wreck_angle = 0;
 
 wreck_parts = [];
 wreck_gravity = 520;
+if (!variable_instance_exists(id, "wreck_bounce_limit")) wreck_bounce_limit = 2;
 wreck_tint = make_color_rgb(190, 190, 190);
 
 wreck_blocked = function(_px, _py, _hw, _hh)
@@ -30,7 +31,9 @@ wreck_blocked = function(_px, _py, _hw, _hh)
 
 // Crop only metal/body sections of the approved drone, excluding both jets.
 // Coordinates are relative to its 55 x 32 source canvas.
-var _cuts = [
+if (!variable_instance_exists(id, "wreck_source_width")) wreck_source_width = 55;
+if (!variable_instance_exists(id, "wreck_source_height")) wreck_source_height = 32;
+if (!variable_instance_exists(id, "wreck_cuts")) wreck_cuts = [
     [5, 9, 16, 3],
     [34, 9, 16, 3],
     [21, 9, 13, 3],
@@ -40,15 +43,17 @@ var _sw = sprite_get_width(wreck_sprite);
 var _sh = sprite_get_height(wreck_sprite);
 var _cos = dcos(wreck_angle);
 var _sin = dsin(wreck_angle);
-for (var _i = 0; _i < array_length(_cuts); _i++)
+for (var _i = 0; _i < array_length(wreck_cuts); _i++)
 {
-    var _cut = _cuts[_i];
-    var _left = round(_cut[0] * _sw / 55);
-    var _top = round(_cut[1] * _sh / 32);
-    var _width = max(1, round(_cut[2] * _sw / 55));
-    var _height = max(1, round(_cut[3] * _sh / 32));
-    var _local_x = (_left + _width * 0.5 - sprite_get_xoffset(wreck_sprite)) * wreck_scale_x;
-    var _local_y = (_top + _height * 0.5 - sprite_get_yoffset(wreck_sprite)) * wreck_scale_y;
+    var _cut = wreck_cuts[_i];
+    var _left = round(_cut[0] * _sw / wreck_source_width);
+    var _top = round(_cut[1] * _sh / wreck_source_height);
+    var _width = max(1, round(_cut[2] * _sw / wreck_source_width));
+    var _height = max(1, round(_cut[3] * _sh / wreck_source_height));
+    var _local_x = (array_length(_cut) > 4 ? _cut[4]
+        : _left + _width * 0.5 - sprite_get_xoffset(wreck_sprite)) * wreck_scale_x;
+    var _local_y = (array_length(_cut) > 5 ? _cut[5]
+        : _top + _height * 0.5 - sprite_get_yoffset(wreck_sprite)) * wreck_scale_y;
     array_push(wreck_parts, {
         left: _left, top: _top, width: _width, height: _height,
         px: x + _local_x * _cos + _local_y * _sin,

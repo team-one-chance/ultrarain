@@ -54,7 +54,7 @@ for (var _i = array_length(wreck_parts) - 1; _i >= 0; _i--)
         {
             if (_step_y > 0)
             {
-                if (_part.vy > 60 && _part.bounces < 2)
+                if (_part.vy > 60 && _part.bounces < wreck_bounce_limit)
                 {
                     _part.vy *= -0.2;
                     _part.vx *= 0.6;
