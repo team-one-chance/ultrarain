@@ -9,17 +9,16 @@ if (variable_global_exists("dev_freeze_enemies") && global.dev_freeze_enemies) e
 
 var dt = (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) / 1000000;
 var scout_start_x = x;
+// Count gameplay time even while knockback suppresses the stopping animation.
+scout_parry_grace_timer = attack_state == 4
+    ? max(0, scout_parry_grace_timer - dt) : 0;
 // Count the whole committed roll, even when knockback suppresses normal AI.
 if (attack_state == 3)
 {
     scout_roll_elapsed += dt;
     if (scout_roll_elapsed >= scout_roll_time_limit || !instance_exists(o_Player))
     {
-        attack_state = 4;
-        attack_rocking = false;
-        scout_stop_timer = 0;
-        attack_shake_x = 0;
-        attack_shake_y = 0;
+        scout_finish_roll();
     }
 }
 scout_roll_spacing_timer = max(0, scout_roll_spacing_timer - dt);
@@ -577,8 +576,7 @@ if (player_y_distance <= attack_vertical_tolerance)
                     attack_shake_y = 0;
 
                     attack_rocking = false;
-                    attack_state = 4;
-                    scout_stop_timer = 0;
+                    scout_finish_roll();
                 }
 
                 break;

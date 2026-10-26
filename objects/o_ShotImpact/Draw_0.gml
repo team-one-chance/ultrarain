@@ -1,5 +1,25 @@
 var _old_color = draw_get_color();
 var _old_alpha = draw_get_alpha();
+if (parry_ring_life > 0)
+{
+    var _progress = 1 - parry_ring_life / parry_ring_duration;
+    var _radius = lerp(5, parry_ring_radius, 1 - sqr(1 - _progress));
+    var _fade = sqr(1 - _progress);
+    // Segmented line ring keeps its width independent of draw-circle precision.
+    for (var _segment = 0; _segment < 48; ++_segment)
+    {
+        var _a = _segment * 360 / 48;
+        var _b = (_segment + 1) * 360 / 48;
+        draw_set_color(make_color_rgb(255, 115, 25));
+        draw_set_alpha(_fade * 0.45);
+        draw_line_width(x + lengthdir_x(_radius, _a), y + lengthdir_y(_radius, _a),
+            x + lengthdir_x(_radius, _b), y + lengthdir_y(_radius, _b), 4);
+        draw_set_color(make_color_rgb(255, 225, 145));
+        draw_set_alpha(_fade);
+        draw_line_width(x + lengthdir_x(_radius, _a), y + lengthdir_y(_radius, _a),
+            x + lengthdir_x(_radius, _b), y + lengthdir_y(_radius, _b), 1);
+    }
+}
 if (flash_life > 0)
 {
     draw_set_color(spark_color_start);

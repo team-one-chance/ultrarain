@@ -58,6 +58,9 @@ knockback_y = 0;
 // DAMAGE FUNCTION / GLOBAL
 // =====================================
 
+// Children can extend eligibility without changing the shared damage response.
+can_parry = function() { return attack_state == 3; };
+
 take_damage = function(
     _damage,
     _knockback_dir = 0,
@@ -67,11 +70,21 @@ take_damage = function(
 {
     var final_damage = _damage;
 
-    // STUN PROPERTIES, MUST ALSO SOMEHOW BE APPLIED TO MINIBOSS
-	// UNIQUE TO ENEMYTEMP BUT YOU COULD REUSE IT FOR THE MINIBOSS
-    if (_is_sword && attack_state == 3)
+    if (_is_sword && can_parry())
     {
         final_damage *= parry_damage_multiplier;
+
+        // Emit at the player-facing contact point, before a lethal hit removes us.
+        var _parry_x = (bbox_left + bbox_right) * 0.5;
+        var _parry_y = (bbox_top + bbox_bottom) * 0.5;
+        var _player = instance_nearest(x, y, o_Player);
+        if (_player != noone)
+        {
+            _parry_x = clamp((_player.bbox_left + _player.bbox_right) * 0.5, bbox_left, bbox_right);
+            _parry_y = clamp((_player.bbox_top + _player.bbox_bottom) * 0.5, bbox_top, bbox_bottom);
+        }
+        instance_create_depth(_parry_x, _parry_y, depth - 1, o_ShotImpact,
+            { impact_enemy: true, impact_parry: true, impact_direction: _knockback_dir });
 
         attack_state = 5;
         stun_timer = parry_stun_duration;
