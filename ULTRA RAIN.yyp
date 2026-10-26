@@ -284,6 +284,7 @@
     {"id":{"name":"sBasherLegUpper","path":"sprites/sBasherLegUpper/sBasherLegUpper.yy",},},
     {"id":{"name":"sBasherSteppy","path":"sprites/sBasherSteppy/sBasherSteppy.yy",},},
     {"id":{"name":"sDarkRepulsor","path":"sprites/sDarkRepulsor/sDarkRepulsor.yy",},},
+    {"id":{"name":"sDrone_1","path":"sprites/sDrone_1/sDrone_1.yy",},},
     {"id":{"name":"sDrone_hit","path":"sprites/sDrone_hit/sDrone_hit.yy",},},
     {"id":{"name":"sDrone","path":"sprites/sDrone/sDrone.yy",},},
     {"id":{"name":"sDroneBeta","path":"sprites/sDroneBeta/sDroneBeta.yy",},},
