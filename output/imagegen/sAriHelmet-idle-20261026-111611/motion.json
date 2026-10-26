@@ -1,0 +1,146 @@
+﻿[
+    {
+        "Frame":  0,
+        "Head":  0,
+        "Torso":  0,
+        "Arm":  0
+    },
+    {
+        "Frame":  1,
+        "Head":  0,
+        "Torso":  0,
+        "Arm":  0
+    },
+    {
+        "Frame":  2,
+        "Head":  0,
+        "Torso":  0,
+        "Arm":  0
+    },
+    {
+        "Frame":  3,
+        "Head":  0,
+        "Torso":  0,
+        "Arm":  0
+    },
+    {
+        "Frame":  4,
+        "Head":  0,
+        "Torso":  0,
+        "Arm":  0
+    },
+    {
+        "Frame":  5,
+        "Head":  0,
+        "Torso":  -1,
+        "Arm":  -1
+    },
+    {
+        "Frame":  6,
+        "Head":  0,
+        "Torso":  -1,
+        "Arm":  -1
+    },
+    {
+        "Frame":  7,
+        "Head":  0,
+        "Torso":  -1,
+        "Arm":  -1
+    },
+    {
+        "Frame":  8,
+        "Head":  -1,
+        "Torso":  -1,
+        "Arm":  -1
+    },
+    {
+        "Frame":  9,
+        "Head":  -1,
+        "Torso":  -1,
+        "Arm":  -1
+    },
+    {
+        "Frame":  10,
+        "Head":  -1,
+        "Torso":  -1,
+        "Arm":  -1
+    },
+    {
+        "Frame":  11,
+        "Head":  -1,
+        "Torso":  -1,
+        "Arm":  -1
+    },
+    {
+        "Frame":  12,
+        "Head":  0,
+        "Torso":  -1,
+        "Arm":  -1
+    },
+    {
+        "Frame":  13,
+        "Head":  0,
+        "Torso":  -1,
+        "Arm":  -1
+    },
+    {
+        "Frame":  14,
+        "Head":  0,
+        "Torso":  -1,
+        "Arm":  -1
+    },
+    {
+        "Frame":  15,
+        "Head":  0,
+        "Torso":  0,
+        "Arm":  0
+    },
+    {
+        "Frame":  16,
+        "Head":  0,
+        "Torso":  0,
+        "Arm":  0
+    },
+    {
+        "Frame":  17,
+        "Head":  0,
+        "Torso":  0,
+        "Arm":  0
+    },
+    {
+        "Frame":  18,
+        "Head":  0,
+        "Torso":  0,
+        "Arm":  0
+    },
+    {
+        "Frame":  19,
+        "Head":  0,
+        "Torso":  0,
+        "Arm":  0
+    },
+    {
+        "Frame":  20,
+        "Head":  0,
+        "Torso":  0,
+        "Arm":  0
+    },
+    {
+        "Frame":  21,
+        "Head":  0,
+        "Torso":  0,
+        "Arm":  0
+    },
+    {
+        "Frame":  22,
+        "Head":  0,
+        "Torso":  0,
+        "Arm":  0
+    },
+    {
+        "Frame":  23,
+        "Head":  0,
+        "Torso":  0,
+        "Arm":  0
+    }
+]
