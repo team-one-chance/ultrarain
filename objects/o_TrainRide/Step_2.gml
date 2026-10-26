@@ -80,7 +80,13 @@ for (var _i = 0; _i < array_length(departure_enemies); _i++)
             {
                 _record.settled = true;
 
-                if (variable_instance_exists(id, "miniboss_state"))
+                if (variable_instance_exists(id, "breaker_state"))
+                {
+                    breaker_set_state(BreakerState.CHASE);
+                    sprite_index = breaker_sprite(s_Breaker_idle, s_Breaker_idle_unshielded);
+                    image_index = 0;
+                }
+                else if (variable_instance_exists(id, "miniboss_state"))
                 {
                     miniboss_state = 0;
                     leap_horizontal_speed = 0;

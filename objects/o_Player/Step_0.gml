@@ -2438,19 +2438,6 @@ if (
 }
 
 
-// =====================================
-// MINIBOSS CONTACT DAMAGE (other enemy bodies are harmless)
-// =====================================
-
-if (dmg_cooldown <= 0)
-{
-    var contact_boss = instance_place(x, y, oMiniBoss);
-    if (contact_boss != noone && take_damage(10, contact_boss.x))
-    {
-        dmg_cooldown = 1;
-    }
-}
-
 if (pHP <= 0)
 {
     instance_destroy();

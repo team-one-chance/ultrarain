@@ -519,7 +519,7 @@ run_action = function(_action)
             return;
         case 20: instance_create_depth(cursor_position[0], cursor_position[1], 0, oEnemy_Scout); break;
         case 21: instance_create_depth(cursor_position[0], cursor_position[1], 0, oDrone); break;
-        case 22: instance_create_depth(cursor_position[0], cursor_position[1], 0, oMiniBoss); break;
+        case 22: instance_create_depth(cursor_position[0], cursor_position[1], 0, oEnemy_Breaker); break;
         case 25: instance_create_depth(cursor_position[0], cursor_position[1], 0, oEnemy_Scout_mini); break;
         case 24:
             with (oEnemyParent) instance_destroy();

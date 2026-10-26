@@ -33,9 +33,9 @@ if (fx_miniboss)
     fx_burst_duration = 0.38;
     fx_burst_radius = 64;
     fx_spark_count = 34;
-    fx_debris_count = 12;
+    fx_debris_count = 40;
     fx_launch_scale = 1.7;
-    fx_debris_scale = 1.6;
+    fx_debris_scale = 2.0;
     fx_ring_width = 2;
     fx_spark_length = 14;
 }

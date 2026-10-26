@@ -977,3 +977,5 @@ begin_grinder_death = function(_gear)
 };
 
 inventory = {};
+// Begin/End Step snapshots let Breaker's core stop a fast dash crossing in one tick.
+breaker_body_snapshot = [];

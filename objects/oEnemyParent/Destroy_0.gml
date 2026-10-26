@@ -20,7 +20,7 @@ if (variable_instance_exists(id, "ehp") && ehp <= 0)
         clamp(depth - 1, -15999, 15999),
         oEnemyExplosion,
         {
-            fx_miniboss: object_index == oMiniBoss || object_is_ancestor(object_index, oMiniBoss),
+            fx_miniboss: object_index == oEnemy_Breaker || object_is_ancestor(object_index, oEnemy_Breaker),
             fx_scout_size: _scout ? max(bbox_right - bbox_left + 1, bbox_bottom - bbox_top + 1) : 0
         }
     );

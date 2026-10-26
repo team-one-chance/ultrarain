@@ -69,13 +69,13 @@ entrance_open_distance = 110;
 
 train_boarding_unlocked = function()
 {
-    if (instance_exists(oMiniBoss)) return false;
+    if (instance_exists(oEnemy_Breaker)) return false;
 
     // An untriggered ambush must not count as an already-defeated boss.
     for (var _i = 0; _i < instance_number(o_DoorEnemySpawn); _i++)
     {
         var _spawn = instance_find(o_DoorEnemySpawn, _i);
-        if (_spawn.enemy_object == oMiniBoss) return false;
+        if (_spawn.enemy_object == oEnemy_Breaker) return false;
     }
     return true;
 };
