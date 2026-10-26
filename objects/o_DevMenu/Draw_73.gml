@@ -1,5 +1,5 @@
 freecam_restore_layers();
-if (!enabled || world_frozen || !global.dev_collisions) exit;
+if (!enabled || menu_exhibition_active() || world_frozen || !global.dev_collisions) exit;
 var _color = draw_get_color();
 var _alpha = draw_get_alpha();
 draw_set_alpha(1);

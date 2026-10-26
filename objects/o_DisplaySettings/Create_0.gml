@@ -10,4 +10,9 @@ persistent = true;
 // Color of the space outside the game image.
 window_set_colour(c_black);
 
-window_set_fullscreen(true);
+if (variable_global_exists("menu_saved_fullscreen") && !is_undefined(global.menu_saved_fullscreen))
+{
+    window_set_fullscreen(global.menu_saved_fullscreen);
+    global.menu_saved_fullscreen = undefined;
+}
+else window_set_fullscreen(true);

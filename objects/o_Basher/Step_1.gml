@@ -1,6 +1,7 @@
 // Only the first Basher owns input; the sliders apply to every Basher.
 if (id != instance_find(o_Basher, 0)) exit;
 global.basher_tuner_capture_mouse = false;
+if (menu_exhibition_active()) exit;
 if (!instance_exists(global.basher_tuner_target)) global.basher_tuner_target = id;
 if (keyboard_check_pressed(vk_f6))
 {
