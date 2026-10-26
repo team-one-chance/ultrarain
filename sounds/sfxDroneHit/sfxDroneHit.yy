@@ -14,8 +14,8 @@
   "exportDir":"",
   "name":"sfxDroneHit",
   "parent":{
-    "name":"sfxEnemy",
-    "path":"folders/SFX/sfxEnemy.yy",
+    "name":"Drone",
+    "path":"folders/SFX/sfxEnemy/Drone.yy",
   },
   "preload":false,
   "resourceType":"GMSound",

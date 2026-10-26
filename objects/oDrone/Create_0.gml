@@ -47,6 +47,9 @@ drone_burst_count = 2;
 drone_shots_left = 0;
 drone_shot_interval = 0.45;
 drone_shot_timer = 0;
+// One short oval blink per actual shot, including the last shot of the burst.
+drone_shot_flash_duration = 0.07;
+drone_shot_flash_timer = 0;
 
 drone_shot_damage = 10;
 drone_shot_range = 900;
@@ -65,6 +68,7 @@ drone_separation_speed = 120;
 
 drone_fire_shot = function()
 {
+    drone_shot_flash_timer = drone_shot_flash_duration;
     var _sx = (bbox_left + bbox_right) * 0.5;
     var _sy = (bbox_top + bbox_bottom) * 0.5;
 

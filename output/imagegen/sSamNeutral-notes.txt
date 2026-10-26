@@ -1,0 +1,9 @@
+Final asset: sSamNeutral.png, separate GameMaker resource sprites/sSamNeutral/sSamNeutral.yy.
+64x96 transparent PNG. Built from original source pixels with no resampling.
+
+The built-in image_gen tool supplied a pose reference. The delivered sprite uses only the original sprite pixels, translated by sSamNeutral-build.ps1. No generated pixels or new colors. Head, face, neck, and central torso remain pixel-identical. Existing sleeve/arm rows move inward 0-2 pixels, and leg rows move inward 0-4 pixels. Original shoes move inward as intact blocks.
+
+Pose-reference prompt:
+Use case: precise-object-edit. Input is the ORIGINAL 64x96 sSam game sprite, not the previously generated redesign. Produce a minimal pixel-art pose edit as a pose reference: keep the exact original pixel character with identical head, hair, GREEN EYES, face, original dark navy shirt with the red shoulder cross and white chest markings, pants and shoes. Bring only arms and legs inward into a neutral standing idle stance. Arms hang close to hips. Straighten the spread legs by moving the lower legs and shoes inward around 4 original pixels per side. Preserve original head and torso completely. No glasses. No redesign, no new details, no shading, no glow, no lighting, no new colors, no smoothing. Transparent background, original 64x96 logical canvas, same character height and alignment. Preserve the original square pixel shapes and limb thickness.
+
+Validation during construction: source file hash unchanged; head/torso pixel equality; every visible output color belongs to the original palette. Comparison preview: original on left, neutral copy on right.

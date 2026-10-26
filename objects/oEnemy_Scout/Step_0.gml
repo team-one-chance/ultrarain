@@ -31,7 +31,13 @@ var scout_parry_locked = attack_state == 5 && stun_timer > 0;
 var scout_stunned = scout_parry_locked || slam_stun_timer > 0 || slam_knockback_timer > 0;
 if (scout_stunned)
 {
-    if (!scout_was_stunned) scout_stun_elapsed = 0;
+    scout_stop_charge_sound();
+    scout_stop_roll_sound();
+    if (!scout_was_stunned)
+    {
+        scout_stun_elapsed = 0;
+        world_sfx_play(sfxScoutStun, x, y);
+    }
     else scout_stun_elapsed += dt;
 }
 scout_was_stunned = scout_stunned;
@@ -260,6 +266,8 @@ else
                     scout_stagger_group_rolls();
                     attack_state = 2;
                     repath_timer = 0;
+                    scout_stop_charge_sound();
+                    scout_charge_sound = world_sfx_play(sfxChargeUp, x, y);
                     break;
                 }
 
@@ -397,6 +405,8 @@ if (player_y_distance <= attack_vertical_tolerance)
                         attack_charge_duration;
 
                     attack_state = 2;
+                    scout_stop_charge_sound();
+                    scout_charge_sound = world_sfx_play(sfxChargeUp, x, y);
                 }
                 else
                 {
@@ -495,6 +505,9 @@ if (player_y_distance <= attack_vertical_tolerance)
                     scout_roll_time_limit = min(2, abs(attack_target_x - x)
                         / max(1, attack_dash_speed) + scout_roll_timeout_grace);
                     attack_state = 3;
+                    scout_stop_charge_sound();
+                    scout_stop_roll_sound();
+                    scout_roll_sound = world_sfx_play(sfxScoutRoll, x, y);
                 }
 
                 break;
@@ -745,6 +758,42 @@ image_index = _one_shot
     ? min(_frames - 1, floor(scout_animation_time * _frames / _duration))
     : floor(scout_animation_time * _frames / _duration) mod _frames;
 image_speed = 0;
+
+// One attack cue per bite animation, including repeated close-range attacks.
+if (_sprite == bite_sprite && attack_state == 0 && attack_rocking)
+{
+    var _attack_cycle = floor(scout_animation_time / _duration);
+    if (_attack_cycle != scout_attack_sound_cycle)
+    {
+        world_sfx_play(sfxScoutAttack, x, y);
+        scout_attack_sound_cycle = _attack_cycle;
+    }
+}
+else scout_attack_sound_cycle = -1;
+
+// Two footfalls per walk cycle; randomize the sample at each actual step.
+if (_sprite == s_Scout_walk && is_grounded && abs(x - scout_start_x) > 0.001)
+{
+    var _footstep = floor(scout_animation_time * 2 / _duration);
+    if (_footstep != scout_footstep_index)
+    {
+        var _sound_count = array_length(scout_walk_sounds);
+        var _sound_index = irandom(_sound_count - 1);
+        if (scout_walk_sound_repeat_count >= 2)
+        {
+            // Pick uniformly from the three samples other than the previous one.
+            _sound_index = irandom(_sound_count - 2);
+            if (_sound_index >= scout_last_walk_sound_index) _sound_index++;
+        }
+        scout_walk_sound_repeat_count = _sound_index == scout_last_walk_sound_index
+            ? scout_walk_sound_repeat_count + 1 : 1;
+        scout_last_walk_sound_index = _sound_index;
+        var _sound = scout_walk_sounds[_sound_index];
+        world_sfx_play(_sound, x, y);
+        scout_footstep_index = _footstep;
+    }
+}
+else scout_footstep_index = -1;
 
 // Lock facing during the roll and stop; face the player for planted attacks.
 if (attack_state == 3 || attack_state == 4) scout_facing = attack_side;

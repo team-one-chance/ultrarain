@@ -612,6 +612,9 @@ pistol_piercing = 0;
 
 // Shooting timer
 weapon_fire_timer = 0;
+gun_reticle_radius = 8;
+gun_reticle_flash_duration = 0.08;
+gun_reticle_flash_timer = 0;
 sword_swing_timer = 0;
 sword_swing_pending_hit = false;
 sword_swing_facing = 1;

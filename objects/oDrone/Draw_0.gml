@@ -1,17 +1,11 @@
 event_inherited();
 
-if (drone_fire_state != 0)
+if (drone_fire_state != 0 || drone_shot_flash_timer > 0)
 {
     var _cx = (bbox_left + bbox_right) * 0.5;
     var _cy = (bbox_top + bbox_bottom) * 0.5;
 
-    var _firing_warning =
-        drone_fire_state == 2
-        || drone_charge_timer <= 0.2;
-
-    var _locked =
-        drone_fire_state == 2
-        || drone_charge_timer <= drone_aim_lock_duration;
+    var _shot_flash = drone_shot_flash_timer > 0;
 
     var _progress = 1;
 
@@ -34,32 +28,39 @@ if (drone_fire_state != 0)
 
     // Faint aiming preview.
     draw_set_color(c_red);
-    draw_set_alpha(0.25);
+    draw_set_alpha(0.35);
 
-    draw_line_width(
-        _cx, _cy,
-        _trace.end_x, _trace.end_y,
-        1
-    );
+    if (drone_fire_state != 0)
+    {
+        draw_line_width(
+            _cx, _cy,
+            _trace.end_x, _trace.end_y,
+            1
+        );
+    }
 
-    // Larger orange ring during the final warning and entire burst.
-    var _radius = _firing_warning
-        ? 30
-        : 18 + _progress * 5;
+    // Match the hit shield's oval, leaving clearance even at the smallest size.
+    var _ring_scale = _shot_flash ? 1.28 : 1.12 + _progress * 0.06;
+    var _radius_x = sprite_get_width(sDrone_hit) * 0.5 * abs(image_xscale) * _ring_scale;
+    var _radius_y = sprite_get_height(sDrone_hit) * 0.5 * abs(image_yscale) * _ring_scale;
+    var _ring_x = _cx + attack_shake_x;
+    var _ring_y = _cy + attack_shake_y;
 
     draw_set_color(
-        _firing_warning
+        _shot_flash
         ? make_color_rgb(255, 120, 35)
         : c_red
     );
 
-    draw_set_alpha(_firing_warning ? 0.9 : 0.45);
+    draw_set_alpha(_shot_flash ? 1 : 0.45);
 
-    draw_circle(_cx, _cy, _radius, true);
+    draw_ellipse(_ring_x - _radius_x, _ring_y - _radius_y,
+        _ring_x + _radius_x, _ring_y + _radius_y, true);
 
-    if (_firing_warning)
+    if (_shot_flash)
     {
-        draw_circle(_cx, _cy, _radius - 2, true);
+        draw_ellipse(_ring_x - _radius_x + 2, _ring_y - _radius_y + 2,
+            _ring_x + _radius_x - 2, _ring_y + _radius_y - 2, true);
     }
 
     draw_set_alpha(1);
