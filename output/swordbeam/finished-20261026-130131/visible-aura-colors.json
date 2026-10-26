@@ -1,0 +1,130 @@
+﻿[
+    {
+        "Frame":  0,
+        "Looping":  false,
+        "VisibleAuraBlack":  0,
+        "VisibleAuraRed":  0,
+        "VisibleAuraYellow":  0,
+        "Phase":  4.4879895051282759
+    },
+    {
+        "Frame":  1,
+        "Looping":  false,
+        "VisibleAuraBlack":  0,
+        "VisibleAuraRed":  0,
+        "VisibleAuraYellow":  0,
+        "Phase":  5.3855874061539311
+    },
+    {
+        "Frame":  2,
+        "Looping":  false,
+        "VisibleAuraBlack":  29,
+        "VisibleAuraRed":  29,
+        "VisibleAuraYellow":  8,
+        "Phase":  0
+    },
+    {
+        "Frame":  3,
+        "Looping":  false,
+        "VisibleAuraBlack":  57,
+        "VisibleAuraRed":  67,
+        "VisibleAuraYellow":  18,
+        "Phase":  0.89759790102565518
+    },
+    {
+        "Frame":  4,
+        "Looping":  false,
+        "VisibleAuraBlack":  103,
+        "VisibleAuraRed":  142,
+        "VisibleAuraYellow":  36,
+        "Phase":  1.7951958020513104
+    },
+    {
+        "Frame":  5,
+        "Looping":  false,
+        "VisibleAuraBlack":  138,
+        "VisibleAuraRed":  202,
+        "VisibleAuraYellow":  51,
+        "Phase":  2.6927937030769655
+    },
+    {
+        "Frame":  6,
+        "Looping":  false,
+        "VisibleAuraBlack":  187,
+        "VisibleAuraRed":  253,
+        "VisibleAuraYellow":  79,
+        "Phase":  3.5903916041026207
+    },
+    {
+        "Frame":  7,
+        "Looping":  false,
+        "VisibleAuraBlack":  291,
+        "VisibleAuraRed":  354,
+        "VisibleAuraYellow":  109,
+        "Phase":  4.4879895051282759
+    },
+    {
+        "Frame":  8,
+        "Looping":  false,
+        "VisibleAuraBlack":  229,
+        "VisibleAuraRed":  340,
+        "VisibleAuraYellow":  88,
+        "Phase":  5.3855874061539311
+    },
+    {
+        "Frame":  9,
+        "Looping":  true,
+        "VisibleAuraBlack":  196,
+        "VisibleAuraRed":  256,
+        "VisibleAuraYellow":  44,
+        "Phase":  0
+    },
+    {
+        "Frame":  10,
+        "Looping":  true,
+        "VisibleAuraBlack":  161,
+        "VisibleAuraRed":  189,
+        "VisibleAuraYellow":  30,
+        "Phase":  0.89759790102565518
+    },
+    {
+        "Frame":  11,
+        "Looping":  true,
+        "VisibleAuraBlack":  132,
+        "VisibleAuraRed":  124,
+        "VisibleAuraYellow":  24,
+        "Phase":  1.7951958020513104
+    },
+    {
+        "Frame":  12,
+        "Looping":  true,
+        "VisibleAuraBlack":  113,
+        "VisibleAuraRed":  77,
+        "VisibleAuraYellow":  18,
+        "Phase":  2.6927937030769655
+    },
+    {
+        "Frame":  13,
+        "Looping":  true,
+        "VisibleAuraBlack":  138,
+        "VisibleAuraRed":  124,
+        "VisibleAuraYellow":  27,
+        "Phase":  3.5903916041026207
+    },
+    {
+        "Frame":  14,
+        "Looping":  true,
+        "VisibleAuraBlack":  165,
+        "VisibleAuraRed":  186,
+        "VisibleAuraYellow":  37,
+        "Phase":  4.4879895051282759
+    },
+    {
+        "Frame":  15,
+        "Looping":  true,
+        "VisibleAuraBlack":  196,
+        "VisibleAuraRed":  248,
+        "VisibleAuraYellow":  46,
+        "Phase":  5.3855874061539311
+    }
+]

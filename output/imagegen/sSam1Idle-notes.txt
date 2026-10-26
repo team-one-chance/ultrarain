@@ -1,0 +1,9 @@
+Source: sprites/sSam_1/6153a636-1f65-4c9a-992c-01b0184f5665.png
+Deliverable: separate GameMaker resource sSam1Idle, 64x96 pixels, 24 frames at 6 fps (4 seconds), looping.
+Motion: original resting pose, one-pixel shoulder/chest rise, following one-pixel head lift, return to rest, single short blink. Legs and feet stay pixel-identical throughout. First frame is pixel-identical to sSam_1. Existing sprite and object assignments preserved.
+Final animation frames are built from original pixels using sSam1Idle-build.ps1. No generated artwork or new colors in the final frames. Built-in image_gen supplied a pose/motion reference.
+
+Pose/motion reference prompt:
+Use case: precise-object-edit. Input is the exact current sSam_1 sprite. Make a pixel-art idle-animation pose reference for this existing 64x96 character. Preserve every design feature: brown hair, green eyes, exact face, navy shirt with white chest marks and red shoulder cross, straight black pants, blue-white shoes and current neutral stance. Show only extremely subtle breathing with a one-logical-pixel rise in shoulders and upper body and occasional blink. Feet planted, no arm swings or changes of stance, no redesign, no new palette, no glasses, no glow, no shading or smoothing. Transparent background. Original image is the authoritative source; keep original pixel proportions.
+
+Exports: sSam1Idle-strip.png (24 frames horizontally), sSam1Idle-preview.gif (6x preview on a neutral background), sSam1Idle-contact.png (rest, inhale, peak, blink).
