@@ -182,6 +182,7 @@
     {"id":{"name":"weapon_hitscan","path":"scripts/weapon_hitscan/weapon_hitscan.yy",},},
     {"id":{"name":"sh_BloomBlur","path":"shaders/sh_BloomBlur/sh_BloomBlur.yy",},},
     {"id":{"name":"sh_BloomExtract","path":"shaders/sh_BloomExtract/sh_BloomExtract.yy",},},
+    {"id":{"name":"sh_BreakerShieldFlash","path":"shaders/sh_BreakerShieldFlash/sh_BreakerShieldFlash.yy",},},
     {"id":{"name":"sh_CeilingCone","path":"shaders/sh_CeilingCone/sh_CeilingCone.yy",},},
     {"id":{"name":"sh_ItemOutline","path":"shaders/sh_ItemOutline/sh_ItemOutline.yy",},},
     {"id":{"name":"sh_PlayerGlowExtract","path":"shaders/sh_PlayerGlowExtract/sh_PlayerGlowExtract.yy",},},
@@ -408,13 +409,13 @@
   "resourceType":"GMProject",
   "resourceVersion":"2.0",
   "RoomOrderNodes":[
+    {"roomId":{"name":"TESTING","path":"rooms/TESTING/TESTING.yy",},},
     {"roomId":{"name":"LE_MENU","path":"rooms/LE_MENU/LE_MENU.yy",},},
     {"roomId":{"name":"LE_PWR","path":"rooms/LE_PWR/LE_PWR.yy",},},
     {"roomId":{"name":"LE_TUTORIAL_WIP","path":"rooms/LE_TUTORIAL_WIP/LE_TUTORIAL_WIP.yy",},},
     {"roomId":{"name":"LE_DEMO_END","path":"rooms/LE_DEMO_END/LE_DEMO_END.yy",},},
     {"roomId":{"name":"LE_TRAIN","path":"rooms/LE_TRAIN/LE_TRAIN.yy",},},
     {"children":[],"groupName":"testing_ALWAYS_LAST",},
-    {"roomId":{"name":"TESTING","path":"rooms/TESTING/TESTING.yy",},},
   ],
   "templateType":"game",
   "TextureGroups":[

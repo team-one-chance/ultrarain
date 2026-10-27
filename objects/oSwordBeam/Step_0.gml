@@ -113,14 +113,15 @@ for (var i = 0; i < ds_list_size(hits); i++)
     {
         ds_list_add(hit_enemies, enemy);
 
-        // Preserve your existing beam flag and impact-X arguments.
+        // Include the consumed coin count for shield knockback tiers.
         enemy.take_damage(
             beam_damage,
             move_dir,
             knockback_force,
             false,
             x,
-            true
+            true,
+            beam_coins_used
         );
     }
 }
