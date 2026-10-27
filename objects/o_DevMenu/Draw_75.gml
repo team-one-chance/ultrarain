@@ -1,4 +1,4 @@
-if (!enabled) exit;
+if ((!enabled || menu_exhibition_active()) && !(instance_exists(o_PauseMenu) && o_PauseMenu.opened)) exit;
 var _color = draw_get_color();
 var _alpha = draw_get_alpha();
 var _font = draw_get_font();

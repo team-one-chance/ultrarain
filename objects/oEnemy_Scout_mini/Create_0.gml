@@ -87,6 +87,25 @@ attack_rocking = false;
 // 5 = stunned after parry
 
 attack_state = 0;
+// Coyote time after a roll ends; normal sword collision still has to connect.
+scout_parry_grace_duration = 0.15;
+scout_parry_grace_timer = 0;
+can_parry = function()
+{
+    return !is_climbing && slam_stun_timer <= 0 && slam_knockback_timer <= 0
+        && (attack_state == 3 || (attack_state == 4 && scout_parry_grace_timer > 0));
+};
+scout_finish_roll = function()
+{
+    // Contact and arrival can both report the same stop in one Step.
+    if (attack_state != 3) return;
+    attack_state = 4;
+    attack_rocking = false;
+    attack_shake_x = 0;
+    attack_shake_y = 0;
+    scout_stop_timer = 0;
+    scout_parry_grace_timer = scout_parry_grace_duration;
+};
 
 attack_cooldown_min = 3;
 attack_cooldown_max = 5;
@@ -151,6 +170,7 @@ slam_stun_duration = 0.5;
 
 slam_interrupt = function()
 {
+    scout_parry_grace_timer = 0;
     path_end();
     is_climbing = false;
     attack_rocking = false;
@@ -224,8 +244,7 @@ attack_register_dash_hit = function(_player)
         // Player protection rejects damage and recoil during dash/slam.
         _player.take_damage(attack_dash_damage, x);
         // Contact confirms the charge outcome; begin the complete stop animation.
-        attack_state = 4;
-        scout_stop_timer = 0;
+        scout_finish_roll();
     }
 };
 
@@ -297,7 +316,7 @@ scout_base_take_damage = take_damage;
 take_damage = function(_damage, _knockback_dir = 0, _knockback_force = 0, _is_sword = false)
 {
     var _hp_before = ehp;
-    if (_is_sword && attack_state == 3) scout_stop_roll_sound();
+    if (_is_sword && can_parry()) scout_stop_roll_sound();
     // Every hit restarts the reaction, including hits during ouch itself.
     // Higher-priority actions consume the hit without queuing a later reaction.
     scout_hit_pending = !is_climbing && attack_state != 3 && attack_state != 4

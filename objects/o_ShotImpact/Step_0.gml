@@ -1,5 +1,6 @@
 var _dt = min((variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) / 1000000, 0.05);
 flash_life = max(0, flash_life - _dt);
+parry_ring_life = max(0, parry_ring_life - _dt);
 for (var _i = array_length(particles) - 1; _i >= 0; _i--)
 {
     var _p = particles[_i];
@@ -13,4 +14,4 @@ for (var _i = array_length(particles) - 1; _i >= 0; _i--)
     _p.py += _p.vy * _dt;
     if (!_p.dust) _p.vy += spark_gravity * _dt;
 }
-if (array_length(particles) == 0) instance_destroy();
+if (array_length(particles) == 0 && parry_ring_life <= 0 && flash_life <= 0) instance_destroy();

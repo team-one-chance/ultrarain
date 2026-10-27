@@ -36,3 +36,6 @@ if (!big_room_cleared && array_length(big_room_enemies) > 0)
         respawn_y = _player.y;
     }
 }
+
+// Keep the latest tutorial checkpoint available during travel to another room.
+global.menu_checkpoint = { x: respawn_x, y: respawn_y, cleared: big_room_cleared };

@@ -1,4 +1,4 @@
-if (!enabled || !global.dev_freecam || world_frozen) exit;
+if (!enabled || menu_exhibition_active() || !global.dev_freecam || world_frozen) exit;
 
 // Hide only during rendering. Reveal triggers retain their actual layer states.
 freecam_layer_states = [];

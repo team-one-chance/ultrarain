@@ -1,4 +1,11 @@
 global.dev_resume_input = false;
+if (instance_exists(o_PauseMenu) && o_PauseMenu.opened) exit;
+menu_exhibition_hotkey();
+if (menu_exhibition_active())
+{
+    update_enemy_freeze();
+    exit;
+}
 if (!enabled) exit;
 
 if (keyboard_check_pressed(vk_f6))

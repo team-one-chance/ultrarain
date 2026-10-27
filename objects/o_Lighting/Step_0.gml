@@ -1,22 +1,4 @@
-// Avoid treating terminal command typing as lighting shortcuts.
-var _allow_toggles = true;
-var _player = instance_find(o_Player, 0);
-
-if (instance_exists(_player))
-{
-    if (variable_instance_exists(_player, "hacking_controller"))
-    {
-        _allow_toggles = _player.hacking_controller == noone;
-    }
-}
-if (_allow_toggles)
-{
-    if (keyboard_check_pressed(ord("N")))
-    {
-        pixelation_size = pixelation_size <= 1.0 ? pixelation_alternate_size : 1.0;
-        resolution_indicator_timer = resolution_indicator_duration;
-    }
-}
+pixelation_size = menu_pixelization_active() ? pixelation_alternate_size : 1.0;
 
 // Keep the sprite and emitted light on the same per-instance flicker state.
 var _dt = min((variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) / 1000000, 0.05);

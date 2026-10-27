@@ -89,9 +89,9 @@ player_glow_color_uniform = shader_get_uniform(sh_PlayerGlowExtract, "u_glow_col
 player_glow_tolerance_uniform = shader_get_uniform(sh_PlayerGlowExtract, "u_tolerance");
 player_glow_feather_uniform = shader_get_uniform(sh_PlayerGlowExtract, "u_feather");
 player_glow_brightness_uniform = shader_get_uniform(sh_PlayerGlowExtract, "u_min_brightness");
-// N switches between normal rendering and the preferred pixelation size.
+// Pixelization is a shared display preference, retained across rooms and retries.
 pixelation_enabled = true;
-pixelation_size = 1.0;
+pixelation_size = menu_pixelization_active() ? 1.3 : 1.0;
 pixelation_alternate_size = 1.3;
 resolution_indicator_duration = 3;
 resolution_indicator_timer = 0;
