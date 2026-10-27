@@ -1,4 +1,4 @@
-if (broken && flash_elapsed < flash_duration)
+if (spawns_ambush && broken && flash_elapsed < flash_duration)
 {
     // 0.15 seconds red, then 0.15 seconds clear.
     if (floor(flash_elapsed / 0.15) mod 2 == 0)

@@ -1,3 +1,10 @@
+for (var _i = 0; _i < array_length(departure_wall_tiles); _i++)
+{
+    var _tile = departure_wall_tiles[_i];
+    draw_tile(_tile.tileset, _tile.data, 0,
+        _tile.home_x - scenery_distance, _tile.home_y);
+}
+
 var _cam = view_camera[0];
 if (_cam == -1) exit;
 var _view_x = camera_get_view_x(_cam);

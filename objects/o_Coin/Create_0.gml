@@ -1,4 +1,8 @@
-depth = o_Player.depth -1;
+var _player = instance_find(o_Player, 0);
+depth = instance_exists(_player) ? _player.depth - 1 : -1;
+is_pinned = false;
+pin_owner = noone;
+geometry_stall_time = 0;
 split_threshold = 0.75;
 
 // Play once whenever a coin is thrown.
