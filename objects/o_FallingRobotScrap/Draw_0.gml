@@ -1,5 +1,5 @@
 // Render the rotated sprite into a small transparent buffer, then crop it.
-if (keyboard_check_pressed(vk_f8))
+if (!menu_exhibition_active() && keyboard_check_pressed(vk_f8))
 {
     var _lava = instance_nearest(x, y, oMoltenLava);
     var _lava_front = instance_nearest(x, y, oLavaFromTheMolten);

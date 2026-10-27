@@ -2,6 +2,7 @@ timerf3 = 0;
 
 // Keep the dev controller within GameMaker's drawable depth range.
 if (!instance_exists(o_DevMenu)) instance_create_depth(0, 0, -14000, o_DevMenu);
+if (!instance_exists(o_PauseMenu)) instance_create_depth(0, 0, -15000, o_PauseMenu);
 
 // =====================================
 // HEALTH
@@ -543,6 +544,8 @@ player_set_collider = function(_short)
 
     physics_fixture_delete(_fix);
     player_collider_short = _short;
+    player_collider_half_width = _half_width;
+    player_collider_height = _half_height * 2;
     phy_fixed_rotation = true;
 };
 
@@ -982,3 +985,4 @@ begin_grinder_death = function(_gear)
 inventory = {};
 // Begin/End Step snapshots let Breaker's core stop a fast dash crossing in one tick.
 breaker_body_snapshot = [];
+breaker_body_sides = {};

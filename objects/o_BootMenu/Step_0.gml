@@ -1,4 +1,5 @@
-if (keyboard_check(vk_shift)
+if (room == LE_MENU) menu_exhibition_hotkey();
+if (!menu_exhibition_active() && keyboard_check(vk_shift)
 && keyboard_check_pressed(ord("Z")))
 {
     instance_destroy();
@@ -6,7 +7,7 @@ if (keyboard_check(vk_shift)
     exit;
 }
 
-if (keyboard_check(vk_shift)
+if (!menu_exhibition_active() && keyboard_check(vk_shift)
 && keyboard_check_pressed(ord("T")))
 {
     instance_destroy();
@@ -14,24 +15,73 @@ if (keyboard_check(vk_shift)
     exit;
 }
 
-if (keyboard_check(vk_shift)
+if (!menu_exhibition_active() && keyboard_check(vk_shift)
 && keyboard_check_pressed(ord("R")))
 {
     instance_destroy();
     room_goto(TESTING);
     exit;
 }
-var _dt = (variable_global_exists("dev_delta_time") ? (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) : delta_time) / 1000000;
+var _dt = (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) / 1000000;
 var _previous_elapsed = state_elapsed;
 
 state_elapsed += _dt;
 boot_elapsed += _dt;
+exit_flash = max(0, exit_flash - _dt);
+
+if (boot_state >= BootMenuState.MAIN && boot_state <= BootMenuState.CONFIRM_EXIT)
+{
+    var _options = boot_menu_options();
+    var _option_count = array_length(_options);
+    var _layout = boot_menu_layout();
+    var _mx = device_mouse_x_to_gui(0);
+    var _my = device_mouse_y_to_gui(0);
+    var _mouse_moved = _mx != menu_mouse_x || _my != menu_mouse_y;
+    menu_mouse_x = _mx;
+    menu_mouse_y = _my;
+    var _hover = -1;
+    if (_mx >= _layout.x && _mx <= _layout.x + _layout.width
+    && _my >= _layout.y && _my < _layout.y + _option_count * _layout.row_height)
+    {
+        _hover = floor((_my - _layout.y) / _layout.row_height);
+    }
+
+    var _previous_selection = menu_selection;
+    if (_mouse_moved && _hover >= 0) menu_selection = _hover;
+    var _move = keyboard_check_pressed(vk_down) - keyboard_check_pressed(vk_up);
+    if (keyboard_check_pressed(vk_tab)) _move = keyboard_check(vk_shift) ? -1 : 1;
+    menu_selection = (menu_selection + _move + _option_count) mod _option_count;
+
+    var _click = mouse_check_button_pressed(mb_left) && _hover >= 0;
+    if (_click) menu_selection = _hover;
+    if (keyboard_check_pressed(vk_escape))
+    {
+        if (boot_state != BootMenuState.MAIN) boot_menu_open(BootMenuState.MAIN);
+    }
+    else if (keyboard_check_pressed(vk_enter) || _click)
+    {
+        // The page consumes this press so Start cannot also dismiss difficulty/sleep.
+        audio_play_sound(sfxInitBG, 1, false);
+        boot_menu_activate();
+    }
+    else if (menu_selection != _previous_selection)
+    {
+        if (line_sound != -1 && audio_is_playing(line_sound)) audio_stop_sound(line_sound);
+        line_sound = audio_play_sound(sfxInitBG, 1, false);
+    }
+    exit;
+}
 
 switch (boot_state)
 {
     // Waiting for Enter.
     case 0:
     {
+        if (keyboard_check_pressed(vk_escape))
+        {
+            boot_menu_open(BootMenuState.DIFFICULTY);
+            break;
+        }
         if (!audio_is_playing(sfxInitOpen) && keyboard_check_pressed(vk_enter))
         {
             audio_play_sound(sfxInitEnter1, 1, false);

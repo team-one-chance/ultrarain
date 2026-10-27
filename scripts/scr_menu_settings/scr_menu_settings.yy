@@ -1,0 +1,10 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_menu_settings",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_menu_settings",
+  "parent":{"name":"R_scripts","path":"folders/Rooms/R_scripts.yy",},
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

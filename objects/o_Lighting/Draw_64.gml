@@ -1,4 +1,4 @@
-if (variable_global_exists("dev_freecam") && global.dev_freecam) exit;
+if (menu_exhibition_active() || (variable_global_exists("dev_freecam") && global.dev_freecam)) exit;
 // Temporary resolution readout; drawn after world pixelation so text stays sharp.
 if (!enabled || resolution_indicator_timer <= 0 || !view_enabled) exit;
 var _cam = view_camera[0];
@@ -15,7 +15,7 @@ draw_set_font(f_Console);
 draw_set_halign(fa_left);
 draw_set_valign(fa_top);
 var _label = "World resolution: " + string(_width) + " x " + string(_height);
-var _detail = "Pixel size: " + string_format(_size, 0, 1) + "   N: toggle";
+var _detail = "Pixel size: " + string_format(_size, 0, 1);
 var _padding = 12;
 var _panel_width = max(string_width(_label), string_width(_detail)) + _padding * 2;
 var _line_height = string_height(_label) + 4;

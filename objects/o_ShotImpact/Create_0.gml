@@ -1,4 +1,8 @@
 // Impact tuning: pixels/second and seconds.
+if (!variable_instance_exists(id, "impact_parry")) impact_parry = false;
+parry_ring_duration = 0.30;
+parry_ring_life = impact_parry ? parry_ring_duration : 0;
+parry_ring_radius = 44;
 spark_count = 8;
 spark_spread = 75;
 spark_speed_min = 65;
@@ -33,6 +37,23 @@ if (impact_enemy)
     dust_count = 3;
     flash_duration = 0.045;
     flash_radius = 4;
+}
+// Sekiro-inspired deflection: a crisp expanding gold ring and radial sparks.
+if (impact_parry)
+{
+    spark_count = 28;
+    spark_spread = 180;
+    spark_speed_min = 130;
+    spark_speed_max = 310;
+    spark_lifetime_min = 0.16;
+    spark_lifetime_max = 0.36;
+    spark_tail_length = 14;
+    spark_gravity = 210;
+    spark_color_start = make_color_rgb(255, 240, 185);
+    spark_color_end = make_color_rgb(255, 105, 20);
+    dust_count = 0;
+    flash_duration = 0.055;
+    flash_radius = 7;
 }
 flash_life = flash_duration;
 particles = [];

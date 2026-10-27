@@ -265,10 +265,10 @@ menu_layout = function()
     };
 };
 
-freeze_world = function()
+freeze_world = function(_menu_owner = noone)
 {
     if (world_frozen) return;
-    capture_map();
+    if (_menu_owner == noone) capture_map();
     with (o_Player)
     {
         stop_movement_sfx();
@@ -290,6 +290,7 @@ freeze_world = function()
         if (id != other.id) array_push(other.paused_instances, id);
     physics_pause_enable(true);
     instance_deactivate_all(true);
+    if (_menu_owner != noone) instance_activate_object(_menu_owner);
     window_set_cursor(cr_default);
     world_frozen = true;
 };
@@ -432,6 +433,7 @@ teleport_player = function(_position)
 
 run_action = function(_action)
 {
+    if (menu_exhibition_active()) return;
     if (_action == 12)
     {
         map_open = true;
@@ -547,4 +549,26 @@ freecam_restore_layers = function()
             layer_set_visible(_saved.layer, _saved.was_visible);
     }
     freecam_layer_states = [];
+};
+
+disable_tools = function()
+{
+    time_paused = false;
+    step_requested = false;
+    time_rate = 1;
+    global.dev_collisions = false;
+    global.dev_invincible = false;
+    global.dev_freeze_enemies = false;
+    global.dev_freecam = false;
+    freecam_restore_layers();
+    opened = false;
+    map_open = false;
+    // The player-facing pause menu continues owning the frozen world.
+    if (!(instance_exists(o_PauseMenu) && o_PauseMenu.opened))
+    {
+        thaw_world();
+        global.dev_resume_input = true;
+    }
+    update_enemy_freeze();
+    game_set_speed(base_game_speed, gamespeed_fps);
 };

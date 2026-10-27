@@ -1,4 +1,4 @@
-if (id != instance_find(o_Basher, 0) || !global.basher_tuner_open) exit;
+if (menu_exhibition_active() || id != instance_find(o_Basher, 0) || !global.basher_tuner_open) exit;
 var _layout = basher_tuner_layout();
 var _s = _layout.scale;
 var _left = _layout.left;

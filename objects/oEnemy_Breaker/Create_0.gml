@@ -26,6 +26,8 @@ breaker_control_grace_duration = 0.75;
 breaker_stun_budget = 0;
 breaker_stun_elapsed = 0;
 breaker_bash_hit = false;
+breaker_leap_hit = false;
+breaker_intercept = false;
 breaker_landed = false;
 facing_direction = 1;
 breaker_source_direction = 1;
@@ -123,18 +125,31 @@ leap_trigger_min_distance = 260;
 leap_trigger_max_distance = 720;
 leap_vertical_tolerance = 90;
 leap_jump_speed = -560;
+leap_launch_speed = leap_jump_speed;
 leap_max_horizontal_speed = 520;
-leap_fall_gravity_multiplier = 2.5;
-leap_max_fall_speed = 900;
+leap_fall_gravity_multiplier = 4;
+leap_max_fall_speed = 1200;
 leap_landing_range = 48;
 leap_landing_height = 20;
 leap_cooldown_min = 5;
 leap_cooldown_max = 7;
 leap_cooldown = 0; // Ready to punish a distant player immediately.
 leap_target_x = x;
+breaker_jump_charge_duration = 0.625;
+breaker_intercept_range = 300;
+breaker_intercept_min_height = 30;
+breaker_intercept_max_height = 420;
+breaker_intercept_max_jump_speed = 900;
+breaker_intercept_prediction_time = 0.20;
+breaker_intercept_max_lead = 80;
+breaker_intercept_cooldown_duration = 2;
+breaker_intercept_cooldown = 0;
 // Fit the entire turn to the apex instead of hovering for the authored duration.
 breaker_turn_duration = 0.18;
 breaker_land_lead = 0.08;
+// Shared impact-to-chase timing; both phases play every frame within this budget.
+breaker_land_duration = 0.30;
+breaker_land_recovery_duration = 0.25;
 slam_knockback_multiplier = 0.35;
 slam_knockback_duration = 0.16;
 slam_stun_duration = 0.2;
@@ -145,6 +160,12 @@ breaker_sprite = function(_shielded, _unshielded) {
     return breaker_unshielded ? _unshielded : _shielded;
 };
 breaker_fps = function(_sprite) {
+    if (_sprite == s_Breaker_jumpcharge || _sprite == s_Breaker_jumpcharge_unshielded)
+        return max(1, sprite_get_number(_sprite)) / breaker_jump_charge_duration;
+    if (_sprite == s_Breaker_land || _sprite == s_Breaker_land_unshielded)
+        return max(1, sprite_get_number(_sprite)) / breaker_land_duration;
+    if (_sprite == s_Breaker_landrecovery || _sprite == s_Breaker_landrecovery_unshielded)
+        return max(1, sprite_get_number(_sprite)) / breaker_land_recovery_duration;
     var _fps = sprite_get_speed(_sprite);
     if (sprite_get_speed_type(_sprite) == spritespeed_framespergameframe)
         _fps *= game_get_speed(gamespeed_fps);
@@ -163,7 +184,24 @@ breaker_set_state = function(_state) {
     breaker_hit_elapsed = 0;
     path_end();
     if (_state == BreakerState.BASH) breaker_bash_hit = false;
+    if (_state == BreakerState.JUMP_CHARGE) breaker_leap_hit = false;
     if (_state == BreakerState.LAND) breaker_landed = false;
+};
+// Spawn-marker entrance: launch once, bypassing chase range and charge gates.
+breaker_start_entrance_slam = function() {
+    var _target = instance_nearest(x, y, o_Player);
+    if (!instance_exists(_target)) return;
+    breaker_clear_control();
+    breaker_intercept = false;
+    breaker_leap_hit = false;
+    leap_target_x = _target.x;
+    var _direction = sign(leap_target_x - (bbox_left + bbox_right) * 0.5);
+    if (_direction != 0) facing_direction = _direction;
+    leap_launch_speed = leap_jump_speed;
+    vertical_speed = leap_launch_speed;
+    breaker_set_state(BreakerState.RISE);
+    sprite_index = breaker_sprite(s_Breaker_jump, s_Breaker_jump_unshielded);
+    image_index = 0;
 };
 breaker_attacking = function() {
     return breaker_state == BreakerState.BASH || breaker_state == BreakerState.JUMP_CHARGE
@@ -173,6 +211,15 @@ breaker_attacking = function() {
 breaker_airborne_attack = function() {
     return breaker_state == BreakerState.RISE || breaker_state == BreakerState.SLAM_TURN
         || breaker_state == BreakerState.DIVE;
+};
+breaker_contact_active = function() {
+    return breaker_airborne_attack()
+        || (breaker_state == BreakerState.LAND && !breaker_landed);
+};
+breaker_leap_damage_player = function(_target) {
+    if (breaker_leap_hit || !instance_exists(_target)) return;
+    breaker_leap_hit = true;
+    miniboss_damage_player(_target, leap_damage);
 };
 breaker_clear_control = function() {
     knockback_timer = 0;

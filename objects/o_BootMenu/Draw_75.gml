@@ -33,6 +33,8 @@ if (boot_state != 8)
     }
 
     var _text_x = 32 + _shake_x;
+    var _is_menu = boot_state >= BootMenuState.MAIN && boot_state <= BootMenuState.CONFIRM_EXIT;
+    var _layout = boot_menu_layout();
 
     draw_set_color(console_dim);
     draw_text(
@@ -73,11 +75,10 @@ if (boot_state != 8)
         }
 
 var _text_scale =
-    (_entry.message == "> rules.exe overwriting...")
-    ? 1.3 : 1;
+    (_entry.message == "> rules.exe overwriting...") ? 1.3 : 1;
 
 draw_text_transformed(
-    _text_x,
+    _is_menu ? _layout.x : _text_x,
     82 + (_i - _first) * _line_height + _shake_y,
     _entry.message,
     _text_scale,
@@ -85,6 +86,74 @@ draw_text_transformed(
     0
 );
         draw_set_alpha(1);
+    }
+
+    // Menu choices are terminal output; the selected choice previews the command.
+    if (_is_menu)
+    {
+        var _options = boot_menu_options();
+        for (var _option = 0; _option < array_length(_options); _option++)
+        {
+            var _selected = _option == menu_selection;
+            var _option_color = _selected ? console_green : console_white;
+            if (boot_state == BootMenuState.DIFFICULTY)
+            {
+                if (_option == 1) _option_color = c_yellow;
+                if (_option == 2) _option_color = console_red;
+            }
+            if (boot_state == BootMenuState.MAIN && _option == 3 && exit_flash > 0)
+                _option_color = merge_color(console_white, console_red, 0.5 + 0.5 * abs(sin(exit_flash * 24)));
+            draw_set_color(_option_color);
+            draw_text_transformed(_layout.x + _layout.text_indent, _layout.y + _option * _layout.row_height,
+                _options[_option], _layout.text_scale, _layout.text_scale, 0);
+            if (_selected)
+            {
+                draw_text_transformed(_layout.x,
+                    _layout.y + _option * _layout.row_height,
+                    ">", _layout.text_scale, _layout.text_scale, 0);
+            }
+        }
+
+        var _command = "PS C:\\SYSTEM> ";
+        switch (boot_state)
+        {
+            case BootMenuState.MAIN:
+                _command += ".\\menu.exe " + string_lower(_options[menu_selection]);
+                break;
+            case BootMenuState.DIFFICULTY:
+                _command += menu_selection == 3 ? ".\\menu.exe" :
+                    ".\\menu.exe start --difficulty " + string_lower(_options[menu_selection]);
+                break;
+            case BootMenuState.SETTINGS:
+                if (menu_selection == 2) _command += ".\\menu.exe";
+                else if (menu_selection == 1)
+                    _command += ".\\display.exe --pixelization " + (menu_pixelization_active() ? "off" : "on");
+                else _command += ".\\display.exe --fullscreen " + (window_get_fullscreen() ? "off" : "on");
+                break;
+            case BootMenuState.CREDITS: _command += ".\\menu.exe"; break;
+            case BootMenuState.CONFIRM_EXIT:
+                _command += menu_selection == 0 ? ".\\menu.exe" : ".\\menu.exe exit --confirm";
+                break;
+        }
+        var _command_y = _layout.y + array_length(_options) * _layout.row_height + 24;
+        draw_set_color(console_white);
+        draw_text_transformed(_layout.x, _command_y, _command,
+            _layout.command_scale, _layout.command_scale, 0);
+        draw_set_color(console_dim);
+        draw_text(_layout.x, _command_y + 34, "UP/DOWN or TAB to select | ENTER or click to run | ESC back");
+        if (floor(boot_elapsed / 0.5) mod 2 == 0)
+        {
+            var _command_cursor_x = _layout.x + string_width(_command) * _layout.command_scale + 12;
+            draw_set_color(console_green);
+            draw_rectangle(_command_cursor_x, _command_y + 3,
+                _command_cursor_x + 10, _command_y + 22, false);
+        }
+    }
+
+    if (_is_menu && global.exhibition_exit_locked)
+    {
+        draw_set_color(console_dim);
+        draw_text(_gw - 350, 24, "EXHIBITION // EXIT LOCKED");
     }
 
     // Enter prompt and blinking block cursor.

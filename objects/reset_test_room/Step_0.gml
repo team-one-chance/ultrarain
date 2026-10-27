@@ -1,3 +1,4 @@
+if (menu_exhibition_active()) exit;
 if (keyboard_check(vk_shift)
 && keyboard_check_pressed(ord("R")))
 {
