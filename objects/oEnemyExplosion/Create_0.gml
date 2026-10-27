@@ -1,6 +1,7 @@
 // Enemy death tuning: compact orange fireball and short-lived metal chips.
 if (!variable_instance_exists(id, "fx_miniboss")) fx_miniboss = false;
 if (!variable_instance_exists(id, "fx_scout_size")) fx_scout_size = 0;
+if (!variable_instance_exists(id, "fx_scale")) fx_scale = 1;
 fx_duration = 0.42;
 fx_flash_duration = 0.09;
 fx_flash_radius = 12;
@@ -39,6 +40,14 @@ if (fx_miniboss)
     fx_ring_width = 2;
     fx_spark_length = 14;
 }
+// Allow a shield burst to share the boss explosion at a smaller size.
+fx_flash_radius *= fx_scale;
+fx_burst_radius *= fx_scale;
+fx_launch_scale *= fx_scale;
+fx_debris_scale *= fx_scale;
+fx_spark_length *= fx_scale;
+fx_spark_count = ceil(fx_spark_count * fx_scale);
+fx_debris_count = ceil(fx_debris_count * fx_scale);
 fx_age = 0;
 fx_particles = [];
 

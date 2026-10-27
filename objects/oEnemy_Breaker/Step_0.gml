@@ -102,6 +102,9 @@ if (!_stunned && !_stagger) switch (breaker_state) {
         var _authored_windup = (breaker_bash_first_frame - 1) / _fps;
         var _active_start = breaker_bash_windup;
         var _active_end = _active_start + (breaker_bash_last_frame - breaker_bash_first_frame + 1) / _fps;
+        if (_previous_time < _active_start && breaker_time >= _active_start) {
+            world_sfx_play(breaker_unshielded ? sfxBreakerStabAttack : sfxBreakerShieldAttack, x, y);
+        }
         // Integrate just the part of this Step inside frames 7 through 9.
         var _active_dt = max(0, min(breaker_time, _active_end) - max(_previous_time, _active_start));
         if (_active_dt > 0) {
@@ -252,6 +255,7 @@ if (is_grounded && vertical_speed >= 0 && (breaker_airborne_attack()
     || (breaker_state == BreakerState.LAND && !breaker_landed))) {
     if (breaker_state != BreakerState.LAND) breaker_set_state(BreakerState.LAND);
     breaker_landed = true;
+    world_sfx_play(sfxBreakerSlam, x, y);
     breaker_time = 0; // The landing animation progresses only after actual impact.
     vertical_speed = 0;
     leap_cooldown = random_range(leap_cooldown_min, leap_cooldown_max);
@@ -346,5 +350,16 @@ sprite_index = _sprite;
 var _frames = max(1, sprite_get_number(_sprite));
 var _duration = _duration_override > 0 ? _duration_override : breaker_duration(_sprite);
 var _frame = floor(max(0, _anim_time) * _frames / _duration);
+// Two planted steps per walk cycle, following the distance-driven leg phase.
+var _walking_sound = _sprite == s_Breaker_walk || _sprite == s_Breaker_walk_unshielded
+    || _sprite == s_Breaker_walk_block;
+if (_walking_sound && is_grounded && abs(x - _start_x) > 0.001) {
+    var _footstep = floor(max(0, _anim_time) * 2 / _duration);
+    if (_footstep != breaker_footstep_index) {
+        world_sfx_play(sfxBreakerWalk, x, y);
+        breaker_footstep_index = _footstep;
+    }
+}
+else breaker_footstep_index = -1;
 image_index = _loop ? _frame mod _frames : min(_frames - 1, _frame);
 image_speed = 0;
