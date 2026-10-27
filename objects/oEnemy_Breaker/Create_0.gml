@@ -17,6 +17,7 @@ y += _old_feet - bbox_bottom;
 breaker_state = BreakerState.CHASE;
 breaker_time = 0;
 breaker_animation_time = 0;
+breaker_footstep_index = -1;
 breaker_unshielded = false;
 breaker_break_pending = false;
 breaker_hit_time = 0;
@@ -38,6 +39,18 @@ breaker_bash_hit = false;
 breaker_leap_hit = false;
 breaker_intercept = false;
 breaker_landed = false;
+breaker_shield_debris_spawned = false;
+breaker_shield_break_sound = -1;
+breaker_hit_sounds = [];
+breaker_play_hit_sound = function(_asset = sfxBreakerHit) {
+    if (breaker_shield_break_sound != -1 && audio_is_playing(breaker_shield_break_sound)) return;
+    for (var _i = array_length(breaker_hit_sounds) - 1; _i >= 0; _i--) {
+        if (!audio_is_playing(breaker_hit_sounds[_i])) array_delete(breaker_hit_sounds, _i, 1);
+    }
+    var _gain = _asset == sfxBreakerHitNoShield ? 2 : 1;
+    var _sound = world_sfx_play(_asset, x, y, _gain);
+    if (_sound != -1) array_push(breaker_hit_sounds, _sound);
+};
 facing_direction = 1;
 breaker_source_direction = 1;
 // Registration in the original 128x216 export canvas, before cropping.
@@ -115,7 +128,7 @@ maximum_fall_speed = 500;
 vertical_speed = 0;
 ground_check_distance = 1;
 is_grounded = false;
-ehp_max = 1000;
+ehp_max = 500;
 ehp = ehp_max;
 shield_hp_max = ehp_max * 0.5;
 shield_hp = shield_hp_max;
@@ -204,6 +217,16 @@ breaker_fps = function(_sprite) {
 breaker_duration = function(_sprite) {
     return max(1, sprite_get_number(_sprite)) / breaker_fps(_sprite);
 };
+breaker_spawn_wreckage = function(_shield) {
+    if (_shield && breaker_shield_debris_spawned) return;
+    if (_shield) breaker_shield_debris_spawned = true;
+    instance_create_depth((bbox_left + bbox_right) * 0.5, bbox_bottom + 1,
+        clamp(depth + 1, -15999, 15999), oBreakerWreckage, {
+            wreck_shield: _shield,
+            wreck_scale_x: abs(image_xscale) * facing_direction * breaker_source_direction,
+            wreck_scale_y: image_yscale
+        });
+};
 breaker_set_state = function(_state) {
     breaker_state = _state;
     breaker_time = 0;
@@ -212,7 +235,24 @@ breaker_set_state = function(_state) {
     breaker_hit_elapsed = 0;
     path_end();
     if (_state == BreakerState.BASH) breaker_bash_hit = false;
-    if (_state == BreakerState.JUMP_CHARGE) breaker_leap_hit = false;
+    if (_state == BreakerState.JUMP_CHARGE) {
+        breaker_leap_hit = false;
+    }
+    if (_state == BreakerState.RISE) world_sfx_play(sfxBreakerJump, x, y);
+    if (_state == BreakerState.SHIELD_BREAK) {
+        for (var _i = 0; _i < array_length(breaker_hit_sounds); _i++) {
+            audio_stop_sound(breaker_hit_sounds[_i]);
+        }
+        breaker_hit_sounds = [];
+        breaker_shield_break_sound = world_sfx_play(sfxBreakerShieldBreak, x, y);
+        world_sfx_play(sfxBreakerTransition, x, y, 1, 1, 1280);
+        breaker_spawn_wreckage(true);
+        var _sx = abs(image_xscale) * facing_direction * breaker_source_direction;
+        instance_create_depth((bbox_left + bbox_right) * 0.5 + (42 - 64 + 60) * _sx,
+            bbox_bottom + 1 + (118 - 208 + 45) * image_yscale,
+            clamp(depth - 1, -15999, 15999), oEnemyExplosion,
+            { fx_miniboss: true, fx_scale: 0.45 });
+    }
     if (_state == BreakerState.LAND) breaker_landed = false;
 };
 // Spawn-marker entrance: launch once, bypassing chase range and charge gates.
@@ -314,6 +354,7 @@ take_damage = function(_damage, _knockback_dir = 0, _knockback_force = 0,
         var _mult = _is_beam ? shield_front_beam_multiplier
             : (_is_sword ? shield_front_sword_multiplier : shield_front_bullet_multiplier);
         shield_hp = max(0, shield_hp - _damage * _mult);
+        if (shield_hp > 0) breaker_play_hit_sound();
         breaker_shield_flash_time = breaker_shield_flash_duration;
         if (shield_hp <= 0) breaker_request_break();
         else breaker_react_to_hit();
@@ -322,8 +363,10 @@ take_damage = function(_damage, _knockback_dir = 0, _knockback_force = 0,
     if (shield_hp <= 0) _damage *= _is_beam ? phase2_beam_damage_multiplier
         : (_is_sword ? phase2_sword_damage_multiplier : phase2_bullet_damage_multiplier);
     if (_back) _damage *= back_damage_multiplier;
-    if (breaker_unshielded && _damage > 0)
+    if (breaker_unshielded && _damage > 0) {
         breaker_body_flash_time = breaker_shield_flash_duration;
+        breaker_play_hit_sound(sfxBreakerHitNoShield);
+    }
     breaker_react_to_hit();
     // Block reactions handle stagger; beam pushback is handled separately above.
     // Avoid invoking the parent's Scout-specific dash parry or knockback.
@@ -355,6 +398,7 @@ slam_damage = function(_damage, _impact_x, _source) {
     var _back = sign(_impact_x - (bbox_left + bbox_right) * 0.5) == -facing_direction;
     if (shield_hp > 0 && !_back) {
         shield_hp = max(0, shield_hp - _damage * slam_shield_damage_multiplier);
+        if (shield_hp > 0) breaker_play_hit_sound();
         breaker_shield_flash_time = breaker_shield_flash_duration;
         if (shield_hp <= 0) breaker_request_break();
         else breaker_react_to_hit();
@@ -362,8 +406,10 @@ slam_damage = function(_damage, _impact_x, _source) {
     }
     if (shield_hp <= 0) _damage *= phase2_slam_damage_multiplier;
     if (_back) _damage *= back_damage_multiplier;
-    if (breaker_unshielded && _damage > 0)
+    if (breaker_unshielded && _damage > 0) {
         breaker_body_flash_time = breaker_shield_flash_duration;
+        breaker_play_hit_sound(sfxBreakerHitNoShield);
+    }
     breaker_react_to_hit();
     miniboss_parent_take_damage(_damage, 0, 0, false);
 };
