@@ -28,6 +28,33 @@ if (keyboard_check_pressed(vk_f5))
     global.dev_resume_input = false;
 }
 
+// Direct shortcuts share the dev menu's exhibition and pause guards above.
+if (keyboard_check_pressed(ord("M")))
+{
+    if (opened && map_open) resume_game();
+    else
+    {
+        if (!opened)
+        {
+            cursor_position = [mouse_x, mouse_y];
+            opened = true;
+            freeze_world();
+        }
+        run_action(12);
+    }
+    update_time();
+    update_enemy_freeze();
+    exit;
+}
+if (!opened && !keyboard_check(vk_shift) && keyboard_check_pressed(ord("R")))
+{
+    cursor_position = [mouse_x, mouse_y];
+    run_action(5);
+    update_time();
+    update_enemy_freeze();
+    exit;
+}
+
 if (keyboard_check_pressed(menu_key))
 {
     if (opened) resume_game();
