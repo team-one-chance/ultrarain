@@ -21,6 +21,15 @@ breaker_unshielded = false;
 breaker_break_pending = false;
 breaker_hit_time = 0;
 breaker_hit_elapsed = 0;
+breaker_shield_flash_time = 0;
+breaker_body_flash_time = 0;
+breaker_shield_flash_duration = 0.12;
+breaker_shield_flash_axis_uniform = shader_get_uniform(sh_BreakerShieldFlash, "u_shield_axis");
+breaker_shield_flash_radius_uniform = shader_get_uniform(sh_BreakerShieldFlash, "u_shield_radius");
+breaker_shield_flash_amount_uniform = shader_get_uniform(sh_BreakerShieldFlash, "u_flash");
+breaker_body_flash_uniform = shader_get_uniform(sh_BreakerShieldFlash, "u_whole_body");
+breaker_beam_knockback_distance = 0;
+breaker_beam_knockback_time = 0;
 breaker_control_grace = 0;
 breaker_control_grace_duration = 0.75;
 breaker_stun_budget = 0;
@@ -73,6 +82,21 @@ variable_struct_set(breaker_foot_offsets, sprite_get_name(s_Breaker_land_unshiel
 variable_struct_set(breaker_foot_offsets, sprite_get_name(s_Breaker_landrecovery), [88, 88, 88, 88, 88]);
 variable_struct_set(breaker_foot_offsets, sprite_get_name(s_Breaker_landrecovery_unshielded), [79, 80, 81, 76, 76]);
 
+// Shield stripe axes in cropped sprite pixels, indexed by animation frame.
+breaker_shield_axes = {};
+variable_struct_set(breaker_shield_axes, sprite_get_name(s_Breaker_idle), [[60.00, 3.50, 60.00, 87.50]]);
+variable_struct_set(breaker_shield_axes, sprite_get_name(s_Breaker_block), [[55.00, 5.50, 55.00, 89.50], [50.18, 3.67, 60.22, 86.28], [57.50, 6.50, 58.60, 90.51], [62.00, 7.50, 62.00, 91.50]]);
+variable_struct_set(breaker_shield_axes, sprite_get_name(s_Breaker_walk), [[71.00, 4.50, 71.00, 88.50], [71.00, 4.50, 71.00, 88.50], [71.00, 6.50, 71.00, 90.50], [71.00, 5.50, 71.00, 89.50], [71.00, 4.50, 71.00, 88.50], [71.00, 3.50, 71.00, 87.50], [71.00, 3.50, 71.00, 87.50], [71.00, 4.50, 71.00, 88.50], [71.00, 6.50, 71.00, 90.50], [71.00, 4.50, 71.00, 88.50], [71.00, 3.50, 71.00, 87.50], [71.00, 3.50, 71.00, 87.50]]);
+variable_struct_set(breaker_shield_axes, sprite_get_name(s_Breaker_walk_block), [[65.00, 3.50, 65.00, 87.50], [63.00, 3.50, 63.00, 87.50], [64.00, 5.50, 64.00, 89.50], [64.00, 5.50, 64.00, 89.50], [65.00, 4.50, 65.00, 88.50], [64.00, 3.50, 64.00, 87.50], [63.00, 3.50, 63.00, 87.50], [65.00, 4.50, 65.00, 88.50], [64.00, 6.50, 64.00, 90.50], [63.00, 4.50, 63.00, 88.50], [62.00, 5.50, 62.00, 89.50], [64.00, 4.50, 64.00, 88.50]]);
+variable_struct_set(breaker_shield_axes, sprite_get_name(s_Breaker_shieldbash), [[61.00, 3.50, 61.00, 87.50], [56.48, 5.64, 65.93, 89.20], [61.00, 6.50, 61.00, 90.50], [61.00, 6.50, 61.00, 90.50], [61.00, 6.50, 61.00, 90.50], [61.00, 6.50, 61.00, 90.50], [75.00, 5.50, 75.00, 89.50], [89.00, 4.50, 89.00, 88.50], [89.00, 5.50, 89.00, 89.50], [92.00, 5.50, 92.00, 89.50], [92.00, 5.50, 92.00, 89.50], [92.00, 5.50, 92.00, 89.50]]);
+variable_struct_set(breaker_shield_axes, sprite_get_name(s_Breaker_bashcooldown), [[76.00, 5.50, 76.00, 89.50], [75.00, 4.50, 75.00, 88.50], [75.00, 3.50, 75.00, 87.50], [75.00, 3.50, 75.00, 87.50], [75.00, 3.50, 75.00, 87.50], [70.00, 4.50, 70.00, 88.50], [63.86, 88.52, 65.95, 4.50], [63.00, 4.50, 63.00, 88.50], [62.00, 3.50, 62.00, 87.50]]);
+variable_struct_set(breaker_shield_axes, sprite_get_name(s_Breaker_jumpcharge), [[60.00, 3.50, 60.00, 87.50], [56.47, 5.64, 65.90, 89.32], [54.88, 4.99, 67.64, 88.24], [53.68, 6.23, 70.90, 88.85], [51.89, 6.42, 72.89, 88.64], [51.07, 7.92, 75.60, 88.18], [51.07, 7.92, 75.60, 88.18], [51.07, 7.92, 75.60, 88.18], [51.07, 7.92, 75.60, 88.18], [51.07, 7.92, 75.60, 88.18], [51.07, 7.92, 75.60, 88.18], [51.07, 7.92, 75.60, 88.18], [51.07, 7.92, 75.60, 88.18], [51.07, 7.92, 75.60, 88.18], [51.07, 9.92, 75.60, 90.18]]);
+variable_struct_set(breaker_shield_axes, sprite_get_name(s_Breaker_jump), [[54.07, 41.92, 78.60, 122.18], [28.78, 15.45, 97.47, 64.20], [3.50, 6.00, 87.50, 6.00], [3.50, 6.00, 87.50, 6.00], [3.50, 6.00, 87.50, 6.00], [3.50, 6.00, 87.50, 6.00], [3.50, 6.00, 87.50, 6.00]]);
+variable_struct_set(breaker_shield_axes, sprite_get_name(s_Breaker_slam_trans), [[3.50, 6.00, 87.50, 6.00], [9.53, 7.79, 93.44, 14.54], [16.94, 7.20, 99.90, 21.71], [23.69, 6.86, 105.20, 30.54], [31.67, 7.91, 109.88, 40.19], [40.07, 9.81, 114.39, 49.22], [47.51, 9.83, 116.82, 57.70]]);
+variable_struct_set(breaker_shield_axes, sprite_get_name(s_Breaker_slam), [[48.51, 0.83, 117.82, 48.70]]);
+variable_struct_set(breaker_shield_axes, sprite_get_name(s_Breaker_land), [[48.51, 0.83, 117.82, 48.70], [48.51, 0.83, 117.82, 48.70], [48.51, 0.83, 117.82, 48.70], [81.29, 90.43, 88.33, 6.54], [81.29, 94.43, 88.33, 10.54], [81.29, 90.43, 88.33, 6.54]]);
+variable_struct_set(breaker_shield_axes, sprite_get_name(s_Breaker_landrecovery), [[70.29, 88.43, 77.33, 4.54], [69.86, 88.52, 71.95, 4.50], [68.00, 4.50, 68.00, 88.50], [66.00, 3.50, 66.00, 87.50], [62.50, 3.50, 63.60, 87.51]]);
+
 // Existing combat tuning is retained; animation timing now controls each action.
 // A deliberate chase pace; the player base run is 264 px/s.
 ground_move_speed = 180;
@@ -91,7 +115,7 @@ maximum_fall_speed = 500;
 vertical_speed = 0;
 ground_check_distance = 1;
 is_grounded = false;
-ehp_max = 400;
+ehp_max = 1000;
 ehp = ehp_max;
 shield_hp_max = ehp_max * 0.5;
 shield_hp = shield_hp_max;
@@ -101,6 +125,9 @@ shield_bar_y_offset = 12;
 shield_front_bullet_multiplier = 0.10;
 shield_front_sword_multiplier = 5;
 shield_front_beam_multiplier = 1;
+// One through four coins: very little, little, moderate, relatively large.
+shield_beam_knockback_distances = [4, 12, 28, 56];
+shield_beam_knockback_duration = 0.12;
 phase2_bullet_damage_multiplier = 2;
 phase2_sword_damage_multiplier = 1;
 phase2_beam_damage_multiplier = 1;
@@ -263,7 +290,7 @@ miniboss_damage_player = function(_target, _damage) {
 
 miniboss_parent_take_damage = take_damage;
 take_damage = function(_damage, _knockback_dir = 0, _knockback_force = 0,
-    _is_sword = false, _hit_x = undefined, _is_beam = false) {
+    _is_sword = false, _hit_x = undefined, _is_beam = false, _beam_coins = 1) {
     if (_damage <= 0) return;
     var _attacker_x = _hit_x;
     if (is_undefined(_attacker_x)) {
@@ -272,10 +299,22 @@ take_damage = function(_damage, _knockback_dir = 0, _knockback_force = 0,
     }
     var _back = !is_undefined(_attacker_x)
         && sign(_attacker_x - (bbox_left + bbox_right) * 0.5) == -facing_direction;
+    // Shield impacts and phase-two body hits share the same coin-scaled push.
+    if (_is_beam && (breaker_unshielded || (shield_hp > 0 && !_back))
+        && !breaker_attacking()
+        && breaker_state != BreakerState.SHIELD_BREAK
+        && breaker_state != BreakerState.STUN
+        && place_meeting(x, y + ground_check_distance, o_Block)) {
+        var _tier = clamp(floor(_beam_coins), 1, array_length(shield_beam_knockback_distances)) - 1;
+        breaker_beam_knockback_distance = lengthdir_x(
+            shield_beam_knockback_distances[_tier], _knockback_dir);
+        breaker_beam_knockback_time = shield_beam_knockback_duration;
+    }
     if (shield_hp > 0 && !_back) {
         var _mult = _is_beam ? shield_front_beam_multiplier
             : (_is_sword ? shield_front_sword_multiplier : shield_front_bullet_multiplier);
         shield_hp = max(0, shield_hp - _damage * _mult);
+        breaker_shield_flash_time = breaker_shield_flash_duration;
         if (shield_hp <= 0) breaker_request_break();
         else breaker_react_to_hit();
         return;
@@ -283,9 +322,11 @@ take_damage = function(_damage, _knockback_dir = 0, _knockback_force = 0,
     if (shield_hp <= 0) _damage *= _is_beam ? phase2_beam_damage_multiplier
         : (_is_sword ? phase2_sword_damage_multiplier : phase2_bullet_damage_multiplier);
     if (_back) _damage *= back_damage_multiplier;
+    if (breaker_unshielded && _damage > 0)
+        breaker_body_flash_time = breaker_shield_flash_duration;
     breaker_react_to_hit();
-    // Hits stagger outside attacks via block_unshielded, without moving the body
-    // or invoking the parent's Scout-specific dash parry.
+    // Block reactions handle stagger; beam pushback is handled separately above.
+    // Avoid invoking the parent's Scout-specific dash parry or knockback.
     miniboss_parent_take_damage(_damage, _knockback_dir, 0, false);
 };
 slam_interrupt = function() {
@@ -314,12 +355,15 @@ slam_damage = function(_damage, _impact_x, _source) {
     var _back = sign(_impact_x - (bbox_left + bbox_right) * 0.5) == -facing_direction;
     if (shield_hp > 0 && !_back) {
         shield_hp = max(0, shield_hp - _damage * slam_shield_damage_multiplier);
+        breaker_shield_flash_time = breaker_shield_flash_duration;
         if (shield_hp <= 0) breaker_request_break();
         else breaker_react_to_hit();
         return;
     }
     if (shield_hp <= 0) _damage *= phase2_slam_damage_multiplier;
     if (_back) _damage *= back_damage_multiplier;
+    if (breaker_unshielded && _damage > 0)
+        breaker_body_flash_time = breaker_shield_flash_duration;
     breaker_react_to_hit();
     miniboss_parent_take_damage(_damage, 0, 0, false);
 };

@@ -10,6 +10,8 @@ var _start_x = x;
 var _previous_time = breaker_time;
 breaker_time += dt;
 breaker_hit_elapsed += dt;
+breaker_shield_flash_time = max(0, breaker_shield_flash_time - dt);
+breaker_body_flash_time = max(0, breaker_body_flash_time - dt);
 breaker_control_grace = max(0, breaker_control_grace - dt);
 var _was_staggered = breaker_unshielded && breaker_hit_time > 0;
 breaker_hit_time = max(0, breaker_hit_time - dt);
@@ -57,6 +59,13 @@ var _player_height = _player != noone ? bbox_bottom - _player.bbox_bottom : -inf
 if (!_stunned && !_stagger) switch (breaker_state) {
     case BreakerState.CHASE:
         if (_player == noone || !is_grounded) break;
+        // Let shield impacts play before starting another attack, including
+        // sword hits at melee range that would otherwise clear the reaction.
+        if (breaker_hit_time > 0) {
+            if (_distance > stand_range)
+                breaker_move_x(facing_direction * ground_move_speed * dt, true);
+            break;
+        }
         if (breaker_intercept_cooldown <= 0 && _distance <= breaker_intercept_range
             && _player_height > breaker_intercept_min_height
             && _player_height <= breaker_intercept_max_height) {
@@ -82,7 +91,9 @@ if (!_stunned && !_stagger) switch (breaker_state) {
             breaker_set_state(BreakerState.CHASE);
             break;
         }
-        if (_distance <= normal_attack_range) breaker_set_state(BreakerState.BASH);
+        if (_distance <= normal_attack_range) {
+            if (breaker_hit_time <= 0) breaker_set_state(BreakerState.BASH);
+        }
         else breaker_move_x(facing_direction * normal_attack_approach_speed * dt, true);
         break;
 
@@ -116,7 +127,8 @@ if (!_stunned && !_stagger) switch (breaker_state) {
         break;
 
     case BreakerState.COOLDOWN:
-        if (breaker_time >= breaker_duration(breaker_sprite(s_Breaker_bashcooldown, s_Breaker_bashcooldown_unshielded)))
+        if (breaker_hit_time <= 0
+            && breaker_time >= breaker_duration(breaker_sprite(s_Breaker_bashcooldown, s_Breaker_bashcooldown_unshielded)))
             breaker_set_state(BreakerState.CHASE);
         break;
 
@@ -198,6 +210,18 @@ if (!_stunned && !_stagger) switch (breaker_state) {
             breaker_set_state(BreakerState.CHASE);
         }
         break;
+}
+
+// Apply beam pushback in either phase over a short, frame-rate independent interval.
+if (breaker_beam_knockback_time > 0) {
+    var _push_dt = min(dt, breaker_beam_knockback_time);
+    var _push = breaker_beam_knockback_distance * _push_dt / breaker_beam_knockback_time;
+    if (!breaker_attacking() && !_stunned
+        && place_meeting(x, y + ground_check_distance, o_Block)) {
+        breaker_move_x(_push, true);
+    }
+    breaker_beam_knockback_distance -= _push;
+    breaker_beam_knockback_time = max(0, breaker_beam_knockback_time - _push_dt);
 }
 
 if (breaker_airborne_attack() && !_stunned) {

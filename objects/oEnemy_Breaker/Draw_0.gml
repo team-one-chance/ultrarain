@@ -57,8 +57,36 @@ if (variable_struct_exists(breaker_foot_offsets, _sprite_name)) {
     _draw_y = bbox_bottom + 1
         + (sprite_get_yoffset(sprite_index) - _feet[_frame]) * image_yscale;
 }
+// Phase one flashes shield markings; phase two flashes every red body marking.
+var _shield_flash = breaker_shield_flash_time > 0 && !breaker_unshielded
+    && variable_struct_exists(breaker_shield_axes, _sprite_name)
+    && shader_is_compiled(sh_BreakerShieldFlash);
+var _body_flash = breaker_unshielded && breaker_body_flash_time > 0
+    && shader_is_compiled(sh_BreakerShieldFlash);
+if (_shield_flash || _body_flash) {
+    shader_set(sh_BreakerShieldFlash);
+    shader_set_uniform_f(breaker_body_flash_uniform, _body_flash ? 1 : 0);
+    var _flash_time = _body_flash ? breaker_body_flash_time : breaker_shield_flash_time;
+    shader_set_uniform_f(breaker_shield_flash_amount_uniform,
+        min(1, _flash_time / (breaker_shield_flash_duration * 0.5)));
+}
+if (_shield_flash) {
+    var _axes = variable_struct_get(breaker_shield_axes, _sprite_name);
+    var _axis = _axes[clamp(floor(image_index), 0, array_length(_axes) - 1)];
+    var _x1 = (_axis[0] - sprite_get_xoffset(sprite_index)) * _scale_x;
+    var _y1 = (_axis[1] - sprite_get_yoffset(sprite_index)) * image_yscale;
+    var _x2 = (_axis[2] - sprite_get_xoffset(sprite_index)) * _scale_x;
+    var _y2 = (_axis[3] - sprite_get_yoffset(sprite_index)) * image_yscale;
+    var _cos = dcos(image_angle);
+    var _sin = dsin(image_angle);
+    shader_set_uniform_f(breaker_shield_flash_axis_uniform,
+        _draw_x + _x1 * _cos + _y1 * _sin, _draw_y - _x1 * _sin + _y1 * _cos,
+        _draw_x + _x2 * _cos + _y2 * _sin, _draw_y - _x2 * _sin + _y2 * _cos);
+    shader_set_uniform_f(breaker_shield_flash_radius_uniform, 5 * abs(image_yscale));
+}
 draw_sprite_ext(sprite_index, image_index, _draw_x, _draw_y,
     _scale_x, image_yscale, image_angle, image_blend, image_alpha);
+if (_shield_flash || _body_flash) shader_reset();
 
 // A small blue bar above the boss shows the remaining shield HP.
 // It disappears once the shield breaks; the red boss bar is unchanged.
