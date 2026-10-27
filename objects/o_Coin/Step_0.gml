@@ -1,34 +1,72 @@
-// =====================================
-// COIN ANCHOR - PINNED STATE
-// =====================================
-
 if (is_pinned)
 {
-    if (instance_exists(pin_owner))
+    var _pin_dt = max(
+        0,
+        (variable_global_exists("dev_delta_time")
+            ? global.dev_delta_time
+            : delta_time) / 1000000
+    );
+
+    pin_time_left -= _pin_dt;
+
+    if (pin_time_left <= 0)
     {
-        // Stop all coin movement.
+        // Release the player's active-coin reference.
+        if (instance_exists(pin_owner))
+        {
+            if (pin_owner.pinned_coin == id)
+                pin_owner.pinned_coin = noone;
+        }
+
+        is_pinned = false;
+        pin_owner = noone;
+        pin_was_supporting = false;
+        pin_drop_remaining = 0;
+
+        // Return to ordinary physics and gravity.
+        phy_position_x = pin_x;
+        phy_position_y = pin_y;
+        phy_active = true;
         phy_speed_x = 0;
         phy_speed_y = 0;
-
-        phy_angular_velocity = 0;
-
-
-        // Follow the player.
-        phy_position_x =
-            pin_owner.x
-            + (
-                pin_owner.pinned_coin_offset_x
-                * pin_owner.image_xscale
-            );
-
-        phy_position_y =
-            pin_owner.y
-            + pin_owner.pinned_coin_offset_y;
     }
     else
     {
-        is_pinned = false;
-        pin_owner = noone;
+        var _standing_player = instance_find(o_Player, 0);
+        var _occupied = pin_player_on_top(_standing_player);
+
+        // Upward movement immediately after standing on the coin.
+        if (pin_was_supporting
+        && instance_exists(_standing_player))
+        {
+            if (_standing_player.phy_speed_y < 0)
+            {
+                pin_drop_remaining = pin_jump_drop_distance;
+            }
+        }
+
+        pin_was_supporting = _occupied;
+
+        if (pin_drop_remaining > 0)
+        {
+            var _drop = min(
+                pin_drop_remaining,
+                pin_jump_drop_speed * _pin_dt
+            );
+
+            pin_y += _drop;
+            pin_drop_remaining -= _drop;
+        }
+        else if (_occupied)
+        {
+            var _sink = pin_sink_speed * _pin_dt;
+
+            pin_y += _sink;
+            _standing_player.phy_position_y += _sink;
+        }
+
+        phy_position_x = pin_x;
+        phy_position_y = pin_y;
     }
 }
 

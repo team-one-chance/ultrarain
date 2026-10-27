@@ -34,6 +34,7 @@ if ((button_hover && mouse_check_button_pressed(mb_left))
         // Rebuild the room and its physics instead of resuming a dead player.
         room_persistent = false;
         keyboard_string = "";
+		item_controllers_reset();
         room_restart();
         exit;
     }

@@ -180,7 +180,22 @@ var ground_right =
         true
     ) != noone;
 
-var on_ground = ground_left || ground_right;
+var _coin_ground = false;
+
+for (var _i = 0; _i < instance_number(o_Coin); _i++)
+{
+    var _coin = instance_find(o_Coin, _i);
+
+    if (!_coin.is_pinned) continue;
+
+    if (_coin.pin_player_on_top(id))
+    {
+        _coin_ground = true;
+        break;
+    }
+}
+
+var on_ground = ground_left || ground_right || _coin_ground;
 
 // Only the airborne-to-grounded transition plays a normal landing sound.
 if (on_ground && !sfx_was_grounded && phy_speed_y >= 0
@@ -2431,8 +2446,7 @@ if (
         pinned_coin =
             _oldest_coin;
 
-        pinned_coin.is_pinned = true;
-        pinned_coin.pin_owner = id;
+		pinned_coin.pin_here(id);
 
 
         // Start 8-second cooldown.

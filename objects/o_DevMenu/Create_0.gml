@@ -518,6 +518,7 @@ run_action = function(_action)
                 }
             }
             room_persistent = false;
+			item_controllers_reset();
             room_restart();
             return;
         case 20: instance_create_depth(cursor_position[0], cursor_position[1], 0, oEnemy_Scout); break;

@@ -1,3 +1,4 @@
+item_controllers_update(id);
 // Record both bodies before movement and the physics update.
 breaker_body_start_left = bbox_left;
 breaker_body_start_right = bbox_right;

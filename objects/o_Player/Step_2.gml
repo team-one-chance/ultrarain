@@ -61,3 +61,24 @@ for (var _i = 0; _i < array_length(breaker_body_snapshot); _i++) {
         phy_speed_x *= lerp(0.2, 1, _softness);
     }
 }
+
+// Begin Step already records these body coordinates
+// for the Breaker collision checks.
+var _coin_start_x =
+    (breaker_body_start_left + breaker_body_start_right) * 0.5
+    - 0.5;
+
+var _coin_start_y = breaker_body_start_bottom;
+
+for (var _coin_i = 0; _coin_i < instance_number(o_Coin); _coin_i++)
+{
+    var _pinned = instance_find(o_Coin, _coin_i);
+
+    if (!_pinned.is_pinned) continue;
+
+    _pinned.pin_resolve_player(
+        id,
+        _coin_start_x,
+        _coin_start_y
+    );
+}

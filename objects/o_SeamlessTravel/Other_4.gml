@@ -99,4 +99,7 @@ for (var _i = 0; _i < array_length(_audio_names); _i++)
     variable_instance_set(_player, _name, variable_struct_get(_room_audio, _name));
 }
 _player.depth = layer_get_depth(layer_get_id("Instances")) - 1;
+
+item_controllers_update(_player);
+
 transition_cooldown = 0.3;
