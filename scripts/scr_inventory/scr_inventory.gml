@@ -1,3 +1,120 @@
+// Inventory and collected controllers belonging to the current run.
+function item_run_inventory()
+{
+    if (!variable_global_exists("run_inventory"))
+        global.run_inventory = {};
+
+    if (!variable_global_exists("item_controllers"))
+        global.item_controllers = [];
+
+    return global.run_inventory;
+}
+
+
+// Called once by each pickup's Create event.
+function item_controller_init(_pickup)
+{
+    item_run_inventory();
+
+    _pickup.item_collected = false;
+    _pickup.item_owner = noone;
+
+    // Uncollected pickups remain in their original room.
+    _pickup.persistent = false;
+}
+
+
+// Collect a pickup and keep it alive as its own controller.
+function item_controller_collect(_pickup, _player)
+{
+    if (!instance_exists(_pickup)
+    || !instance_exists(_player))
+        return false;
+
+    if (_pickup.item_collected) return false;
+
+    _player.inventory = item_run_inventory();
+
+    if (!item_add_level(
+        _player,
+        _pickup.item_key,
+        _pickup.item_amount,
+        _pickup.item_max_level
+    ))
+    {
+        return false;
+    }
+
+    _pickup.item_collected = true;
+    _pickup.item_owner = _player;
+    _pickup.persistent = true;
+    _pickup.visible = false;
+
+    // Both current inventory pickups use physics.
+    // Collected controllers must no longer collide or fall.
+    _pickup.phy_active = false;
+
+    array_push(global.item_controllers, _pickup);
+
+    return true;
+}
+
+
+// Reconnect controllers to the current room's player.
+function item_controllers_update(_player)
+{
+    if (!instance_exists(_player)) return;
+
+    _player.inventory = item_run_inventory();
+
+    // Preserve compatibility with the existing Pinhouse code.
+    _player.item_coin_anchor =
+        item_get_level(_player, "coin_anchor") > 0;
+
+    for (
+        var _i = array_length(global.item_controllers) - 1;
+        _i >= 0;
+        _i--
+    )
+    {
+        var _controller = global.item_controllers[_i];
+
+        if (!instance_exists(_controller))
+        {
+            array_delete(global.item_controllers, _i, 1);
+            continue;
+        }
+
+        _controller.item_owner = _player;
+
+        // Keep the invisible controller near its owner.
+        _controller.x = _player.x;
+        _controller.y = _player.y;
+    }
+}
+
+
+// A fresh room restart discards the current inventory.
+function item_controllers_reset()
+{
+    item_run_inventory();
+
+    var _controllers = global.item_controllers;
+
+    global.item_controllers = [];
+    global.run_inventory = {};
+
+    for (var _i = 0; _i < array_length(_controllers); _i++)
+    {
+        var _controller = _controllers[_i];
+
+        if (instance_exists(_controller))
+        {
+            instance_destroy(_controller);
+        }
+    }
+}
+
 // Return an item's level. Unowned items return 0.
 function item_get_level(_player, _item)
 {

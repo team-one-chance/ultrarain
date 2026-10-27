@@ -1,3 +1,4 @@
+item_controllers_update(id);
 // Record both bodies before movement and the physics update.
 // Match the physics fixture, independent of animation bounds and facing.
 breaker_body_start_left = phy_position_x + 0.5 - player_collider_half_width;

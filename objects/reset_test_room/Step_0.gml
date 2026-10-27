@@ -21,6 +21,7 @@ if (keyboard_check(vk_shift)
 
     // Discard the current room's stored state before restarting.
     room_persistent = false;
+	item_controllers_reset();
     room_restart();
     exit;
 }
@@ -45,6 +46,7 @@ if (keyboard_check(vk_shift)
     }
 
     room_persistent = false;
+	item_controllers_reset();
     room_restart();
     exit;
 }

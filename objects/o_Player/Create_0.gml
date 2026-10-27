@@ -529,6 +529,8 @@ player_set_collider = function(_short)
     }
 
     physics_fixture_set_box_shape(_fix, _half_width, _half_height);
+	player_collider_half_width = _half_width;
+player_collider_height = _half_height * 2;
     physics_fixture_set_density(_fix, 0.5);
     physics_fixture_set_friction(_fix, 0.5);
     physics_fixture_set_restitution(_fix, 0);
@@ -897,7 +899,9 @@ coin_anchor_cooldown_timer = 0;
 
 hacking_controller = noone;
 
-// Restore inventory when arriving from the tutorial or train.
+// =====================================
+// RESTORE PLAYER
+// =====================================
 if (variable_global_exists("demo_travel_state"))
 {
     if (is_struct(global.demo_travel_state))
@@ -982,7 +986,7 @@ begin_grinder_death = function(_gear)
     global.demo_took_damage = true;
 };
 
-inventory = {};
+inventory = item_run_inventory();
 // Begin/End Step snapshots let Breaker's core stop a fast dash crossing in one tick.
 breaker_body_snapshot = [];
 breaker_body_sides = {};
