@@ -930,6 +930,17 @@ if (variable_global_exists("demo_travel_state"))
 // Chip enemy: player debuffs and wall-projectile response.
 chip_player_setup();
 
+// Changing the player's draw order must not move it out of its dedicated layer.
+player_room_layer = layer_get_id("Player");
+player_room_layer_depth = player_room_layer == -1 ? 0 : layer_get_depth(player_room_layer);
+player_set_draw_depth = function(_depth)
+{
+    if (player_room_layer != -1 && layer == player_room_layer)
+        layer_depth(player_room_layer, _depth);
+    else
+        depth = _depth;
+};
+
 grinder_dying = false;
 grinder_elapsed = 0;
 grinder_pull_duration = 0.35;
@@ -972,7 +983,7 @@ begin_grinder_death = function(_gear)
     grinder_gear_depth = _gear.depth;
 
     // Draw the body behind the teeth as it is pulled inward.
-    depth = grinder_gear_depth + 1;
+    player_set_draw_depth(grinder_gear_depth + 1);
     image_speed = 0;
 
     is_slamming = false;

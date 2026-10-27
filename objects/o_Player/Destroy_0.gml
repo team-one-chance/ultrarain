@@ -27,3 +27,7 @@ if (pHP <= 0)
         oPlayerExplosion
     );
 }
+
+// The persistent room may recreate the player after a grinder death or travel.
+if (player_room_layer != -1 && layer_exists(player_room_layer))
+    layer_depth(player_room_layer, player_room_layer_depth);

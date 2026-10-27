@@ -54,7 +54,7 @@ if (grinder_dying)
         grinder_pull_duration + grinder_crush_duration)
     {
         // Let the existing Destroy event produce the explosion.
-        depth = grinder_gear_depth - 1;
+        player_set_draw_depth(grinder_gear_depth - 1);
         pHP = 0;
         instance_destroy();
     }
