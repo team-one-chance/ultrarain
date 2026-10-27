@@ -18,9 +18,10 @@ if (_was_staggered && breaker_hit_time <= 0)
 hit_timer = max(0, hit_timer - dt);
 normal_attack_cooldown = max(0, normal_attack_cooldown - dt);
 leap_cooldown = max(0, leap_cooldown - dt);
+breaker_intercept_cooldown = max(0, breaker_intercept_cooldown - dt);
 var _player = instance_nearest(x, y, o_Player);
 var _centre = (bbox_left + bbox_right) * 0.5;
-if (_player != noone) {
+if (_player != noone && !(breaker_intercept && breaker_contact_active())) {
     var _facing = sign(_player.x - _centre);
     if (_facing != 0) facing_direction = _facing;
 }
@@ -51,12 +52,21 @@ var _charge = breaker_sprite(s_Breaker_jumpcharge, s_Breaker_jumpcharge_unshield
 var _land = breaker_sprite(s_Breaker_land, s_Breaker_land_unshielded);
 var _distance = _player != noone ? abs(_player.x - _centre) : infinity;
 var _feet_difference = _player != noone ? abs(_player.bbox_bottom - bbox_bottom) : infinity;
+var _player_height = _player != noone ? bbox_bottom - _player.bbox_bottom : -infinity;
 
 if (!_stunned && !_stagger) switch (breaker_state) {
     case BreakerState.CHASE:
         if (_player == noone || !is_grounded) break;
-        if (leap_cooldown <= 0 && _distance >= leap_trigger_min_distance
+        if (breaker_intercept_cooldown <= 0 && _distance <= breaker_intercept_range
+            && _player_height > breaker_intercept_min_height
+            && _player_height <= breaker_intercept_max_height) {
+            breaker_intercept = true;
+            leap_target_x = _player.x;
+            breaker_set_state(BreakerState.JUMP_CHARGE);
+        }
+        else if (leap_cooldown <= 0 && _distance >= leap_trigger_min_distance
             && _distance <= leap_trigger_max_distance && _feet_difference <= leap_vertical_tolerance) {
+            breaker_intercept = false;
             leap_target_x = _player.x;
             breaker_set_state(BreakerState.JUMP_CHARGE);
         }
@@ -113,13 +123,26 @@ if (!_stunned && !_stagger) switch (breaker_state) {
     case BreakerState.JUMP_CHARGE:
         if (_player != noone) leap_target_x = _player.x;
         if (breaker_time >= breaker_duration(_charge)) {
-            vertical_speed = leap_jump_speed;
+            leap_launch_speed = leap_jump_speed;
+            if (breaker_intercept && _player != noone) {
+                // Reach higher walljumps without changing the normal slam arc.
+                var _height = max(0, bbox_bottom - _player.bbox_bottom) + 24;
+                leap_launch_speed = -clamp(sqrt(2 * gravity_force * _height),
+                    abs(leap_jump_speed), breaker_intercept_max_jump_speed);
+                // Physics speed is in pixels per game frame; lead is bounded.
+                leap_target_x += clamp(_player.phy_speed_x * game_get_speed(gamespeed_fps)
+                    * breaker_intercept_prediction_time,
+                    -breaker_intercept_max_lead, breaker_intercept_max_lead);
+                var _launch_facing = sign(leap_target_x - _centre);
+                if (_launch_facing != 0) facing_direction = _launch_facing;
+            }
+            vertical_speed = leap_launch_speed;
             breaker_set_state(BreakerState.RISE);
         }
         break;
 
     case BreakerState.RISE:
-        if (_player != noone) leap_target_x = _player.x;
+        if (!breaker_intercept && _player != noone) leap_target_x = _player.x;
         // Start the turn just before the apex; finish it just after the apex.
         if (vertical_speed >= -gravity_force * breaker_turn_duration * 0.5)
             breaker_set_state(BreakerState.SLAM_TURN);
@@ -208,10 +231,11 @@ if (is_grounded && vertical_speed >= 0 && (breaker_airborne_attack()
     breaker_time = 0; // The landing animation progresses only after actual impact.
     vertical_speed = 0;
     leap_cooldown = random_range(leap_cooldown_min, leap_cooldown_max);
+    breaker_intercept_cooldown = breaker_intercept_cooldown_duration;
     var _landing_target = collision_rectangle(bbox_left - leap_landing_range,
         bbox_bottom - leap_landing_height, bbox_right + leap_landing_range,
         bbox_bottom + ground_check_distance, o_Player, false, true);
-    if (_landing_target != noone) miniboss_damage_player(_landing_target, leap_damage);
+    if (_landing_target != noone) breaker_leap_damage_player(_landing_target);
 }
 
 var _sprite = breaker_sprite(s_Breaker_idle, s_Breaker_idle_unshielded);
@@ -227,7 +251,7 @@ switch (breaker_state) {
             _sprite = breaker_unshielded ? s_Breaker_block_unshielded
                 : (abs(x - _start_x) > 0.001 ? s_Breaker_walk_block : s_Breaker_block);
             _anim_time = breaker_hit_elapsed;
-            _loop = false;
+            _loop = _sprite == s_Breaker_walk_block;
         }
         break;
     case BreakerState.BASH:
@@ -247,7 +271,7 @@ switch (breaker_state) {
     case BreakerState.JUMP_CHARGE: _sprite = _charge; break;
     case BreakerState.RISE:
         _sprite = breaker_sprite(s_Breaker_jump, s_Breaker_jump_unshielded);
-        _duration_override = max(0.001, -leap_jump_speed / gravity_force - breaker_turn_duration * 0.5);
+        _duration_override = max(0.001, -leap_launch_speed / gravity_force - breaker_turn_duration * 0.5);
         break;
     case BreakerState.SLAM_TURN:
         _sprite = breaker_sprite(s_Breaker_slam_trans, s_Breaker_slam_trans_unshielded);
@@ -281,9 +305,16 @@ switch (breaker_state) {
 }
 // Locomotion gets its own clock; one-shot states use time since entry.
 if (_loop && breaker_state != BreakerState.STUN) {
-    if (sprite_index != _sprite) breaker_animation_time = 0;
-    else if (_sprite == s_Breaker_walk || _sprite == s_Breaker_walk_unshielded)
+    var _walking = _sprite == s_Breaker_walk || _sprite == s_Breaker_walk_unshielded
+        || _sprite == s_Breaker_walk_block;
+    var _was_walking = sprite_index == s_Breaker_walk || sprite_index == s_Breaker_walk_unshielded
+        || sprite_index == s_Breaker_walk_block;
+    if (_walking) {
+        // Walk and walk_block share leg frames and a distance-driven phase.
+        if (!_was_walking) breaker_animation_time = 0;
         breaker_animation_time += abs(x - _start_x) / breaker_walk_cycle_distance * breaker_duration(_sprite);
+    }
+    else if (sprite_index != _sprite) breaker_animation_time = 0;
     else breaker_animation_time += dt;
     _anim_time = breaker_animation_time;
 }
