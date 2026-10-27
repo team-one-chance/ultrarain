@@ -153,7 +153,7 @@ boot_menu_activate = function()
             }
             break;
         case BootMenuState.DIFFICULTY:
-            // All difficulties continue to the intro; gameplay tuning comes later.
+            if (menu_selection != 3) global.game_difficulty = menu_selection;
             boot_menu_open(menu_selection == 3 ? BootMenuState.MAIN : 0);
             break;
         case BootMenuState.SETTINGS:

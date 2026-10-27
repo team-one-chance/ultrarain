@@ -15,7 +15,7 @@ if ((button_hover && mouse_check_button_pressed(mb_left))
         var _checkpoint = instance_find(o_TutorialCheckpoint, 0);
         global.tutorial_checkpoint_retry = {
             x: _checkpoint.respawn_x, y: _checkpoint.respawn_y,
-            cleared: _checkpoint.big_room_cleared
+            cleared: _checkpoint.big_room_cleared, layers: _checkpoint.checkpoint_layers
         };
         global.demo_travel_state = undefined;
         with (o_SeamlessTravel)

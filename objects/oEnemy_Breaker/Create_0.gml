@@ -137,8 +137,9 @@ hit_timer = 0;
 normal_attack_damage = 12;
 normal_attack_range = 36;
 normal_attack_vertical_tolerance = 30;
-normal_attack_cooldown_min = 0.6;
-normal_attack_cooldown_max = 0.9;
+var _breaker_wait = enemy_difficulty == 0 ? 1.25 : (enemy_difficulty == 2 ? 0.85 : 1);
+normal_attack_cooldown_min = 0.6 * _breaker_wait;
+normal_attack_cooldown_max = 0.9 * _breaker_wait;
 normal_attack_cooldown = random_range(normal_attack_cooldown_min, normal_attack_cooldown_max);
 stand_range = 85;
 // Human frame numbers: damage and movement start at 7, end after 9.
@@ -158,8 +159,8 @@ leap_fall_gravity_multiplier = 4;
 leap_max_fall_speed = 1200;
 leap_landing_range = 48;
 leap_landing_height = 20;
-leap_cooldown_min = 5;
-leap_cooldown_max = 7;
+leap_cooldown_min = 5 * _breaker_wait;
+leap_cooldown_max = 7 * _breaker_wait;
 leap_cooldown = 0; // Ready to punish a distant player immediately.
 leap_target_x = x;
 breaker_jump_charge_duration = 0.625;
@@ -169,7 +170,7 @@ breaker_intercept_max_height = 420;
 breaker_intercept_max_jump_speed = 900;
 breaker_intercept_prediction_time = 0.20;
 breaker_intercept_max_lead = 80;
-breaker_intercept_cooldown_duration = 2;
+breaker_intercept_cooldown_duration = 2 * _breaker_wait;
 breaker_intercept_cooldown = 0;
 // Fit the entire turn to the apex instead of hovering for the authored duration.
 breaker_turn_duration = 0.18;

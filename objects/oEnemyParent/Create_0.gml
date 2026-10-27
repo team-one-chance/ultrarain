@@ -2,6 +2,9 @@
 // NAVIGATION GLOBAL
 // =====================================
 
+// Direct room launches default to Normal. Children tune their own idle delays.
+enemy_difficulty = variable_global_exists("game_difficulty") ? global.game_difficulty : 1;
+
 var cell_size = 16;
 
 nav_grid = mp_grid_create(

@@ -8,7 +8,8 @@ if (!instance_exists(o_PauseMenu)) instance_create_depth(0, 0, -15000, o_PauseMe
 // HEALTH
 // =====================================
 
-pHP_max = 150;
+pHP_max = !variable_global_exists("game_difficulty") ? 150
+    : (global.game_difficulty == 0 ? 200 : (global.game_difficulty == 2 ? 100 : 150));
 pHP = pHP_max;
 dmg_cooldown = 0;
 
