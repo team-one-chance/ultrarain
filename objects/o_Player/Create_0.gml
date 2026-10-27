@@ -544,6 +544,8 @@ player_set_collider = function(_short)
 
     physics_fixture_delete(_fix);
     player_collider_short = _short;
+    player_collider_half_width = _half_width;
+    player_collider_height = _half_height * 2;
     phy_fixed_rotation = true;
 };
 
@@ -983,3 +985,4 @@ begin_grinder_death = function(_gear)
 inventory = {};
 // Begin/End Step snapshots let Breaker's core stop a fast dash crossing in one tick.
 breaker_body_snapshot = [];
+breaker_body_sides = {};
