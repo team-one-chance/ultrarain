@@ -82,12 +82,12 @@ if (instance_exists(_old_player))
 // Tutorial Create resets fresh-run history; a seamless return is the same run.
 var _took_damage = global.demo_took_damage;
 var _used_healing = global.demo_used_healing;
-var _player = instance_create_depth(
-    _arrival.x,
-    _arrival.y,
-    0,
-    o_Player
-);
+var _player_layer = layer_get_id("Player");
+var _player;
+if (_player_layer != -1)
+    _player = instance_create_layer(_arrival.x, _arrival.y, _player_layer, o_Player);
+else
+    _player = instance_create_depth(_arrival.x, _arrival.y, 0, o_Player);
 global.demo_took_damage = _took_damage;
 global.demo_used_healing = _used_healing;
 
@@ -98,5 +98,6 @@ for (var _i = 0; _i < array_length(_audio_names); _i++)
     var _name = _audio_names[_i];
     variable_instance_set(_player, _name, variable_struct_get(_room_audio, _name));
 }
-_player.depth = layer_get_depth(layer_get_id("Instances")) - 1;
+if (_player_layer == -1)
+    _player.depth = layer_get_depth(layer_get_id("Instances")) - 1;
 transition_cooldown = 0.3;

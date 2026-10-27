@@ -48,6 +48,7 @@ with (o_light_ceil_long_ow)
 }
 with (o_DoorController)
 {
+    if (!layer_get_visible(layer)) continue;
     var _terminal_color = controller_state == 0
         ? _renderer.terminal_idle_color
         : _renderer.terminal_used_color;
@@ -57,12 +58,14 @@ with (o_DoorController)
 }
 with (o_DemoTerminal)
 {
+    if (!layer_get_visible(layer)) continue;
     _renderer.draw_soft_light((bbox_left + bbox_right) * 0.5,
         (bbox_top + bbox_bottom) * 0.5, _renderer.terminal_radius,
         _renderer.demo_terminal_color, _renderer.terminal_strength);
 }
 with (o_Block_wires)
 {
+    if (!layer_get_visible(layer)) continue;
     for (var _i = 0; _i < array_length(wire_arcs); _i++)
     {
         var _arc = wire_arcs[_i];
@@ -170,10 +173,12 @@ if (bloom_enabled && (bloom_strength > 0 || scout_bloom_strength > 0 || player_b
             _renderer.draw_lamp_bloom(id, _renderer.ceiling_light,
                 image_index < 1 ? _renderer.ceiling_flicker.dim_multiplier : 1);
         with (o_DoorController)
+        if (layer_get_visible(layer))
             _renderer.draw_bloom_point((bbox_left + bbox_right) * 0.5, (bbox_top + bbox_bottom) * 0.5,
                 controller_state == 0 ? _renderer.terminal_idle_color : _renderer.terminal_used_color,
                 _renderer.terminal_bloom_strength);
         with (o_DemoTerminal)
+        if (layer_get_visible(layer))
             _renderer.draw_bloom_point((bbox_left + bbox_right) * 0.5, (bbox_top + bbox_bottom) * 0.5,
                 _renderer.demo_terminal_color, _renderer.terminal_bloom_strength);
         with (o_ShotImpact)
@@ -192,6 +197,7 @@ if (bloom_enabled && (bloom_strength > 0 || scout_bloom_strength > 0 || player_b
         }
         with (o_Block_wires)
         {
+            if (!layer_get_visible(layer)) continue;
             for (var _i = 0; _i < array_length(wire_arcs); _i++)
             {
                 var _arc = wire_arcs[_i];
@@ -372,7 +378,7 @@ if (bloom_enabled && (bloom_strength > 0 || scout_bloom_strength > 0 || player_b
             draw_clear_alpha(c_black, 1);
             with (oLavaFromTheMolten)
             {
-                if (visible && sprite_index != -1 && image_alpha > 0)
+                if (visible && layer_get_visible(layer) && sprite_index != -1 && image_alpha > 0)
                 {
                     draw_sprite_ext(sprite_index, image_index, x, y,
                         image_xscale, image_yscale, image_angle, image_blend, image_alpha);
