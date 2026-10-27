@@ -39,7 +39,7 @@ if (sprite_index == s_Scout_charge && attack_state == 2)
     draw_set_color(c_red);
     draw_set_alpha(lerp(0.45, 1, _progress));
     // A filled strip gives the oval a solid three-pixel stroke.
-    var _stroke_half = 1.5;
+    var _stroke_half = 1;
     var _segments = 64;
     draw_primitive_begin(pr_trianglestrip);
     for (var _i = 0; _i <= _segments; ++_i)

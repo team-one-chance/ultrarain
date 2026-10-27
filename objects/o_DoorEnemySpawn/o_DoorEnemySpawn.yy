@@ -24,6 +24,7 @@
   "physicsShapePoints":[],
   "physicsStartAwake":true,
   "properties":[
+    {"$GMObjectProperty":"v2","%Name":"breaker_entrance_slam","filters":[],"listItems":[],"multiselect":false,"name":"breaker_entrance_slam","rangeEnabled":false,"rangeMax":10.0,"rangeMin":0.0,"resourceType":"GMObjectProperty","resourceVersion":"2.0","value":"False","varType":3,},
     {"$GMObjectProperty":"v2","%Name":"ambush_group","filters":[],"listItems":[],"multiselect":false,"name":"ambush_group","rangeEnabled":false,"rangeMax":10.0,"rangeMin":0.0,"resourceType":"GMObjectProperty","resourceVersion":"2.0","value":"0.0","varType":0,},
     {"$GMObjectProperty":"v2","%Name":"enemy_object","filters":[],"listItems":[],"multiselect":false,"name":"enemy_object","rangeEnabled":false,"rangeMax":10.0,"rangeMin":0.0,"resource":{"name":"oEnemy_Scout","path":"objects/oEnemy_Scout/oEnemy_Scout.yy",},"resourceType":"GMObjectProperty","resourceVersion":"2.0","value":"oEnemy_Scout","varType":5,},
   ],

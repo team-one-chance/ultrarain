@@ -546,6 +546,8 @@ player_collider_height = _half_height * 2;
 
     physics_fixture_delete(_fix);
     player_collider_short = _short;
+    player_collider_half_width = _half_width;
+    player_collider_height = _half_height * 2;
     phy_fixed_rotation = true;
 };
 
@@ -987,3 +989,25 @@ begin_grinder_death = function(_gear)
 inventory = item_run_inventory();
 // Begin/End Step snapshots let Breaker's core stop a fast dash crossing in one tick.
 breaker_body_snapshot = [];
+breaker_body_sides = {};
+
+// Sweep from the torso to the aimed muzzle; do not spawn physics through terrain.
+coin_spawn_at_muzzle = function()
+{
+    var _muzzle = player_get_muzzle();
+    var _start_x = x;
+    var _start_y = y - (is_sliding ? 12 : 32);
+    var _distance = point_distance(_start_x, _start_y, _muzzle.muzzle_x, _muzzle.muzzle_y);
+    var _steps = max(1, ceil(_distance / 2));
+    var _coin_x = _start_x;
+    var _coin_y = _start_y;
+    for (var _i = 1; _i <= _steps; _i++)
+    {
+        var _next_x = lerp(_start_x, _muzzle.muzzle_x, _i / _steps);
+        var _next_y = lerp(_start_y, _muzzle.muzzle_y, _i / _steps);
+        if (collision_circle(_next_x, _next_y, 5, o_Block, false, true) != noone) break;
+        _coin_x = _next_x;
+        _coin_y = _next_y;
+    }
+    return instance_create_layer(_coin_x, _coin_y, "Instances", o_Coin);
+};

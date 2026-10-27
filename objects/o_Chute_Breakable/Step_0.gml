@@ -5,7 +5,8 @@ if (break_requested && !broken)
     world_sfx_play(sfxDoorBreaking, x, y, 0.8);
 
     var _alarm_player = instance_nearest(x, y, o_Player);
-    if (instance_exists(_alarm_player)) _alarm_player.start_ambush_alarm_sfx(id);
+    if (spawns_ambush && instance_exists(_alarm_player))
+        _alarm_player.start_ambush_alarm_sfx(id);
 
     physics_remove_fixture(id, door_fixture);
     door_fixture = -1;
@@ -41,6 +42,13 @@ if (broken)
 {
     flash_elapsed += (variable_global_exists("dev_delta_time") ? (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) : delta_time) / 1000000;
 
+    // Ordinary covers break without claiming any ambush markers.
+    if (!spawns_ambush)
+    {
+        instance_destroy();
+        exit;
+    }
+
     // Spawn enemies after the three flashes finish.
     if (flash_elapsed >= flash_duration)
     {
@@ -54,6 +62,10 @@ if (broken)
                 var _spawned_enemy = instance_create_layer(
                     x, y, "Instances", enemy_object
                 );
+                if (breaker_entrance_slam && enemy_object == oEnemy_Breaker)
+                {
+                    _spawned_enemy.breaker_start_entrance_slam();
+                }
                 if (instance_exists(_alarm_player))
                 {
                     array_push(_alarm_player.ambush_alarm_enemies, _spawned_enemy);

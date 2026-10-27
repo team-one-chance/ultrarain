@@ -123,6 +123,26 @@ if (place_meeting(x, y, oEnemy_Scout))
     instance_destroy();
 }
 */
+// Coins wedged between a door and terrain must not accumulate physics contacts.
+var _touching_door = place_meeting(x, y, [o_Door_UNB, o_Door_Breakable, o_Chute_Breakable]);
+var _touching_block = place_meeting(x, y, o_Block);
+if (!is_pinned && _touching_door && _touching_block)
+{
+    instance_destroy();
+    exit;
+}
+if (!is_pinned && (_touching_door || _touching_block)
+&& abs(phy_speed_x) + abs(phy_speed_y) < 0.2)
+{
+    geometry_stall_time += (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) / 1000000;
+    if (geometry_stall_time >= 0.2)
+    {
+        instance_destroy();
+        exit;
+    }
+}
+else geometry_stall_time = 0;
+
 // =====================================
 // APEX ANIMATION
 // =====================================

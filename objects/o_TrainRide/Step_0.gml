@@ -11,11 +11,7 @@ if (!ride_started)
         exit;
     }
 
-    var _inside =
-        _boarding_player.x >= train_left + 80
-        && _boarding_player.x <= train_right - 80
-        && _boarding_player.y >= train_roof + 64
-        && _boarding_player.y <= train_floor + 8;
+    var _inside = train_player_inside(_boarding_player);
 
     if (_inside)
     {
