@@ -103,6 +103,18 @@ map_begin_scan = function()
     map_scan_layer = 0;
     map_scan_cell = 0;
     map_content_bounds = [room_width, room_height, 0, 0];
+    // Conservative authored terrain envelope, with room for expansion. Other rooms
+    // retain the full-room scan until they have a known playable envelope.
+    var _scan_bounds = [0, 0, room_width, room_height];
+    if (room == LE_TUTORIAL_WIP)
+        _scan_bounds = [0, 0, min(room_width, 10600), min(room_height, 5200)];
+    if (!is_undefined(map_player))
+    {
+        _scan_bounds[0] = max(0, min(_scan_bounds[0], map_player[0] - 512));
+        _scan_bounds[1] = max(0, min(_scan_bounds[1], map_player[1] - 512));
+        _scan_bounds[2] = min(room_width, max(_scan_bounds[2], map_player[0] + 512));
+        _scan_bounds[3] = min(room_height, max(_scan_bounds[3], map_player[1] + 512));
+    }
     var _layers = layer_get_all();
     for (var _i = 0; _i < array_length(_layers); ++_i)
     {
@@ -114,12 +126,20 @@ map_begin_scan = function()
         var _width = tilemap_get_width(_tilemap);
         var _height = tilemap_get_height(_tilemap);
         if (_width <= 0 || _height <= 0) continue;
+        var _tw = tilemap_get_tile_width(_tilemap);
+        var _th = tilemap_get_tile_height(_tilemap);
+        if (_tw <= 0 || _th <= 0) continue;
+        var _x = layer_get_x(_layer) + tilemap_get_x(_tilemap);
+        var _y = layer_get_y(_layer) + tilemap_get_y(_tilemap);
+        var _left = clamp(floor((_scan_bounds[0] - _x) / _tw), 0, _width);
+        var _top = clamp(floor((_scan_bounds[1] - _y) / _th), 0, _height);
+        var _right = clamp(ceil((_scan_bounds[2] - _x) / _tw), 0, _width);
+        var _bottom = clamp(ceil((_scan_bounds[3] - _y) / _th), 0, _height);
+        if (_right <= _left || _bottom <= _top) continue;
         array_push(map_scan_layers, { depth: layer_get_depth(_layer), tilemap: _tilemap,
-            tileset: _tileset, tiles: [], width: _width, height: _height,
-            tile_width: tilemap_get_tile_width(_tilemap),
-            tile_height: tilemap_get_tile_height(_tilemap),
-            x: layer_get_x(_layer) + tilemap_get_x(_tilemap),
-            y: layer_get_y(_layer) + tilemap_get_y(_tilemap),
+            tileset: _tileset, tiles: [], width: _right - _left, height: _bottom - _top,
+            left: _left, top: _top, tile_width: _tw, tile_height: _th,
+            x: _x, y: _y,
             fit: string_pos("bg_", string_lower(layer_get_name(_layer))) != 1 });
     }
     map_scan_started = true;
@@ -137,12 +157,13 @@ map_update_scan = function()
         var _total = _item.width * _item.height;
         while (map_scan_cell < _total)
         {
-            var _data = tilemap_get(_item.tilemap, map_scan_cell mod _item.width,
-                floor(map_scan_cell / _item.width));
+            var _cell_x = _item.left + map_scan_cell mod _item.width;
+            var _cell_y = _item.top + floor(map_scan_cell / _item.width);
+            var _data = tilemap_get(_item.tilemap, _cell_x, _cell_y);
             if (tile_get_index(_data) != 0)
             {
-                var _x = _item.x + (map_scan_cell mod _item.width) * _item.tile_width;
-                var _y = _item.y + floor(map_scan_cell / _item.width) * _item.tile_height;
+                var _x = _item.x + _cell_x * _item.tile_width;
+                var _y = _item.y + _cell_y * _item.tile_height;
                 array_push(_item.tiles, { data: _data, x: _x, y: _y });
                 if (_item.fit)
                 {
@@ -390,13 +411,13 @@ menu_label = function(_action)
         case 2: return "Refill health and coins";
         case 3: return "Equip pistol / reset cooldown";
         case 4: return "Equip sword / reset cooldown";
-        case 5: return "Teleport to cursor captured on opening";
+        case 5: return "Teleport to cursor captured on opening [R in game]";
         case 6: return "Save current test position";
         case 7: return "Teleport to saved position" + (is_undefined(test_position) ? " (none saved)" : "");
         case 8: return "Teleport to room spawn";
         case 9: return "Restart room";
         case 10: return "Close menu";
-        case 12: return "Open level map / click to teleport";
+        case 12: return "Open level map / click to teleport [M]";
 		case 11: return "Freecam [F6]: " + (global.dev_freecam ? "ON" : "OFF");
         case 20: return "Spawn scout at captured cursor";
         case 21: return "Spawn drone at captured cursor";
