@@ -266,6 +266,8 @@ function seamless_rebuild_room_physics()
         physics_fixture_delete(_fix);
     }
 
+    with (o_PlayerBarrier) barrier_bind_physics();
+
     // Thick doors: open doors remain nonblocking.
     with (o_Door_UNB)
     {

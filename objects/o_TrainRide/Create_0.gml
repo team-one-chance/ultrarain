@@ -25,6 +25,7 @@ scenery_max_speed = 220;
 scenery_speed = 0;
 scenery_distance = 0;
 departure_enemies = [];
+departure_wall_tiles = [];
 cruise_duration = max(0, ride_duration - arrival_duration);
 total_travel_distance = scenery_max_speed * cruise_duration
     + scenery_max_speed * arrival_duration * 0.5;
@@ -108,6 +109,15 @@ train_find_entrance = function()
     return true;
 };
 
+train_player_inside = function(_player)
+{
+    return instance_exists(_player)
+        && _player.x + 0.5 - _player.player_collider_half_width >= train_left + 34
+        && _player.x + 0.5 + _player.player_collider_half_width <= train_right - 34
+        && _player.y - _player.player_collider_height >= train_roof + 32
+        && _player.y <= train_floor + 8;
+};
+
 begin_ride = function(_player)
 {
     if (ride_started
@@ -119,13 +129,7 @@ begin_ride = function(_player)
     }
 
     // The player must be safely inside the cabin.
-    if (_player.x < train_left + 80
-    || _player.x > train_right - 80
-    || _player.y < train_roof + 64
-    || _player.y > train_floor + 8)
-    {
-        return false;
-    }
+    if (!train_player_inside(_player)) return false;
 
     if (!train_find_entrance()) return false;
 
@@ -181,6 +185,38 @@ begin_ride = function(_player)
 	
 	// Enemies outside the cabin belong to the departing scenery.
     departure_enemies = [];
+    departure_wall_tiles = [];
+    var _layers = layer_get_all();
+    for (var _layer_i = 0; _layer_i < array_length(_layers); _layer_i++)
+    {
+        var _layer = _layers[_layer_i];
+        var _name = layer_get_name(_layer);
+        // Scenery layers already have their own train transform.
+        if (_layer == departure_layer || _layer == underwalkway_layer
+        || _layer == station_layer || _layer == station_layer_1
+        || _layer == tunnel_a || _layer == tunnel_b
+        || _name == "BG_Far" || _name == "BG_Middle") continue;
+        var _map = layer_tilemap_get_id(_layer);
+        if (_map == -1) continue;
+        var _set = tilemap_get_tileset(_map);
+        var _tw = tilemap_get_tile_width(_map);
+        var _th = tilemap_get_tile_height(_map);
+        if (_set == -1 || _tw <= 0 || _th <= 0) continue;
+        var _ox = layer_get_x(_layer);
+        var _oy = layer_get_y(_layer);
+        for (var _yy = 0; _yy < room_height; _yy += _th)
+        {
+            for (var _xx = 5952; _xx < 6208; _xx += _tw)
+            {
+                var _cx = floor((_xx - _ox) / _tw);
+                var _cy = floor((_yy - _oy) / _th);
+                var _tile = tilemap_get(_map, _cx, _cy);
+                if (tile_get_index(_tile) == 0) continue;
+                array_push(departure_wall_tiles, {tileset: _set, data: _tile, home_x: _xx, home_y: _yy});
+                tilemap_set(_map, 0, _cx, _cy);
+            }
+        }
+    }
     for (var _enemy_i = 0; _enemy_i < instance_number(oEnemyParent); _enemy_i++)
     {
         var _enemy = instance_find(oEnemyParent, _enemy_i);

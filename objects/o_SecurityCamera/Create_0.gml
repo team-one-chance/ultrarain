@@ -1,5 +1,5 @@
 broken = false;
-broken_sprite = -1; // replace -1 with your broken camera sprite
+broken_sprite = s_SecurityCamera_ouch;
 
 image_index = 0;
 image_speed = 0;
@@ -11,6 +11,7 @@ camera_break = function()
     if (broken) return;
 
     broken = true;
+    image_blend = make_color_rgb(110, 115, 120);
 
     if (broken_sprite != -1)
     {

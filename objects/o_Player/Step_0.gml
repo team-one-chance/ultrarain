@@ -2118,13 +2118,7 @@ if (!menu_exhibition_active() && keyboard_check_direct(vk_f3))
     if (coin_count > 0)
     {
 		if (timerf3 <=0) {
-        var _debug_coin_muzzle = player_get_muzzle();
-        var coin = instance_create_layer(
-            _debug_coin_muzzle.muzzle_x,
-            _debug_coin_muzzle.muzzle_y,
-            "Instances",
-            o_Coin
-        );
+        var coin = coin_spawn_at_muzzle();
 		
 		coin.split_threshold =
 			coin_split_y_speed_threshold;
@@ -2197,13 +2191,7 @@ if (!_basher_ui_mouse && !_syringe_combo
     if (coin_count > 0)
     {
 		
-        var _coin_muzzle = player_get_muzzle();
-        var coin = instance_create_layer(
-            _coin_muzzle.muzzle_x,
-            _coin_muzzle.muzzle_y,
-            "Instances",
-            o_Coin
-        );
+        var coin = coin_spawn_at_muzzle();
 		
 		coin.split_threshold =
 			coin_split_y_speed_threshold;
