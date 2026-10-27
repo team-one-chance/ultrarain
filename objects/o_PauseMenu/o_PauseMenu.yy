@@ -10,7 +10,10 @@
   "managed":true,
   "name":"o_PauseMenu",
   "overriddenProperties":[],
-  "parent":{"name":"Objects","path":"folders/Objects.yy",},
+  "parent":{
+    "name":"Objects",
+    "path":"folders/Objects.yy",
+  },
   "parentObjectId":null,
   "persistent":false,
   "physicsAngularDamping":0.1,

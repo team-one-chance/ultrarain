@@ -1,11 +1,8 @@
-item_add_level(other, "coin_anchor", 1, 1);
-// Give item to player.
-other.item_coin_anchor = true;
+if (item_collected) exit;
 
-// Item is immediately usable.
+if (!item_controller_collect(id, other)) exit;
+
+other.item_coin_anchor = true;
 other.coin_anchor_cooldown_timer = 0;
 
 audio_play_sound(sfxPinhousePickup, 1, false);
-
-// Remove pickup from room.
-instance_destroy();

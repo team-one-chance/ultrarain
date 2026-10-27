@@ -103,6 +103,7 @@ pause_activate = function()
                     }
                 }
                 room_persistent = false;
+				item_controllers_reset();
                 room_restart();
             }
             else if (variable_global_exists("menu_checkpoint") && is_struct(global.menu_checkpoint))
