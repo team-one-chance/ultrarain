@@ -1,3 +1,11 @@
+// Wait until all room Create events have finished before restoring visibility.
+if (checkpoint_layers_pending)
+{
+    restore_checkpoint_layers();
+    checkpoint_layers_pending = false;
+}
+else if (!is_struct(checkpoint_layers)) save_checkpoint_layers();
+
 var _player = instance_find(o_Player, 0);
 if (!instance_exists(_player)) exit;
 if (_player.pHP <= 0 || _player.grinder_dying) exit;
@@ -34,8 +42,9 @@ if (!big_room_cleared && array_length(big_room_enemies) > 0)
         big_room_cleared = true;
         respawn_x = _player.x;
         respawn_y = _player.y;
+        save_checkpoint_layers();
     }
 }
 
 // Keep the latest tutorial checkpoint available during travel to another room.
-global.menu_checkpoint = { x: respawn_x, y: respawn_y, cleared: big_room_cleared };
+global.menu_checkpoint = { x: respawn_x, y: respawn_y, cleared: big_room_cleared, layers: checkpoint_layers };

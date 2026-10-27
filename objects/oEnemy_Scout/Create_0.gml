@@ -107,8 +107,9 @@ scout_finish_roll = function()
     scout_parry_grace_timer = scout_parry_grace_duration;
 };
 
-attack_cooldown_min = 3;
-attack_cooldown_max = 5;
+var _scout_wait = enemy_difficulty == 0 ? 1.25 : (enemy_difficulty == 2 ? 0.8 : 1);
+attack_cooldown_min = 3 * _scout_wait;
+attack_cooldown_max = 5 * _scout_wait;
 
 attack_cooldown = random_range(
     attack_cooldown_min,
