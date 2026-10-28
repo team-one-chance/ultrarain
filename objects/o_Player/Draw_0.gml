@@ -42,6 +42,31 @@ if (grinder_dying)
 
 // physics_world_draw_debug(phy_debug_render_shapes);
 
+if (!grinder_dying && parry_is_active())
+{
+    var _progress = 1 - parry_timer / max(0.001, parry_duration);
+
+    var _frame = min(
+        sprite_get_number(s_parry_TEMP) - 1,
+        floor(_progress * sprite_get_number(s_parry_TEMP))
+    );
+
+    draw_sprite_ext(
+        s_parry_TEMP,
+        _frame,
+        x,
+        y,
+        parry_animation_facing,
+        1,
+        0,
+        c_white,
+        1
+    );
+
+    // Don't draw the normal player body or weapon rig.
+    exit;
+}
+
 var _body_facing = sign(image_xscale);
 
 var _rig = player_rig_pose(sprite_index, image_index);

@@ -1974,6 +1974,14 @@ if (on_ground && is_slamming)
     slam_last_y = phy_position_y;
 }
 
+var _parry_dt =
+    (variable_global_exists("dev_delta_time")
+        ? global.dev_delta_time
+        : delta_time) / 1000000;
+
+parry_timer = max(0, parry_timer - _parry_dt);
+parry_cooldown = max(0, parry_cooldown - _parry_dt);
+
 // =====================================
 // WEAPON SYSTEM
 // =====================================
@@ -1982,6 +1990,7 @@ if (keyboard_check_pressed(ord("1")))
 {
     if (weapon_type != "pistol")
     {
+		parry_timer = 0;
         audio_play_sound(sfxSwitchGun, 1, false);
     }
     weapon_type = "pistol";
@@ -2215,6 +2224,25 @@ coin.pin_owner = noone;
 }
 
 if (!_basher_ui_mouse && !_syringe_combo
+&& weapon_type == "sword"
+&& mouse_check_button_pressed(mb_right)
+&& parry_timer <= 0
+&& parry_cooldown <= 0)
+{
+    parry_duration = parry_get_duration();
+    parry_timer = parry_duration;
+
+    // A successful parry clears this cooldown.
+    parry_cooldown = parry_miss_cooldown;
+
+    parry_animation_facing = sign(aim_facing);
+
+    if (parry_animation_facing == 0)
+        parry_animation_facing = 1;
+}
+
+if (!_basher_ui_mouse && !_syringe_combo
+&& weapon_type == "pistol"
 && mouse_check_button_pressed(mb_right))
 {
     // Only throw if we actually have a coin.

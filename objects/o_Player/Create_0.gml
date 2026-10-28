@@ -13,6 +13,99 @@ pHP_max = !variable_global_exists("game_difficulty") ? 150
 pHP = pHP_max;
 dmg_cooldown = 0;
 
+// =====================================
+// SWORD PARRY
+// =====================================
+
+parry_cooldown = 0;
+parry_miss_cooldown = 5;
+
+parry_timer = 0;
+parry_duration = 0;
+parry_animation_facing = 1;
+
+// Difficulty: 0 = easy, 1 = normal, 2 = hard.
+parry_get_difficulty = function()
+{
+    if (!variable_global_exists("game_difficulty"))
+        return 1;
+
+    return global.game_difficulty;
+};
+
+parry_get_duration = function()
+{
+    switch (parry_get_difficulty())
+    {
+        case 0: return 0.50; // Easy
+        case 2: return 0.33; // Hard
+        default: return 0.40; // Normal
+    }
+};
+
+parry_get_heal_fraction = function()
+{
+    switch (parry_get_difficulty())
+    {
+        case 0: return 0.10; // Easy
+        case 2: return 0.05; // Hard
+        default: return 0.08; // Normal
+    }
+};
+
+parry_is_active = function()
+{
+    return weapon_type == "sword" && parry_timer > 0;
+};
+
+// Returns true when an incoming yellow or green attack was parried.
+parry_melee = function(_enemy, _is_green = false)
+{
+    if (!parry_is_active() || !instance_exists(_enemy))
+        return false;
+		parry_cooldown = 0;
+
+    var _heal = parry_get_heal_fraction();
+
+    if (_is_green)
+        _heal *= 2.5;
+
+    pHP = min(pHP_max, pHP + pHP_max * _heal);
+
+    // Set the reaction before dealing damage: the damage may kill the enemy.
+    if (_enemy.object_index == o_ChipRobot)
+    {
+        _enemy.chip_set_state(ChipRobotState.STUN, 1.5);
+        _enemy.take_damage(30, 0, 0, false);
+    }
+    else if (_enemy.object_index == oEnemy_Breaker)
+    {
+        _enemy.breaker_set_state(BreakerState.STUN);
+        _enemy.breaker_stun_elapsed = 0;
+        _enemy.slam_stun_timer = 1.5;
+        _enemy.breaker_stun_budget = 1.5;
+
+        // The unshielded stab is parried directly against the Breaker's HP.
+        _enemy.miniboss_parent_take_damage(30, 0, 0, false);
+    }
+    else
+    {
+        // Scout and Mini Scout use the existing Scout stun state.
+        _enemy.attack_state = 5;
+        _enemy.stun_timer = _enemy.parry_stun_duration;
+        _enemy.attack_rocking = false;
+        _enemy.is_climbing = false;
+        with (_enemy)
+{
+    path_end();
+}
+
+        _enemy.take_damage(30, 0, 0, false);
+    }
+
+    return true;
+};
+
 // Small damage recoil; speeds use the same units as player movement.
 damage_knockback_speed = 2.5;
 damage_knockback_duration = 0.12;
@@ -23,11 +116,30 @@ damage_knockback_pending = false;
 
 // All attacks use this method. Pass the source's x position when available.
 // Returns true only when health was actually lost.
-take_damage = function(_amount, _source_x = undefined)
+take_damage = function(
+    _amount,
+    _source_x = undefined,
+    _attack_type = ""
+)
 {
 	    if (grinder_dying) return false;
     // Slam blocks the whole hit, including recoil and trap bounce.
     if (_amount <= 0 || pHP <= 0 || damage_blocks_damage()) return false;
+	
+	// Red attacks are less effective when parried.
+if (_attack_type == "red" && parry_is_active())
+{
+    pHP = max(0, pHP - _amount * 0.5);
+	parry_cooldown = 0;
+
+    if (pHP > 0)
+        audio_play_sound(sfxPTakeDamage, 1, false);
+
+    global.demo_took_damage = true;
+
+    // Return before the usual recoil and knockback code.
+    return true;
+}
 
     var _push = 0;
     if (!is_undefined(_source_x)) _push = sign(x - _source_x);
