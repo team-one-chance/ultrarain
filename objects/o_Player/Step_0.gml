@@ -69,6 +69,17 @@ if (pHP <= 0)
     exit;
 }
 
+// While held, the Breaker positions the player after physics in End Step.
+if (instance_exists(breaker_grab_owner)
+    && !(variable_instance_exists(breaker_grab_owner, "train_departing") && breaker_grab_owner.train_departing))
+{
+    stop_movement_sfx();
+    phy_speed_x = 0;
+    phy_speed_y = 0;
+    exit;
+}
+breaker_grab_owner = noone;
+
 update_electric_wires_sfx();
 update_molten_lava_sfx();
 update_gear_grinder_sfx();

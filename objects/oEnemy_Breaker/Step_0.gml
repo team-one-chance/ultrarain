@@ -23,7 +23,8 @@ leap_cooldown = max(0, leap_cooldown - dt);
 breaker_intercept_cooldown = max(0, breaker_intercept_cooldown - dt);
 var _player = instance_nearest(x, y, o_Player);
 var _centre = (bbox_left + bbox_right) * 0.5;
-if (_player != noone && !(breaker_intercept && breaker_contact_active())) {
+if (_player != noone && breaker_state != BreakerState.GRAB && breaker_state != BreakerState.THROW
+    && !(breaker_intercept && breaker_contact_active())) {
     var _facing = sign(_player.x - _centre);
     if (_facing != 0) facing_direction = _facing;
 }
@@ -55,8 +56,55 @@ var _land = breaker_sprite(s_Breaker_land, s_Breaker_land_unshielded);
 var _distance = _player != noone ? abs(_player.x - _centre) : infinity;
 var _feet_difference = _player != noone ? abs(_player.bbox_bottom - bbox_bottom) : infinity;
 var _player_height = _player != noone ? bbox_bottom - _player.bbox_bottom : -infinity;
+// A player whose feet are alongside the Breaker's body can provoke a bash.
+// Keep the existing allowance for players below the Breaker.
+var _bash_vertical_range = _player != noone
+    && _player_height >= -normal_attack_vertical_tolerance
+    && _player_height <= max(normal_attack_vertical_tolerance, bbox_bottom - bbox_top);
 
 if (!_stunned && !_stagger) switch (breaker_state) {
+    case BreakerState.GRAB:
+        if (!instance_exists(breaker_grab_target) || breaker_grab_target.pHP <= 0) {
+            breaker_grab_target = noone;
+            breaker_set_state(BreakerState.CHASE);
+            break;
+        }
+        // The blade reaches the held player on grab frame 7 (one-based).
+        if (!breaker_grab_stabbed && breaker_time >= 6 / breaker_fps(s_Breaker_grab_unshielded)) {
+            breaker_grab_stabbed = true;
+            world_sfx_play(sfxBreakerStabAttack, x, y);
+            breaker_grab_target.take_damage(normal_attack_damage, x);
+        }
+        if (breaker_time >= breaker_duration(s_Breaker_grab_unshielded))
+            breaker_set_state(BreakerState.THROW);
+        break;
+
+    case BreakerState.THROW:
+        if (!breaker_throw_flipped && breaker_time >= 3 / breaker_fps(s_Breaker_throw_unshielded)) {
+            breaker_throw_flipped = true;
+            facing_direction = -facing_direction;
+            if (instance_exists(breaker_grab_target)) {
+                breaker_grab_target.image_xscale = -breaker_grab_target.image_xscale;
+                breaker_grab_target.aim_facing = -breaker_grab_target.aim_facing;
+            }
+        }
+        // Keep the player attached through frame 7, then launch in the new facing direction.
+        if (instance_exists(breaker_grab_target)
+            && breaker_time >= 7 / breaker_fps(s_Breaker_throw_unshielded)) {
+            var _thrown = breaker_grab_target;
+            _thrown.breaker_grab_owner = noone;
+            _thrown.phy_speed_x = facing_direction * breaker_throw_speed;
+            _thrown.phy_speed_y = -breaker_throw_lift;
+            _thrown.damage_knockback_speed_x = _thrown.phy_speed_x;
+            _thrown.damage_knockback_timer = 0.25;
+            breaker_grab_target = noone;
+        }
+        if (breaker_time >= breaker_duration(s_Breaker_throw_unshielded)) {
+            normal_attack_cooldown = random_range(normal_attack_cooldown_min, normal_attack_cooldown_max);
+            breaker_set_state(BreakerState.CHASE);
+        }
+        break;
+
     case BreakerState.CHASE:
         if (_player == noone || !is_grounded) break;
         // Let shield impacts play before starting another attack, including
@@ -79,7 +127,7 @@ if (!_stunned && !_stagger) switch (breaker_state) {
             leap_target_x = _player.x;
             breaker_set_state(BreakerState.JUMP_CHARGE);
         }
-        else if (_distance <= stand_range && _feet_difference <= normal_attack_vertical_tolerance) {
+        else if (_distance <= stand_range && _bash_vertical_range) {
             // Stationary waiting replaces the old cooldown shuffle.
             if (normal_attack_cooldown <= 0) breaker_set_state(BreakerState.APPROACH);
         }
@@ -87,7 +135,7 @@ if (!_stunned && !_stagger) switch (breaker_state) {
         break;
 
     case BreakerState.APPROACH:
-        if (_player == noone || !is_grounded || _feet_difference > normal_attack_vertical_tolerance) {
+        if (_player == noone || !is_grounded || !_bash_vertical_range) {
             breaker_set_state(BreakerState.CHASE);
             break;
         }
@@ -274,7 +322,9 @@ if (is_grounded && vertical_speed >= 0 && (breaker_airborne_attack()
     breaker_time = 0; // The landing animation progresses only after actual impact.
     vertical_speed = 0;
     leap_cooldown = random_range(leap_cooldown_min, leap_cooldown_max);
-    breaker_intercept_cooldown = breaker_intercept_cooldown_duration;
+    breaker_intercept_cooldown = enemy_difficulty == 3
+        ? random_range(breaker_intercept_cooldown_duration - 1, breaker_intercept_cooldown_duration + 1)
+        : breaker_intercept_cooldown_duration;
     var _landing_target = collision_rectangle(bbox_left - leap_landing_range,
         bbox_bottom - leap_landing_height, bbox_right + leap_landing_range,
         bbox_bottom + ground_check_distance, o_Player, false, true);
@@ -286,6 +336,8 @@ var _anim_time = breaker_time;
 var _loop = false;
 var _duration_override = 0;
 switch (breaker_state) {
+    case BreakerState.GRAB: _sprite = s_Breaker_grab_unshielded; break;
+    case BreakerState.THROW: _sprite = s_Breaker_throw_unshielded; break;
     case BreakerState.CHASE:
     case BreakerState.APPROACH:
         _loop = true;

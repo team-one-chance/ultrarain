@@ -17,11 +17,12 @@ draw_set_alpha(1);
 if (boot_state != 8)
 {
     var _background_difficulty = console_difficulty;
-    if (boot_state == BootMenuState.DIFFICULTY && menu_selection < 3)
+    if (boot_state == BootMenuState.DIFFICULTY && menu_selection < array_length(boot_menu_options()) - 1)
         _background_difficulty = menu_selection;
     var _background_color = make_color_rgb(5, 8, 7);
     if (_background_difficulty == 0) _background_color = make_color_rgb(5, 8, 12);
     if (_background_difficulty == 2) _background_color = make_color_rgb(12, 5, 6);
+    if (_background_difficulty == 3) _background_color = make_color_rgb(10, 5, 14);
     var _theme_accent = console_green;
     var _theme_dim = console_dim;
     var _theme_text = console_white;
@@ -36,6 +37,12 @@ if (boot_state != 8)
         _theme_accent = console_red;
         _theme_dim = make_color_rgb(120, 90, 95);
         _theme_text = make_color_rgb(235, 215, 215);
+    }
+    else if (_background_difficulty == 3)
+    {
+        _theme_accent = console_purple;
+        _theme_dim = make_color_rgb(115, 90, 130);
+        _theme_text = make_color_rgb(230, 215, 240);
     }
     draw_set_color(_background_color);
     draw_rectangle(0, 0, _gw, _gh, false);
@@ -121,7 +128,7 @@ draw_text_transformed(
         {
             var _selected = _option == menu_selection;
             var _option_color = _selected ? _theme_accent : _theme_text;
-            if (boot_state == BootMenuState.DIFFICULTY && _option < 3 && !_selected)
+            if (boot_state == BootMenuState.DIFFICULTY && _option < array_length(_options) - 1 && !_selected)
                 _option_color = c_white;
             if (boot_state == BootMenuState.MAIN && _option == 3 && exit_flash > 0)
                 _option_color = merge_color(console_white, console_red, 0.5 + 0.5 * abs(sin(exit_flash * 24)));
@@ -143,7 +150,7 @@ draw_text_transformed(
                 _command += ".\\menu.exe " + string_lower(_options[menu_selection]);
                 break;
             case BootMenuState.DIFFICULTY:
-                _command += menu_selection == 3 ? ".\\menu.exe" :
+                _command += menu_selection == array_length(_options) - 1 ? ".\\menu.exe" :
                     ".\\menu.exe start --difficulty " + string_lower(_options[menu_selection]);
                 break;
             case BootMenuState.SETTINGS:
@@ -161,7 +168,7 @@ draw_text_transformed(
         if (boot_state == BootMenuState.DIFFICULTY)
         {
             // Reserve the same space for Back so the command does not jump.
-            if (menu_selection < array_length(difficulty_descriptions))
+            if (menu_selection < array_length(_options) - 1)
             {
                 var _description = difficulty_descriptions[menu_selection];
                 draw_set_color(_theme_dim);

@@ -2,6 +2,30 @@
 // Breaker. His jumping attack also damages on contact before body correction.
 if (variable_global_exists("dev_freecam") && global.dev_freecam) exit;
 if (grinder_dying || pHP <= 0) exit;
+if (instance_exists(breaker_grab_owner)) {
+    var _holder = breaker_grab_owner;
+    if (_holder.breaker_grab_target == id
+        && (_holder.breaker_state == BreakerState.GRAB || _holder.breaker_state == BreakerState.THROW)) {
+        var _holding_grab = _holder.breaker_state == BreakerState.GRAB;
+        var _holding_sprite = _holding_grab ? s_Breaker_grab_unshielded : s_Breaker_throw_unshielded;
+        var _hand = _holding_grab ? _holder.breaker_grab_hand : _holder.breaker_throw_hand;
+        var _hand_frame = floor(_holder.breaker_time * _holder.breaker_fps(_holding_sprite));
+        if (_hand_frame >= 1) {
+            var _point = _hand[clamp(_hand_frame - 1, 0, array_length(_hand) - 1)];
+            var _crop = variable_struct_get(_holder.breaker_crop_offsets, sprite_get_name(_holding_sprite));
+            var _scale_x = abs(_holder.image_xscale) * _holder.facing_direction * _holder.breaker_source_direction;
+            phy_position_x = (_holder.bbox_left + _holder.bbox_right) * 0.5
+                + (_crop[0] - _holder.breaker_anchor_x + _point[0]) * _scale_x;
+            phy_position_y = _holder.bbox_bottom + 1
+                + (_crop[1] - _holder.breaker_anchor_y + _point[1]) * _holder.image_yscale
+                + player_collider_height * 0.5;
+        }
+        phy_speed_x = 0;
+        phy_speed_y = 0;
+        exit;
+    }
+    breaker_grab_owner = noone;
+}
 var _old_centre = (breaker_body_start_left + breaker_body_start_right) * 0.5;
 var _contact_sides = {};
 var _player_left = phy_position_x + 0.5 - player_collider_half_width;
@@ -30,6 +54,15 @@ for (var _i = 0; _i < array_length(breaker_body_snapshot); _i++) {
     var _boss_top = _boss.bbox_bottom + 1
         - (_boss.bbox_bottom - _boss.bbox_top + 1) * _boss.breaker_body_height_fraction;
     var _jump_contact = _record.airborne_attack || _boss.breaker_contact_active();
+    // Sweep the dash against the core so high speed cannot skip the grab.
+    // A prior body-separation side may be stale after a grab carries us across.
+    var _grab_side = sign(_previous_separation);
+    if (dash_active && _boss.breaker_unshielded
+        && !(variable_global_exists("dev_freeze_enemies") && global.dev_freeze_enemies)
+        && _player_bottom >= _boss_top && _player_top <= _boss.bbox_bottom
+        && _grab_side != 0 && _separation * _grab_side < _limit
+        && _separation * _grab_side < _previous_separation * _grab_side
+        && _boss.breaker_try_grab(id, _grab_side)) exit;
     // Sweep the relative bodies on both axes before horizontal separation.
     // This also catches a fast rise/dive or a player crossing between Steps.
     if (!(variable_global_exists("dev_freeze_enemies") && global.dev_freeze_enemies)

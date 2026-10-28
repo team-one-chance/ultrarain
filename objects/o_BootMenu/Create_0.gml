@@ -40,6 +40,7 @@ scroll_interval = 0.1;
 console_green = make_color_rgb(90, 235, 130);
 console_blue = make_color_rgb(145, 210, 255);
 console_red = make_color_rgb(255, 55, 65);
+console_purple = make_color_rgb(195, 110, 255);
 console_white = make_color_rgb(215, 225, 220);
 console_dim = make_color_rgb(90, 110, 100);
 console_difficulty = 1;
@@ -48,7 +49,8 @@ console_difficulty = 1;
 difficulty_descriptions = [
     "200 health - Slower, less aggressive enemies with more time between attacks. Have some fun.",
     "150 health - The game's intended difficulty.",
-    "100 health - Faster, more aggressive enemies with less room for error."
+    "100 health - Faster, more aggressive enemies with less room for error.",
+    "100 health - You will not survive."
 ];
 
 boot_add_line = function(_text, _color, _play_sfx = true)
@@ -102,7 +104,10 @@ boot_menu_options = function()
     switch (boot_state)
     {
         case BootMenuState.MAIN: return ["Start", "Settings", "Credits", "Exit"];
-        case BootMenuState.DIFFICULTY: return ["Easy", "Normal", "Hard", "Back"];
+        case BootMenuState.DIFFICULTY:
+            if (!menu_exhibition_active() && variable_global_exists("dev_futile_unlocked") && global.dev_futile_unlocked)
+                return ["Easy", "Normal", "Hard", "Futile", "Back"];
+            return ["Easy", "Normal", "Hard", "Back"];
         case BootMenuState.SETTINGS:
             return ["Fullscreen: " + (window_get_fullscreen() ? "On" : "Off"),
                 "Pixelization: " + (menu_pixelization_active() ? "On" : "Off"), "Back"];
@@ -165,12 +170,13 @@ boot_menu_activate = function()
             }
             break;
         case BootMenuState.DIFFICULTY:
-            if (menu_selection != 3)
+            var _back = array_length(boot_menu_options()) - 1;
+            if (menu_selection != _back)
             {
                 global.game_difficulty = menu_selection;
                 console_difficulty = menu_selection;
             }
-            boot_menu_open(menu_selection == 3 ? BootMenuState.MAIN : 0);
+            boot_menu_open(menu_selection == _back ? BootMenuState.MAIN : 0);
             break;
         case BootMenuState.SETTINGS:
             if (menu_selection == 0) window_set_fullscreen(!window_get_fullscreen());
