@@ -6,8 +6,8 @@ function weapon_hitscan(_damage, _range, _piercing)
 
     var _muzzle = player_get_muzzle();
 
-    var start_x = _muzzle.muzzle_x;
-    var start_y = _muzzle.muzzle_y;
+	var start_x = _muzzle.aim_x;
+	var start_y = _muzzle.aim_y;
 
     // Aim from the shot's actual start to the crosshair in room coordinates.
     // The body-based weapon angle otherwise makes shots miss the cursor up close.
@@ -106,17 +106,29 @@ function weapon_hitscan(_damage, _range, _piercing)
             ds_list_add(already_hit, inst);
 
             // Spawn before damage so lethal hits also leave a burst.
-            if (instance_exists(inst) && inst.object_index != o_Coin)
-            {
-                var _enemy_impact = inst.object_index == oEnemyParent
-                    || object_is_ancestor(inst.object_index, oEnemyParent);
-                instance_create_depth(
-                    check_x - lengthdir_x(1, shoot_direction),
-                    check_y - lengthdir_y(1, shoot_direction),
-                    -10000, o_ShotImpact,
-                    { impact_direction: shoot_direction, impact_enemy: _enemy_impact }
-                );
-            }
+// Distance from the shoulder to the muzzle along the firing direction.
+var _muzzle_distance =
+    (_muzzle.muzzle_x - start_x) * lengthdir_x(1, shoot_direction)
+    + (_muzzle.muzzle_y - start_y) * lengthdir_y(1, shoot_direction);
+
+// Only show an impact if the shot reached or passed the muzzle.
+if (instance_exists(inst)
+&& inst.object_index != o_Coin
+&& dist >= _muzzle_distance)
+{
+    var _enemy_impact = inst.object_index == oEnemyParent
+        || object_is_ancestor(inst.object_index, oEnemyParent);
+
+    instance_create_depth(
+        check_x - lengthdir_x(1, shoot_direction),
+        check_y - lengthdir_y(1, shoot_direction),
+        -10000, o_ShotImpact,
+        {
+            impact_direction: shoot_direction,
+            impact_enemy: _enemy_impact
+        }
+    );
+}
 
             // =================================
             // BREAKABLE BLOCK
@@ -220,6 +232,26 @@ function weapon_hitscan(_damage, _range, _piercing)
     // =====================================
     // HITSCAN VISUAL
     // =====================================
+	
+	// Compare the hit position with the muzzle along the firing direction.
+var _dir_x = lengthdir_x(1, shoot_direction);
+var _dir_y = lengthdir_y(1, shoot_direction);
+
+var _muzzle_distance =
+    (_muzzle.muzzle_x - start_x) * _dir_x
+    + (_muzzle.muzzle_y - start_y) * _dir_y;
+
+var _hit_distance =
+    (final_x - start_x) * _dir_x
+    + (final_y - start_y) * _dir_y;
+
+var _blocked_before_muzzle =
+    stopped && _hit_distance < _muzzle_distance;
+
+// The shot hit something before leaving the barrel.
+// Its impact effect was already created during the collision check.
+if (_blocked_before_muzzle)
+    return false;
 
     var shot = instance_create_layer(
         0,
@@ -228,8 +260,8 @@ function weapon_hitscan(_damage, _range, _piercing)
         o_HitscanVisual
     );
 
-    shot.line_x1 = start_x;
-    shot.line_y1 = start_y;
+	shot.line_x1 = _muzzle.muzzle_x;
+	shot.line_y1 = _muzzle.muzzle_y;
     shot.line_x2 = final_x;
     shot.line_y2 = final_y;
     // Give the muzzle-to-first-coin segment the same effect as the whole chain.
@@ -240,3 +272,4 @@ function weapon_hitscan(_damage, _range, _piercing)
         shot.set_coin_effects(_coin_style.bounces, _coin_style.bullet_flash);
     }
 }
+return true;

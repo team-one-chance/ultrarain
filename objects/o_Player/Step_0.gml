@@ -1976,6 +1976,14 @@ if (on_ground && is_slamming)
     slam_last_y = phy_position_y;
 }
 
+var _parry_dt =
+    (variable_global_exists("dev_delta_time")
+        ? global.dev_delta_time
+        : delta_time) / 1000000;
+
+parry_timer = max(0, parry_timer - _parry_dt);
+parry_cooldown = max(0, parry_cooldown - _parry_dt);
+
 // =====================================
 // WEAPON SYSTEM
 // =====================================
@@ -1984,6 +1992,7 @@ if (keyboard_check_pressed(ord("1")))
 {
     if (weapon_type != "pistol")
     {
+		parry_timer = 0;
         audio_play_sound(sfxSwitchGun, 1, false);
     }
     weapon_type = "pistol";
@@ -2003,6 +2012,19 @@ if (keyboard_check_pressed(ord("2")))
 aim_rig_mode = (weapon_type == "sword")
     ? AimRigMode.TWO_HANDED
     : AimRigMode.ONE_HANDED;
+	
+	// Aim from the actual firing shoulder while sliding.
+if (weapon_type == "pistol" && is_sliding)
+{
+    var _slide_aim = player_get_muzzle();
+
+    aim_angle = point_direction(
+        _slide_aim.aim_x,
+        _slide_aim.aim_y,
+        mouse_x,
+        mouse_y
+    );
+}
 
 if (weapon_fire_timer > 0)
 {
@@ -2065,14 +2087,18 @@ if (weapon_type == "pistol")
     {
         // Leave room in the mix for the target's impact cue.
         audio_play_sound(sfxGunshot, 1, false, 0.55);
-        weapon_hitscan(
-            pistol_damage,
-            pistol_range,
-            pistol_piercing
-        );
+var _shot_visible = weapon_hitscan(
+    pistol_damage,
+    pistol_range,
+    pistol_piercing
+);
 
-        weapon_fire_timer = pistol_cooldown * chip_attack_multiplier();
-        gun_reticle_flash_timer = gun_reticle_flash_duration;
+weapon_fire_timer = pistol_cooldown * chip_attack_multiplier();
+
+if (_shot_visible)
+{
+    gun_reticle_flash_timer = gun_reticle_flash_duration;
+}
     }
 }
 else if (weapon_type == "sword")
@@ -2201,6 +2227,25 @@ coin.pin_owner = noone;
 }
 
 if (!_basher_ui_mouse && !_syringe_combo
+&& weapon_type == "sword"
+&& mouse_check_button_pressed(mb_right)
+&& parry_timer <= 0
+&& parry_cooldown <= 0)
+{
+    parry_duration = parry_get_duration();
+    parry_timer = parry_duration;
+
+    // A successful parry clears this cooldown.
+    parry_cooldown = parry_miss_cooldown;
+
+    parry_animation_facing = sign(aim_facing);
+
+    if (parry_animation_facing == 0)
+        parry_animation_facing = 1;
+}
+
+if (!_basher_ui_mouse && !_syringe_combo
+&& weapon_type == "pistol"
 && mouse_check_button_pressed(mb_right))
 {
     // Only throw if we actually have a coin.

@@ -88,7 +88,7 @@ drone_fire_shot = function()
         {
             var _player = _trace.hit;
 
-            _player.take_damage(drone_shot_damage, _sx);
+            _player.take_damage(drone_shot_damage, _sx, "red");
         }
     }
 

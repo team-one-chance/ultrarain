@@ -389,7 +389,7 @@ menu_actions = function()
     {
         case 1: return [1, 2, 3, 4, 99];
         case 2: return [12, 5, 6, 7, 8, 9, 99];
-        case 3: return [20, 25, 21, 22, 23, 24, 99];
+        case 3: return [20, 25, 21, 22, 26, 23, 24, 99];
         case 4: return [30, 31, 34, 33, 36, 35, 32, 99];
         case 5: return [0, 99];
     }
@@ -425,6 +425,7 @@ menu_label = function(_action)
         case 23: return "Freeze enemy AI: " + (global.dev_freeze_enemies ? "ON" : "OFF");
         case 24: return "Clear all enemies";
         case 25: return "Spawn scout (mini) at captured cursor";
+		case 26: return "Spawn Chip at captured cursor";
         case 30: return "Simulation pause [F4]: " + (time_paused ? "ON" : "OFF");
         case 31: return "Advance one frame [F5]";
         case 32: return "Speed: 100%" + (time_rate == 1 ? " (selected)" : "");
@@ -546,6 +547,7 @@ run_action = function(_action)
         case 21: instance_create_depth(cursor_position[0], cursor_position[1], 0, oDrone); break;
         case 22: instance_create_depth(cursor_position[0], cursor_position[1], 0, oEnemy_Breaker); break;
         case 25: instance_create_depth(cursor_position[0], cursor_position[1], 0, oEnemy_Scout_mini); break;
+		case 26: instance_create_depth(cursor_position[0], cursor_position[1], 0, o_ChipRobot); break;
         case 24:
             with (oEnemyParent) instance_destroy();
             with (oEnemyDroneBullet) instance_destroy();

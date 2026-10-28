@@ -6,3 +6,4 @@ travel_angle = 0;
 travel_speed = 420;
 life = 2.5;
 image_speed = 0;
+dodged_player = noone;

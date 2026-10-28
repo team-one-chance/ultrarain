@@ -48,6 +48,8 @@ function coin_ricochet(
     var _enemy_piercing = variable_instance_exists(id, "item_coin_enemy_piercing")
         && variable_instance_get(id, "item_coin_enemy_piercing");
     var _chain = { walls_left: 1, enemies_left: _enemy_piercing ? 1 : 0 };
+	// Shared by every coin and every split shot in this chain.
+var _chain_hit_enemies = ds_list_create();
 
     var _current_coin =
         _coin;
@@ -56,7 +58,7 @@ function coin_ricochet(
         _damage;
 
     var _perfect_threshold =
-        0.05;
+        0.1;
 
     var _chain_perfect_apex = false;
     var _ricochet_color = c_yellow;
@@ -106,7 +108,7 @@ function coin_ricochet(
         {
             _coin_shot_count = 4;
             _chain_perfect_apex = true;
-			_current_damage += 8
+			_current_damage += 7
 
             perfect_apex_flash_timer =
                 perfect_apex_flash_duration;
@@ -125,7 +127,7 @@ function coin_ricochet(
         // =================================
 
 var _damage_before_multiplier = _current_damage;
-var _damage_before_rounding = _damage_before_multiplier * 1.65;
+var _damage_before_rounding = _damage_before_multiplier * 1.45;
 
 _current_damage = coin_round_damage(
     _damage_before_rounding,
@@ -309,7 +311,11 @@ show_debug_message(
                     {
                         continue;
                     }
-
+// First, prefer enemies that haven't been hit by this chain.
+if (ds_list_find_index(_chain_hit_enemies, _enemy) != -1)
+{
+    continue;
+}
 
                     var _distance =
                         point_distance(
@@ -339,52 +345,45 @@ show_debug_message(
                 // REUSE NEAREST ENEMY
                 // =============================
 
-                if (_target == noone)
-                {
-                    _target_distance =
-                        _range + 1;
+if (_target == noone)
+{
+    // First try an enemy that another shot from this coin
+    // hasn't selected. If none remain, allow any enemy.
+    for (var _pass = 0; _pass < 2; _pass++)
+    {
+        _target_distance = _range + 1;
 
+        for (var _i = 0; _i < _enemy_count; _i++)
+        {
+            var _enemy = instance_find(oEnemyParent, _i);
 
-                    for (
-                        var i = 0;
-                        i < _enemy_count;
-                        i++
-                    )
-                    {
-                        var _enemy =
-                            instance_find(
-                                oEnemyParent,
-                                i
-                            );
+            if (!instance_exists(_enemy))
+                continue;
 
-                        if (!instance_exists(_enemy))
-                        {
-                            continue;
-                        }
+            if (_pass == 0
+            && ds_list_find_index(_used_targets, _enemy) != -1)
+            {
+                continue;
+            }
 
+            var _distance = point_distance(
+                _last_x,
+                _last_y,
+                _enemy.x,
+                _enemy.y
+            );
 
-                        var _distance =
-                            point_distance(
-                                _last_x,
-                                _last_y,
-                                _enemy.x,
-                                _enemy.y
-                            );
+            if (_distance < _target_distance && _distance <= _range)
+            {
+                _target_distance = _distance;
+                _target = _enemy;
+            }
+        }
 
-
-                        if (
-                            _distance < _target_distance
-                            && _distance <= _range
-                        )
-                        {
-                            _target_distance =
-                                _distance;
-
-                            _target =
-                                _enemy;
-                        }
-                    }
-                }
+        if (_target != noone)
+            break;
+    }
+}
 
 
                 if (_target == noone)
@@ -488,7 +487,7 @@ show_debug_message(
                 var _trace = coin_chain_trace(
                     _last_x, _last_y,
                     _end_x, _end_y,
-                    _current_damage, _branch
+                    _current_damage, _branch, _chain_hit_enemies
                 );
 
                 var _enemy_visual = instance_create_layer(
@@ -517,10 +516,10 @@ show_debug_message(
         {
             if (instance_exists(_next_coin))
             {
-                var _chain_trace = coin_chain_trace(
-                    _last_x, _last_y, _next_coin.x, _next_coin.y,
-                    _current_damage, _chain
-                );
+var _chain_trace = coin_chain_trace(
+    _last_x, _last_y, _next_coin.x, _next_coin.y,
+    _current_damage, _chain, _chain_hit_enemies
+);
 
                 var _chain_visual = instance_create_layer(
                     0, 0, "Instances", o_HitscanVisual
@@ -565,9 +564,12 @@ show_debug_message(
     }
 
 
-    ds_list_destroy(
-        _coins
-    );
+ds_list_destroy(
+    _coins
+);
+
+ds_list_destroy(_chain_hit_enemies);
+	
 
     // The whole hitscan resolves before drawing. Use the actual completed chain
     // for every segment, including early links and split shots.
@@ -589,7 +591,10 @@ show_debug_message(
 
 // The continuation carries its budget; each split branch receives its own copy.
 // Repeated pixels inside one wall consume only one hit per ray.
-function coin_chain_trace(_sx, _sy, _ex, _ey, _damage, _chain)
+function coin_chain_trace(
+    _sx, _sy, _ex, _ey,
+    _damage, _chain, _chain_hit_enemies
+)
 {
     var _seen = ds_list_create();
     var _hits = ds_list_create();
@@ -639,10 +644,23 @@ function coin_chain_trace(_sx, _sy, _ex, _ey, _damage, _chain)
                 }
             );
 
-            if (_enemy)
-            {
-                // The item allows one enemy penetration. Lethal hits still count.
-                _hit.take_damage(_damage);
+if (_enemy)
+{
+    var _repeat_hit =
+        ds_list_find_index(_chain_hit_enemies, _hit) != -1;
+
+    var _hit_damage = _repeat_hit ? _damage * 0.25 : _damage;
+
+    if (!_repeat_hit)
+        ds_list_add(_chain_hit_enemies, _hit);
+
+    show_debug_message(
+        "COIN ENEMY HIT"
+        + " | repeat=" + string(_repeat_hit)
+        + " | damage=" + string(_hit_damage)
+    );
+
+    _hit.take_damage(_hit_damage);
                 if (_chain.enemies_left > 0)
                     _chain.enemies_left--;
                 else

@@ -815,7 +815,10 @@ if (attack_state == 0 && attack_rocking && sprite_index == bite_sprite
     if (bite_target != noone && scout_bite_in_range(bite_target)
         && bite_target.dmg_cooldown <= 0)
     {
-        if (bite_target.take_damage(attack_bite_damage, x))
-            bite_target.dmg_cooldown = 1;
+if (bite_target.parry_melee(id, false))
+    exit;
+
+if (bite_target.take_damage(attack_bite_damage, x))
+    bite_target.dmg_cooldown = 1;
     }
 }

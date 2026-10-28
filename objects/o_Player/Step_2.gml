@@ -59,6 +59,10 @@ for (var _i = 0; _i < array_length(breaker_body_snapshot); _i++) {
         }
         if (_enter <= _leave) _boss.breaker_leap_damage_player(id);
     }
+	// Skip body separation while dashing.
+// Keep the attack contact check above this line.
+if (dash_active || (!dash_iframe_is_ground && dash_iframe_timer > 0))
+    continue;
     if (_boss.breaker_unshielded && is_sliding) continue;
     var _overlap_now = _player_bottom >= _boss_top && _player_top <= _boss.bbox_bottom;
     var _signed_distance = _separation * _side;
