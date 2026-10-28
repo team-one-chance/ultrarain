@@ -9,7 +9,13 @@ function weapon_hitscan(_damage, _range, _piercing)
 	var start_x = _muzzle.aim_x;
 	var start_y = _muzzle.aim_y;
 
-    var shoot_direction = aim_angle;
+    // Aim from the shot's actual start to the crosshair in room coordinates.
+    // The body-based weapon angle otherwise makes shots miss the cursor up close.
+    var shoot_direction = point_direction(start_x, start_y, mouse_x, mouse_y); // Degrees; follows the crosshair at any distance.
+    if (start_x == mouse_x && start_y == mouse_y)
+    {
+        shoot_direction = aim_angle; // Keep the weapon direction when the cursor is exactly on the muzzle.
+    }
 
     // Default: bullet reaches full range.
     var final_x =

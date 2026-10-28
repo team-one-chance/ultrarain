@@ -2557,7 +2557,7 @@ if (_wall_slide_sounding)
 {
     if (wall_slide_sound == -1 || !audio_is_playing(wall_slide_sound))
     {
-        wall_slide_sound = audio_play_sound(sfxWallSlide, 1, true);
+        wall_slide_sound = audio_play_sound(sfxSlide, 1, true);
     }
 }
 else
@@ -2578,7 +2578,9 @@ if (_slide_sounding)
 {
     if (slide_sound == -1 || !audio_is_playing(slide_sound))
     {
-        slide_sound = audio_play_sound(sfxSlide, 1, true);
+        slide_sound = audio_play_sound(sfxSlide, 1, true, 0);
+        audio_sound_pitch(slide_sound, slide_sound_pitch);
+        audio_sound_gain(slide_sound, slide_sound_gain, slide_sound_fade_in_ms);
     }
 }
 else

@@ -139,7 +139,6 @@
     {"id":{"name":"o_TrainRide","path":"objects/o_TrainRide/o_TrainRide.yy",},},
     {"id":{"name":"o_TutorialCheckpoint","path":"objects/o_TutorialCheckpoint/o_TutorialCheckpoint.yy",},},
     {"id":{"name":"oAri","path":"objects/oAri/oAri.yy",},},
-    {"id":{"name":"oBreakerSlamVFX","path":"objects/oBreakerSlamVFX/oBreakerSlamVFX.yy",},},
     {"id":{"name":"oBreakerWreckage","path":"objects/oBreakerWreckage/oBreakerWreckage.yy",},},
     {"id":{"name":"oDrone","path":"objects/oDrone/oDrone.yy",},},
     {"id":{"name":"oDroneExplosion","path":"objects/oDroneExplosion/oDroneExplosion.yy",},},
