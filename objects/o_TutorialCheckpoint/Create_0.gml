@@ -69,7 +69,14 @@ if (variable_global_exists("tutorial_checkpoint_retry")
     {
         with (o_DoorEnemySpawn) if (ambush_group == 0) instance_destroy();
         with (o_Door_Breakable) if (ambush_group == 0) instance_destroy();
-        with (o_Chute_Breakable) if (ambush_group == 0) instance_destroy();
+        with (o_Chute_Breakable)
+{
+    var _is_secret = variable_instance_exists(id, "secret_hard_only")
+        && secret_hard_only;
+
+    if (ambush_group == 0 && !_is_secret)
+        instance_destroy();
+}
     }
 
     var _cam = view_camera[0];
