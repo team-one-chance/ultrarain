@@ -47,9 +47,7 @@ if (drone_fire_state != 0 || drone_shot_flash_timer > 0)
     var _ring_y = _cy + attack_shake_y;
 
     draw_set_color(
-        _shot_flash
-        ? make_color_rgb(255, 120, 35)
-        : c_red
+        c_red
     );
 
     draw_set_alpha(_shot_flash ? 1 : 0.45);
