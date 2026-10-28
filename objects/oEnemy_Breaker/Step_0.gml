@@ -256,9 +256,8 @@ if (is_grounded && vertical_speed >= 0 && (breaker_airborne_attack()
     if (breaker_state != BreakerState.LAND) breaker_set_state(BreakerState.LAND);
     breaker_landed = true;
     world_sfx_play(sfxBreakerSlam, x, y);
-    // Shared boss VFX (visual effects) reads its global settings; rooms supply no tuning overrides.
-    instance_create_depth((bbox_left + bbox_right) * 0.5,
-        bbox_bottom + 1, clamp(depth - 2, -15999, 15999), oBreakerSlamVFX);
+    var _slam_visuals = breaker_slam_visual_settings(); // Shared impact tuning for both phases and every room.
+    with (o_CAMERA) start_shake(_slam_visuals.camera_shake_pixels, _slam_visuals.camera_shake_seconds);
     breaker_time = 0; // The landing animation progresses only after actual impact.
     vertical_speed = 0;
     leap_cooldown = random_range(leap_cooldown_min, leap_cooldown_max);

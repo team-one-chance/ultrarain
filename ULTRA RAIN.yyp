@@ -138,7 +138,6 @@
     {"id":{"name":"o_TrainRide","path":"objects/o_TrainRide/o_TrainRide.yy",},},
     {"id":{"name":"o_TutorialCheckpoint","path":"objects/o_TutorialCheckpoint/o_TutorialCheckpoint.yy",},},
     {"id":{"name":"oAri","path":"objects/oAri/oAri.yy",},},
-    {"id":{"name":"oBreakerSlamVFX","path":"objects/oBreakerSlamVFX/oBreakerSlamVFX.yy",},},
     {"id":{"name":"oBreakerWreckage","path":"objects/oBreakerWreckage/oBreakerWreckage.yy",},},
     {"id":{"name":"oDrone","path":"objects/oDrone/oDrone.yy",},},
     {"id":{"name":"oDroneExplosion","path":"objects/oDroneExplosion/oDroneExplosion.yy",},},
@@ -426,13 +425,14 @@
   "resourceType":"GMProject",
   "resourceVersion":"2.0",
   "RoomOrderNodes":[
-    {"roomId":{"name":"TESTING","path":"rooms/TESTING/TESTING.yy",},},
-    {"roomId":{"name":"LE_TUTORIAL_WIP","path":"rooms/LE_TUTORIAL_WIP/LE_TUTORIAL_WIP.yy",},},
     {"roomId":{"name":"LE_MENU","path":"rooms/LE_MENU/LE_MENU.yy",},},
+    {"roomId":{"name":"LE_TUTORIAL_WIP","path":"rooms/LE_TUTORIAL_WIP/LE_TUTORIAL_WIP.yy",},},
     {"roomId":{"name":"LE_PWR","path":"rooms/LE_PWR/LE_PWR.yy",},},
     {"roomId":{"name":"LE_DEMO_END","path":"rooms/LE_DEMO_END/LE_DEMO_END.yy",},},
     {"roomId":{"name":"LE_TRAIN","path":"rooms/LE_TRAIN/LE_TRAIN.yy",},},
-    {"children":[],"groupName":"testing_ALWAYS_LAST",},
+    {"children":[
+        {"roomId":{"name":"TESTING","path":"rooms/TESTING/TESTING.yy",},},
+      ],"groupName":"testing_ALWAYS_LAST",},
   ],
   "templateType":"game",
   "TextureGroups":[

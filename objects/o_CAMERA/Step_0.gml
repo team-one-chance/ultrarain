@@ -1,3 +1,16 @@
+// Remove the previous shake before following so repeated impacts cannot cause drift.
+if (camera != -1)
+{
+    camera_set_view_pos(camera,
+        camera_get_view_x(camera) - shake_offset_x,
+        camera_get_view_y(camera) - shake_offset_y);
+}
+shake_offset_x = 0;
+shake_offset_y = 0;
+var _shake_dt = max(0, (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) / 1000000); // Simulation seconds; respects pause and slow motion.
+shake_remaining_seconds = max(0, shake_remaining_seconds - _shake_dt);
+if (shake_remaining_seconds <= 0) shake_strength_pixels = 0;
+
 // Freecam takes priority over train framing and seamless gate framing.
 if (variable_global_exists("dev_freecam") && global.dev_freecam)
 {
@@ -131,4 +144,10 @@ cam_y += (target_y - cam_y) * vertical_strength;
 // APPLY CAMERA POSITION
 // =====================================
 
-camera_set_view_pos(cam, cam_x, cam_y);
+if (shake_remaining_seconds > 0)
+{
+    var _shake_strength = shake_strength_pixels * shake_remaining_seconds / shake_duration_seconds; // Pixels; fades linearly to zero.
+    shake_offset_x = random_range(-_shake_strength, _shake_strength);
+    shake_offset_y = random_range(-_shake_strength, _shake_strength);
+}
+camera_set_view_pos(cam, cam_x + shake_offset_x, cam_y + shake_offset_y);
