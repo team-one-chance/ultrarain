@@ -16,8 +16,25 @@ function item_controller_init(_pickup)
 {
     item_run_inventory();
 
+    // A retry rebuilds room pickups, while collected controllers persist.
+    // Suppress the rebuilt copy of a pickup already owned in this run.
+    for (var _i = 0; _i < array_length(global.item_controllers); _i++)
+    {
+        var _owned = global.item_controllers[_i];
+        if (instance_exists(_owned) && _owned.object_index == _pickup.object_index
+        && _owned.item_source_room == room && _owned.item_source_x == _pickup.x
+        && _owned.item_source_y == _pickup.y)
+        {
+            instance_destroy(_pickup);
+            return;
+        }
+    }
+
     _pickup.item_collected = false;
     _pickup.item_owner = noone;
+    _pickup.item_source_room = room;
+    _pickup.item_source_x = _pickup.x;
+    _pickup.item_source_y = _pickup.y;
 
     // Uncollected pickups remain in their original room.
     _pickup.persistent = false;
@@ -55,6 +72,9 @@ function item_controller_collect(_pickup, _player)
     _pickup.phy_active = false;
 
     array_push(global.item_controllers, _pickup);
+
+    _player.item_notice_key = _pickup.item_key;
+    _player.item_notice_time = 5; // Seconds the full pickup description remains visible.
 
     return true;
 }
@@ -178,13 +198,17 @@ function item_get_definition(_key)
             return {
                 name: "PI-tastic",
                 icon: object_get_sprite(o_PI_tastic),
+                description: "Coin ricochets round their damage down, then add 1, 2 or 4 damage at levels 1, 2 or 3.",
+                short_description: "Coin ricochets gain damage.",
                 quality: 1
             };
 
         case "coin_anchor":
             return {
-                name: "Pin House",
+                name: "Pinhouse",
                 icon: object_get_sprite(o_pinhouse),
+                description: "Press middle mouse to pin your oldest thrown coin in place. Recharges in 8 seconds.",
+                short_description: "Middle mouse pins a coin.",
                 quality: 4
             };
     }
@@ -192,6 +216,8 @@ function item_get_definition(_key)
     return {
         name: _key,
         icon: -1,
+        description: "",
+        short_description: "",
         quality: 1
     };
 }
@@ -282,6 +308,7 @@ function item_draw_hud(_player)
     draw_set_valign(fa_middle);
 
     var _outline_available = shader_is_compiled(sh_ItemOutline);
+    var _hovered = undefined;
 
     for (var _i = 0; _i < _count; _i++)
     {
@@ -312,6 +339,8 @@ function item_draw_hud(_player)
         var _bottom = _top + _size;
         var _cx = (_left + _right) * 0.5;
         var _cy = (_top + _bottom) * 0.5;
+        if (point_in_rectangle(device_mouse_x_to_gui(0), device_mouse_y_to_gui(0),
+            _left, _top, _right, _bottom)) _hovered = _definition;
 
         var _border = make_color_rgb(192, 192, 192);
 
@@ -430,6 +459,35 @@ function item_draw_hud(_player)
 
         draw_set_color(c_white);
         draw_text(_text_x, _text_y, _text);
+    }
+
+    // Show the full description on pickup and a compact reminder on hover.
+    var _notice = undefined;
+    var _notice_text = "";
+    if (is_struct(_hovered))
+    {
+        _notice = _hovered;
+        _notice_text = _notice.short_description;
+    }
+    else if (_player.item_notice_time > 0)
+    {
+        _notice = item_get_definition(_player.item_notice_key);
+        _notice_text = _notice.description;
+    }
+    if (is_struct(_notice))
+    {
+        var _box_width = min(440, _gw - 32);
+        var _box_bottom = _gh - _bottom_margin - _rows * _size - (_rows - 1) * _gap - 8;
+        var _box_height = 68;
+        draw_set_color(c_black);
+        draw_set_alpha(0.85);
+        draw_rectangle((_gw - _box_width) * 0.5, _box_bottom - _box_height,
+            (_gw + _box_width) * 0.5, _box_bottom, false);
+        draw_set_alpha(1);
+        draw_set_color(c_white);
+        draw_set_valign(fa_top);
+        draw_text(_gw * 0.5, _box_bottom - _box_height + 6, _notice.name);
+        draw_text_ext(_gw * 0.5, _box_bottom - _box_height + 24, _notice_text, 16, _box_width - 16);
     }
 
     draw_set_color(_old_color);

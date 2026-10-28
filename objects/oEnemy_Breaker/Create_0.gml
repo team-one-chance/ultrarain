@@ -167,7 +167,7 @@ ground_check_distance = 1;
 is_grounded = false;
 ehp_max = 1000;
 ehp = ehp_max;
-shield_hp_max = ehp_max * 0.5;
+shield_hp_max = ehp_max * (enemy_difficulty == 3 ? 0.5 : 0.25); // Shield health as a fraction of boss health; Futile retains its tuning.
 shield_hp = shield_hp_max;
 shield_bar_width = 28;
 shield_bar_height = 3;
@@ -187,7 +187,7 @@ hit_timer = 0;
 normal_attack_damage = 12;
 normal_attack_range = 36;
 normal_attack_vertical_tolerance = 30;
-var _breaker_wait = enemy_difficulty == 0 ? 1.25 : (enemy_difficulty == 3 ? 0.6 : (enemy_difficulty == 2 ? 0.85 : 1));
+var _breaker_wait = enemy_difficulty == 0 ? 1.75 : (enemy_difficulty == 3 ? 0.6 : (enemy_difficulty == 2 ? 0.85 : 1.4)); // Longer attack intervals on Easy and Normal.
 normal_attack_cooldown_min = 0.6 * _breaker_wait;
 normal_attack_cooldown_max = 0.9 * _breaker_wait;
 normal_attack_cooldown = random_range(normal_attack_cooldown_min, normal_attack_cooldown_max);

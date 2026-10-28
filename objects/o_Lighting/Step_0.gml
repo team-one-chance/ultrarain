@@ -7,6 +7,7 @@ resolution_indicator_timer = max(0, resolution_indicator_timer - _dt);
 var _settings = ceiling_flicker;
 with (o_light_ceil_long_ow)
 {
+    if (variable_instance_exists(id, "lamp_broken") && lamp_broken) continue;
     if (!variable_instance_exists(id, "light_flicker_timer"))
     {
         light_flickering = false;

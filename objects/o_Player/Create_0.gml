@@ -1116,6 +1116,8 @@ begin_grinder_death = function(_gear)
 };
 
 inventory = item_run_inventory();
+item_notice_key = "";
+item_notice_time = 0; // Seconds remaining for the latest pickup description.
 // Begin/End Step snapshots let Breaker's core stop a fast dash crossing in one tick.
 breaker_body_snapshot = [];
 breaker_grab_owner = noone; // Breaker holding this player, or noone when free.

@@ -64,6 +64,7 @@ if (station_layer_1 != -1) layer_x(station_layer_1, station_1_base_x + total_tra
 
 train_exit_door = noone;
 train_entrance_door = noone;
+boss_door_barrier = noone; // Player-only barrier at the tram entrance during the encounter.
 
 boarding_requested = false;
 entrance_open_distance = 110;

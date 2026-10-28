@@ -5,6 +5,40 @@ big_room_cleared = false;
 big_room_enemies = [];
 checkpoint_layers = undefined;
 checkpoint_layers_pending = false;
+checkpoint_first_door_open = false; // Remember the first tutorial door across a retry.
+checkpoint_first_door_pending = false;
+
+first_door_is_open = function()
+{
+    var _door = instance_nearest(1600, 128, o_Door_UNB);
+    return instance_exists(_door) && point_distance(_door.x, _door.y, 1600, 128) < 8
+        && (_door.door_state == 1 || _door.door_state == 2);
+};
+
+restore_first_door = function()
+{
+    var _door = instance_nearest(1600, 128, o_Door_UNB);
+    if (instance_exists(_door) && point_distance(_door.x, _door.y, 1600, 128) < 8)
+    {
+        _door.door_state = 2;
+        _door.image_index = _door.image_number - 1;
+        _door.image_speed = 0;
+        if (_door.door_fixture != -1)
+        {
+            physics_remove_fixture(_door, _door.door_fixture);
+            _door.door_fixture = -1;
+        }
+        with (oDrone) nav_grid_dirty = true;
+    }
+    var _controller = instance_nearest(1504, 128, o_DoorController);
+    if (instance_exists(_controller) && point_distance(_controller.x, _controller.y, 1504, 128) < 8)
+    {
+        _controller.controller_state = 3;
+        _controller.sprite_index = _controller.broken_sprite;
+        _controller.image_index = 0;
+        _controller.image_speed = 0;
+    }
+};
 
 // Store layer names, not room-specific layer IDs, which change on restart.
 save_checkpoint_layers = function()
@@ -49,6 +83,11 @@ if (variable_global_exists("tutorial_checkpoint_retry")
     respawn_x = _retry.x;
     respawn_y = _retry.y;
     big_room_cleared = _retry.cleared;
+    if (variable_struct_exists(_retry, "first_door_open"))
+    {
+        checkpoint_first_door_open = _retry.first_door_open;
+        checkpoint_first_door_pending = checkpoint_first_door_open;
+    }
     if (variable_struct_exists(_retry, "layers"))
     {
         checkpoint_layers = _retry.layers;

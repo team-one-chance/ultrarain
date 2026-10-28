@@ -15,7 +15,8 @@ if ((button_hover && mouse_check_button_pressed(mb_left))
         var _checkpoint = instance_find(o_TutorialCheckpoint, 0);
         global.tutorial_checkpoint_retry = {
             x: _checkpoint.respawn_x, y: _checkpoint.respawn_y,
-            cleared: _checkpoint.big_room_cleared, layers: _checkpoint.checkpoint_layers
+            cleared: _checkpoint.big_room_cleared, layers: _checkpoint.checkpoint_layers,
+            first_door_open: _checkpoint.checkpoint_first_door_open || _checkpoint.first_door_is_open()
         };
         global.demo_travel_state = undefined;
         with (o_SeamlessTravel)
@@ -34,7 +35,6 @@ if ((button_hover && mouse_check_button_pressed(mb_left))
         // Rebuild the room and its physics instead of resuming a dead player.
         room_persistent = false;
         keyboard_string = "";
-		item_controllers_reset();
         room_restart();
         exit;
     }

@@ -154,7 +154,9 @@ draw_text_transformed(
                     ".\\menu.exe start --difficulty " + string_lower(_options[menu_selection]);
                 break;
             case BootMenuState.SETTINGS:
-                if (menu_selection == 2) _command += ".\\menu.exe";
+                if (menu_selection == 3) _command += ".\\menu.exe";
+                else if (menu_selection == 2)
+                    _command += ".\\controls.exe --mouse-heal " + (global.heal_mouse_combo ? "off" : "on");
                 else if (menu_selection == 1)
                     _command += ".\\display.exe --pixelization " + (menu_pixelization_active() ? "off" : "on");
                 else _command += ".\\display.exe --fullscreen " + (window_get_fullscreen() ? "off" : "on");

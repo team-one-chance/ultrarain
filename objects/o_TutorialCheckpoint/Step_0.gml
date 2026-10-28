@@ -1,4 +1,10 @@
 // Wait until all room Create events have finished before restoring visibility.
+if (checkpoint_first_door_pending)
+{
+    restore_first_door();
+    checkpoint_first_door_pending = false;
+}
+if (first_door_is_open()) checkpoint_first_door_open = true;
 if (checkpoint_layers_pending)
 {
     restore_checkpoint_layers();
@@ -47,4 +53,5 @@ if (!big_room_cleared && array_length(big_room_enemies) > 0)
 }
 
 // Keep the latest tutorial checkpoint available during travel to another room.
-global.menu_checkpoint = { x: respawn_x, y: respawn_y, cleared: big_room_cleared, layers: checkpoint_layers };
+global.menu_checkpoint = { x: respawn_x, y: respawn_y, cleared: big_room_cleared, layers: checkpoint_layers,
+    first_door_open: checkpoint_first_door_open };

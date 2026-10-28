@@ -2063,12 +2063,13 @@ if (perfect_apex_flash_timer > 0)
 // Both buttons reserve the input for syringe use.
 var _basher_ui_mouse = variable_global_exists("basher_tuner_capture_mouse") && global.basher_tuner_capture_mouse;
 var _syringe_combo =
-    !_basher_ui_mouse && mouse_check_button(mb_left)
+    variable_global_exists("heal_mouse_combo") && global.heal_mouse_combo
+    && !_basher_ui_mouse && mouse_check_button(mb_left)
     && mouse_check_button(mb_right);
 
-if (_syringe_combo
+if (keyboard_check_pressed(ord("H")) || (_syringe_combo
 && (mouse_check_button_pressed(mb_left)
-    || mouse_check_button_pressed(mb_right)))
+    || mouse_check_button_pressed(mb_right))))
 {
     use_syringe(false);
 }

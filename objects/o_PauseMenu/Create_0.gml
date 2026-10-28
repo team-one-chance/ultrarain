@@ -8,13 +8,15 @@ last_mouse_y = device_mouse_y_to_gui(0);
 accent = make_color_rgb(0, 186, 225);
 controller = noone;
 if (!variable_global_exists("exhibition_exit_locked")) global.exhibition_exit_locked = false;
+if (!variable_global_exists("heal_mouse_combo")) global.heal_mouse_combo = false; // Optional two-button healing input.
 
 pause_options = function()
 {
     switch (page)
     {
         case 1: return ["Fullscreen: " + (window_get_fullscreen() ? "On" : "Off"),
-            "Pixelization: " + (menu_pixelization_active() ? "On" : "Off"), "Back"];
+            "Pixelization: " + (menu_pixelization_active() ? "On" : "Off"),
+            "Mouse combo heal: " + (global.heal_mouse_combo ? "On" : "Off"), "Back"];
         case 2: return ["Back"];
     }
     return ["Resume", "Restart from Checkpoint", "Restart Level", "Settings", "Credits", "Exit to Main Menu"];
@@ -66,6 +68,7 @@ pause_activate = function()
     {
         if (selected == 0) window_set_fullscreen(!window_get_fullscreen());
         else if (selected == 1) menu_toggle_pixelization();
+        else if (selected == 2) global.heal_mouse_combo = !global.heal_mouse_combo;
         else { page = 0; selected = 3; }
         selection_age = 0;
         return;
@@ -88,7 +91,8 @@ pause_activate = function()
                 var _checkpoint = instance_find(o_TutorialCheckpoint, 0);
                 global.tutorial_checkpoint_retry = {
                     x: _checkpoint.respawn_x, y: _checkpoint.respawn_y,
-                    cleared: _checkpoint.big_room_cleared, layers: _checkpoint.checkpoint_layers
+                    cleared: _checkpoint.big_room_cleared, layers: _checkpoint.checkpoint_layers,
+                    first_door_open: _checkpoint.checkpoint_first_door_open || _checkpoint.first_door_is_open()
                 };
                 global.demo_travel_state = undefined;
                 with (o_SeamlessTravel)
@@ -103,7 +107,6 @@ pause_activate = function()
                     }
                 }
                 room_persistent = false;
-				item_controllers_reset();
                 room_restart();
             }
             else if (variable_global_exists("menu_checkpoint") && is_struct(global.menu_checkpoint))

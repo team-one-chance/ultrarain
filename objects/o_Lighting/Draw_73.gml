@@ -35,14 +35,17 @@ with (o_PointLight)
 }
 with (o_light_ceil_long)
 {
+    if (variable_instance_exists(id, "lamp_broken") && lamp_broken) continue;
     _renderer.draw_light_cone(id, _renderer.ceiling_light);
 }
 with (o_light_ceil_long_strong)
 {
+    if (variable_instance_exists(id, "lamp_broken") && lamp_broken) continue;
     _renderer.draw_light_cone(id, _renderer.ceiling_light_strong);
 }
 with (o_light_ceil_long_ow)
 {
+    if (variable_instance_exists(id, "lamp_broken") && lamp_broken) continue;
     var _brightness = image_index < 1 ? _renderer.ceiling_flicker.dim_multiplier : 1;
     _renderer.draw_light_cone(id, _renderer.ceiling_light, _brightness);
 }
@@ -187,10 +190,11 @@ if (bloom_enabled && (bloom_strength > 0 || scout_bloom_strength > 0 || player_b
         // Bloom comes from glowing sources, never from the wide illumination cones.
         gpu_set_blendmode(bm_add);
         with (o_light_ceil_long)
-            _renderer.draw_lamp_bloom(id, _renderer.ceiling_light);
+            if (!variable_instance_exists(id, "lamp_broken") || !lamp_broken) _renderer.draw_lamp_bloom(id, _renderer.ceiling_light);
         with (o_light_ceil_long_strong)
-            _renderer.draw_lamp_bloom(id, _renderer.ceiling_light_strong);
+            if (!variable_instance_exists(id, "lamp_broken") || !lamp_broken) _renderer.draw_lamp_bloom(id, _renderer.ceiling_light_strong);
         with (o_light_ceil_long_ow)
+        if (!variable_instance_exists(id, "lamp_broken") || !lamp_broken)
             _renderer.draw_lamp_bloom(id, _renderer.ceiling_light,
                 image_index < 1 ? _renderer.ceiling_flicker.dim_multiplier : 1);
         with (o_DoorController)

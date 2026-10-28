@@ -57,11 +57,12 @@ for (var _i = 0; _i < array_length(breaker_body_snapshot); _i++) {
     // Sweep the dash against the core so high speed cannot skip the grab.
     // A prior body-separation side may be stale after a grab carries us across.
     var _grab_side = sign(_previous_separation);
+    if (_grab_side == 0) _grab_side = -dash_direction;
     if (dash_active && _boss.breaker_unshielded
         && !(variable_global_exists("dev_freeze_enemies") && global.dev_freeze_enemies)
         && _player_bottom >= _boss_top && _player_top <= _boss.bbox_bottom
         && _grab_side != 0 && _separation * _grab_side < _limit
-        && _separation * _grab_side < _previous_separation * _grab_side
+        && dash_direction == -_grab_side
         && _boss.breaker_try_grab(id, _grab_side)) exit;
     // Sweep the relative bodies on both axes before horizontal separation.
     // This also catches a fast rise/dive or a player crossing between Steps.

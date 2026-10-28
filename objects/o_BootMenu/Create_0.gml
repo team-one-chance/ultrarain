@@ -1,5 +1,6 @@
 // Entering the main menu starts a fresh run, including direct level launches.
 item_controllers_reset();
+if (!variable_global_exists("heal_mouse_combo")) global.heal_mouse_combo = false; // Optional two-button healing input.
 
 // Carry the final white overlay into the tutorial.
 persistent = true;
@@ -110,7 +111,8 @@ boot_menu_options = function()
             return ["Easy", "Normal", "Hard", "Back"];
         case BootMenuState.SETTINGS:
             return ["Fullscreen: " + (window_get_fullscreen() ? "On" : "Off"),
-                "Pixelization: " + (menu_pixelization_active() ? "On" : "Off"), "Back"];
+                "Pixelization: " + (menu_pixelization_active() ? "On" : "Off"),
+                "Mouse combo heal: " + (global.heal_mouse_combo ? "On" : "Off"), "Back"];
         case BootMenuState.CREDITS: return ["Back"];
         case BootMenuState.CONFIRM_EXIT: return ["Cancel", "Quit game"];
     }
@@ -181,6 +183,7 @@ boot_menu_activate = function()
         case BootMenuState.SETTINGS:
             if (menu_selection == 0) window_set_fullscreen(!window_get_fullscreen());
             else if (menu_selection == 1) menu_toggle_pixelization();
+            else if (menu_selection == 2) global.heal_mouse_combo = !global.heal_mouse_combo;
             else boot_menu_open(BootMenuState.MAIN);
             break;
         case BootMenuState.CREDITS:
