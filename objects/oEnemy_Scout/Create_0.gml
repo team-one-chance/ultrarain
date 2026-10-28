@@ -245,6 +245,8 @@ attack_register_dash_hit = function(_player)
     )
     {
         attack_hit_player = true;
+		if (_player.parry_melee(id, false))
+    return;
         // Damage only on the first contact during the active charge attack.
         // Player protection rejects damage and recoil during dash/slam.
         _player.take_damage(attack_dash_damage, x);

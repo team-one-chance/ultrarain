@@ -113,3 +113,38 @@ if (shield_hp > 0 && shield_hp_max > 0)
         shield_blue, shield_blue, shield_blue, shield_blue, false
     );
 }
+
+var _warning_color = c_white;
+var _show_warning = false;
+
+if (breaker_state == BreakerState.BASH)
+{
+    _warning_color = breaker_unshielded ? c_yellow : c_red;
+    _show_warning = true;
+}
+else if (breaker_state == BreakerState.JUMP_CHARGE
+    || breaker_airborne_attack())
+{
+    _warning_color = c_blue;
+    _show_warning = true;
+}
+
+if (_show_warning)
+{
+    var _old_warning_color = draw_get_color();
+    var _old_warning_alpha = draw_get_alpha();
+
+    draw_set_color(_warning_color);
+    draw_set_alpha(0.8);
+
+    draw_ellipse(
+        bbox_left - 8,
+        bbox_top - 8,
+        bbox_right + 8,
+        bbox_bottom + 8,
+        true
+    );
+
+    draw_set_color(_old_warning_color);
+    draw_set_alpha(_old_warning_alpha);
+}

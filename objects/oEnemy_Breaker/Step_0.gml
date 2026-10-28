@@ -118,7 +118,19 @@ if (!_stunned && !_stagger) switch (breaker_state) {
                     var _target = collision_rectangle(_left, bbox_top, _right, bbox_bottom, o_Player, false, true);
                     if (_target != noone) {
                         breaker_bash_hit = true;
-                        miniboss_damage_player(_target, normal_attack_damage);
+                        if (breaker_unshielded)
+{
+    // Unshielded stab: yellow.
+    if (_target.parry_melee(id, false))
+        exit;
+
+    miniboss_damage_player(_target, normal_attack_damage);
+}
+else
+{
+    // Shield bash: red.
+    miniboss_damage_player(_target, normal_attack_damage, "red");
+}
                     }
                 }
             }

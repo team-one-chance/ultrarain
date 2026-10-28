@@ -324,8 +324,9 @@ breaker_move_x = function(_distance, _needs_floor) {
         x += _dx;
     }
 };
-miniboss_damage_player = function(_target, _damage) {
-    if (instance_exists(_target)) _target.take_damage(_damage, x);
+miniboss_damage_player = function(_target, _damage, _attack_type = "") {
+    if (instance_exists(_target))
+        _target.take_damage(_damage, x, _attack_type);
 };
 
 miniboss_parent_take_damage = take_damage;
