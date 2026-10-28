@@ -86,3 +86,13 @@ Weitere Waffen, waffenspezifische Aufsätze und Körper-Items sollen unterschied
 ## Team
 
 ULTRARAIN wird von **Team One Chance** entwickelt.
+
+## Lizenz & Modding
+
+Der originale Quellcode von ULTRARAIN steht unter der [PolyForm Noncommercial License 1.0.0](LICENSE). Sie erlaubt nichtkommerzielle Änderungen und Weiterverbreitung, einschliesslich Code-Forks, gemäss ihren Bedingungen. Die zugehörige Programmkonfiguration und technische Ressourcen-Metadaten sind im dort beschriebenen Umfang eingeschlossen; die genaue Abgrenzung steht in [ASSET-LICENSE.md](ASSET-LICENSE.md).
+
+Für die originalen kreativen Inhalte von Team One Chance gilt **All Rights Reserved**, Copyright 2026 Team One Chance. Dazu gehören Grafik, Animationen, Audio und kreative Levelinhalte, auch wenn sie in GameMaker-`.yy`-Dateien enthalten sind. Materialien Dritter bleiben ihren jeweiligen Bedingungen unterstellt.
+
+Community-Mods und Total Conversions sind willkommen! Nichtkommerzielle, eigenständig erstellte Mods und Patch-Dateien dürfen gemäss [MODDING.md](MODDING.md) verbreitet werden. Geschützte Original-Assets dürfen dabei nicht mitgeliefert werden; lokale Änderungen an einer legitimen Installation sind für nichtkommerzielles Modding erlaubt.
+
+Eine kommerzielle Verwertung von Material von Team One Chance ausserhalb der bereits erteilten Rechte benötigt eine separate Erlaubnis. Massgeblich sind [LICENSE](LICENSE), [ASSET-LICENSE.md](ASSET-LICENSE.md) und [MODDING.md](MODDING.md).
