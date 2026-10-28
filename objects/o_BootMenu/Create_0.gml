@@ -1,3 +1,6 @@
+// Entering the main menu starts a fresh run, including direct level launches.
+item_controllers_reset();
+
 // Carry the final white overlay into the tutorial.
 persistent = true;
 depth = 100;
@@ -35,9 +38,18 @@ scroll_timer = 0;
 scroll_interval = 0.1;
 
 console_green = make_color_rgb(90, 235, 130);
+console_blue = make_color_rgb(145, 210, 255);
 console_red = make_color_rgb(255, 55, 65);
 console_white = make_color_rgb(215, 225, 220);
 console_dim = make_color_rgb(90, 110, 100);
+console_difficulty = 1;
+
+// Replace these placeholders with the final difficulty descriptions.
+difficulty_descriptions = [
+    "200 health - Slower, less aggressive enemies with more time between attacks. Have some fun.",
+    "150 health - The game's intended difficulty.",
+    "100 health - Faster, more aggressive enemies with less room for error."
+];
 
 boot_add_line = function(_text, _color, _play_sfx = true)
 {
@@ -153,7 +165,11 @@ boot_menu_activate = function()
             }
             break;
         case BootMenuState.DIFFICULTY:
-            if (menu_selection != 3) global.game_difficulty = menu_selection;
+            if (menu_selection != 3)
+            {
+                global.game_difficulty = menu_selection;
+                console_difficulty = menu_selection;
+            }
             boot_menu_open(menu_selection == 3 ? BootMenuState.MAIN : 0);
             break;
         case BootMenuState.SETTINGS:

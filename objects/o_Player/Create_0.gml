@@ -624,6 +624,9 @@ gun_reticle_flash_timer = 0;
 sword_swing_timer = 0;
 sword_swing_pending_hit = false;
 sword_swing_facing = 1;
+sword_combat_facing_timer = 0;
+sword_combat_facing_duration = 3;
+sword_last_move_facing = 1;
 sword_slash_sound_index = 0;
 
 // Dark Repulsor tuning. Angles are degrees; distances are pixels;

@@ -922,6 +922,21 @@ if (abs(aim_dx) > 1)
     aim_facing = sign(aim_dx);
 }
 
+if (move != 0)
+{
+    sword_last_move_facing = sign(move);
+}
+
+if (weapon_type != "sword")
+{
+    sword_combat_facing_timer = 0;
+}
+else if (sword_swing_timer <= 0)
+{
+    sword_combat_facing_timer = max(0, sword_combat_facing_timer
+        - (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) / 1000000);
+}
+
 // =====================================
 // SPRITE / ANIMATION
 // =====================================
@@ -1043,9 +1058,6 @@ else if (move != 0)
 {
     sprite_index = s_Player_Run;
 	
-	// 1 when moving forward, -1 when backpedaling
-    image_speed = move * aim_facing;
-	
     if (move > 0)
     {
         image_xscale = 1;
@@ -1070,20 +1082,6 @@ else
     sprite_index = s_Player;
 }
 
-// Normal poses face toward the cursor.
-// Direction-specific poses keep their forced direction.
-/*
-var facing_locked =
-    is_sliding
-    || is_ledge_climbing
-    || (!on_ground && wall_jump_lock_time > 0)
-    || (!on_ground && touching_wall && coyote_timer <= 0);
-
-if (!facing_locked)
-{
-    image_xscale = aim_facing;
-}
-*/
 // =====================================
 // SLAM INPUT
 // =====================================
@@ -2083,12 +2081,11 @@ else if (weapon_type == "sword")
     && chip_sword_cooldown_timer <= 0)
     {
         sword_swing_timer = max(0.001, sword_config.swing_duration);
+        sword_combat_facing_timer = sword_combat_facing_duration;
         chip_sword_cooldown_timer = sword_swing_timer * chip_attack_multiplier();
         sword_swing_pending_hit = true;
-        // Aim independently of the slide's movement/body direction.
-        sword_swing_facing = is_sliding
-            ? sign(aim_facing)
-            : sign(image_xscale);
+        // Lock the swing to the cursor's direction when the attack starts.
+        sword_swing_facing = sign(aim_facing);
 
         if (sword_swing_facing == 0)
         {
@@ -2119,6 +2116,23 @@ else if (weapon_type == "sword")
         slash.sync_sword_swing();
         slash.slash_damage = sword_config.slash_damage;
         slash.knockback_force = sword_config.slash_knockback;
+    }
+}
+
+// Sword combat temporarily turns the body toward the cursor. The swing itself
+// stays locked to its starting direction, as does its slash.
+if (weapon_type == "sword")
+{
+    var _sword_facing_locked = player_collider_short || is_ledge_climbing
+        || is_mantle_lunging || (!on_ground && wall_jump_lock_time > 0)
+        || (!on_ground && touching_wall && coyote_timer <= 0);
+    if (!_sword_facing_locked)
+    {
+        image_xscale = sword_combat_facing_timer > 0 ? aim_facing : sword_last_move_facing;
+        if (sprite_index == s_Player_Run && move != 0)
+        {
+            image_speed *= move * sign(image_xscale);
+        }
     }
 }
 

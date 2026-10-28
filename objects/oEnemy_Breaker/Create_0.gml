@@ -103,9 +103,10 @@ ground_move_speed = 180;
 // Approximate authored stride, scaled into room pixels.
 breaker_walk_cycle_distance = 144 * breaker_scale;
 normal_attack_approach_speed = ground_move_speed;
-breaker_unshielded_move_multiplier = 1.2;
-breaker_unshielded_damage_multiplier = 1.25;
-breaker_unshielded_cooldown_multiplier = 0.6;
+// Hard mode makes the shield-break phase a sharper escalation.
+breaker_unshielded_move_multiplier = enemy_difficulty == 2 ? 1.45 : 1.2;
+breaker_unshielded_damage_multiplier = enemy_difficulty == 2 ? 1.5 : 1.25;
+breaker_unshielded_cooldown_multiplier = enemy_difficulty == 2 ? 0.45 : 0.6;
 // The narrow core allows overlap with the outside of the visible silhouette.
 breaker_body_core_fraction = 0.36;
 breaker_body_height_fraction = 0.8; // Keep the feet fixed; lower the blocking top.

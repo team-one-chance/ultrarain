@@ -422,6 +422,19 @@ if (bloom_enabled && (bloom_strength > 0 || scout_bloom_strength > 0 || player_b
         gpu_set_texfilter(_old_filter);
     }
 }
+// Pickups retain their original colours and outline after world lighting.
+// Draw after bloom so they do not feed the glow buffers or illuminate the room.
+gpu_set_blendmode(bm_normal);
+draw_set_color(c_white);
+draw_set_alpha(1);
+with (o_pinhouse)
+{
+    if (visible && layer_get_visible(layer) && !item_collected) item_draw_pickup(id);
+}
+with (o_PI_tastic)
+{
+    if (visible && layer_get_visible(layer) && !item_collected) item_draw_pickup(id);
+}
 // Final world pass runs after bloom and before Draw GUI, keeping the HUD sharp.
 if (pixelation_enabled && pixelation_size > 1 && surface_exists(application_surface)
 && shader_is_compiled(sh_WorldPixelate))

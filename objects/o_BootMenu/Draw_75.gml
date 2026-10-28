@@ -16,7 +16,28 @@ draw_set_alpha(1);
 // Stop drawing the console once the tutorial is entered.
 if (boot_state != 8)
 {
-    draw_set_color(make_color_rgb(5, 8, 7));
+    var _background_difficulty = console_difficulty;
+    if (boot_state == BootMenuState.DIFFICULTY && menu_selection < 3)
+        _background_difficulty = menu_selection;
+    var _background_color = make_color_rgb(5, 8, 7);
+    if (_background_difficulty == 0) _background_color = make_color_rgb(5, 8, 12);
+    if (_background_difficulty == 2) _background_color = make_color_rgb(12, 5, 6);
+    var _theme_accent = console_green;
+    var _theme_dim = console_dim;
+    var _theme_text = console_white;
+    if (_background_difficulty == 0)
+    {
+        _theme_accent = console_blue;
+        _theme_dim = make_color_rgb(90, 105, 120);
+        _theme_text = make_color_rgb(215, 225, 235);
+    }
+    else if (_background_difficulty == 2)
+    {
+        _theme_accent = console_red;
+        _theme_dim = make_color_rgb(120, 90, 95);
+        _theme_text = make_color_rgb(235, 215, 215);
+    }
+    draw_set_color(_background_color);
     draw_rectangle(0, 0, _gw, _gh, false);
 
     // Shake the console during the crash.
@@ -36,7 +57,7 @@ if (boot_state != 8)
     var _is_menu = boot_state >= BootMenuState.MAIN && boot_state <= BootMenuState.CONFIRM_EXIT;
     var _layout = boot_menu_layout();
 
-    draw_set_color(console_dim);
+    draw_set_color(_theme_dim);
     draw_text(
         _text_x,
         24 + _shake_y,
@@ -62,7 +83,11 @@ if (boot_state != 8)
     {
         var _entry = console_lines[_i];
 
-        draw_set_color(_entry.tint);
+        var _entry_color = _entry.tint;
+        if (_entry_color == console_green) _entry_color = _theme_accent;
+        else if (_entry_color == console_dim) _entry_color = _theme_dim;
+        else if (_entry_color == console_white) _entry_color = _theme_text;
+        draw_set_color(_entry_color);
 
         if (_entry.message == "> rules.exe overwriting..."
         && transition_sound != -1 && audio_is_playing(transition_sound))
@@ -95,12 +120,9 @@ draw_text_transformed(
         for (var _option = 0; _option < array_length(_options); _option++)
         {
             var _selected = _option == menu_selection;
-            var _option_color = _selected ? console_green : console_white;
-            if (boot_state == BootMenuState.DIFFICULTY)
-            {
-                if (_option == 1) _option_color = c_yellow;
-                if (_option == 2) _option_color = console_red;
-            }
+            var _option_color = _selected ? _theme_accent : _theme_text;
+            if (boot_state == BootMenuState.DIFFICULTY && _option < 3 && !_selected)
+                _option_color = c_white;
             if (boot_state == BootMenuState.MAIN && _option == 3 && exit_flash > 0)
                 _option_color = merge_color(console_white, console_red, 0.5 + 0.5 * abs(sin(exit_flash * 24)));
             draw_set_color(_option_color);
@@ -136,15 +158,26 @@ draw_text_transformed(
                 break;
         }
         var _command_y = _layout.y + array_length(_options) * _layout.row_height + 24;
-        draw_set_color(console_white);
+        if (boot_state == BootMenuState.DIFFICULTY)
+        {
+            // Reserve the same space for Back so the command does not jump.
+            if (menu_selection < array_length(difficulty_descriptions))
+            {
+                var _description = difficulty_descriptions[menu_selection];
+                draw_set_color(_theme_dim);
+                draw_text(_layout.x, _command_y, _description);
+            }
+            _command_y += string_height("Ag") + 24;
+        }
+        draw_set_color(_theme_text);
         draw_text_transformed(_layout.x, _command_y, _command,
             _layout.command_scale, _layout.command_scale, 0);
-        draw_set_color(console_dim);
+        draw_set_color(_theme_dim);
         draw_text(_layout.x, _command_y + 34, "UP/DOWN or TAB to select | ENTER or click to run | ESC back");
         if (floor(boot_elapsed / 0.5) mod 2 == 0)
         {
             var _command_cursor_x = _layout.x + string_width(_command) * _layout.command_scale + 12;
-            draw_set_color(console_green);
+            draw_set_color(_theme_accent);
             draw_rectangle(_command_cursor_x, _command_y + 3,
                 _command_cursor_x + 10, _command_y + 22, false);
         }
@@ -152,7 +185,7 @@ draw_text_transformed(
 
     if (_is_menu && global.exhibition_exit_locked)
     {
-        draw_set_color(console_dim);
+        draw_set_color(_theme_dim);
         draw_text(_gw - 350, 24, "EXHIBITION // EXIT LOCKED");
     }
 
@@ -167,7 +200,7 @@ if (boot_state == 0 || boot_state == 4)
     }
         var _prompt_y = _gh - 58;
 
-        draw_set_color(console_white);
+        draw_set_color(_theme_text);
         draw_text(_text_x, _prompt_y, _prompt);
 
         if (floor(boot_elapsed / 0.5) mod 2 == 0)
@@ -175,7 +208,7 @@ if (boot_state == 0 || boot_state == 4)
             var _cursor_x =
                 _text_x + string_width(_prompt) + 12;
 
-            draw_set_color(console_green);
+            draw_set_color(_theme_accent);
 
             draw_rectangle(
                 _cursor_x,

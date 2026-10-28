@@ -197,6 +197,44 @@ function item_get_definition(_key)
 }
 
 
+// Draw an uncollected item hovering above its pickup body.
+function item_draw_pickup(_pickup)
+{
+    var _definition = item_get_definition(_pickup.item_key);
+    var _border = make_color_rgb(192, 192, 192);
+    switch (_definition.quality)
+    {
+        case 2: _border = make_color_rgb(70, 220, 90); break;
+        case 3: _border = make_color_rgb(235, 65, 65); break;
+        case 4: _border = make_color_rgb(255, 200, 45); break;
+    }
+
+    var _float_y = _pickup.y - 6 + sin(current_time / 500) * 3;
+    if (shader_is_compiled(sh_ItemOutline))
+    {
+        shader_set(sh_ItemOutline);
+        shader_set_uniform_f(shader_get_uniform(sh_ItemOutline, "u_time"), (current_time mod 60000) / 1000);
+        shader_set_uniform_f(shader_get_uniform(sh_ItemOutline, "u_rainbow"), _definition.quality == 5 ? 1 : 0);
+        shader_set_uniform_f(shader_get_uniform(sh_ItemOutline, "u_q4"), _definition.quality == 4 ? 1 : 0);
+        for (var _ox = -1; _ox <= 1; _ox++)
+        {
+            for (var _oy = -1; _oy <= 1; _oy++)
+            {
+                if (_ox == 0 && _oy == 0) continue;
+                draw_sprite_ext(_pickup.sprite_index, _pickup.image_index,
+                    _pickup.x + _ox * 2, _float_y + _oy * 2,
+                    _pickup.image_xscale, _pickup.image_yscale, _pickup.image_angle,
+                    _border, _pickup.image_alpha);
+            }
+        }
+        shader_reset();
+    }
+    draw_sprite_ext(_pickup.sprite_index, _pickup.image_index, _pickup.x, _float_y,
+        _pickup.image_xscale, _pickup.image_yscale, _pickup.image_angle,
+        _pickup.image_blend, _pickup.image_alpha);
+}
+
+
 // Draw the player's inventory at the bottom centre of the GUI.
 function item_draw_hud(_player)
 {
