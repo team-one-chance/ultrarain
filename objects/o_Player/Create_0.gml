@@ -866,7 +866,7 @@ coin_recharge_timer = 0;
 
 // Coin counts as being near its apex if its
 // vertical speed is within this range.
-coin_split_y_speed_threshold = 0.75;
+coin_split_y_speed_threshold = 1.25;
 
 // =====================================
 // MANTLE LUNGE
