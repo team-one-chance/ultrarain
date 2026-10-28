@@ -19,6 +19,14 @@ breaker_time = 0;
 breaker_animation_time = 0;
 breaker_footstep_index = -1;
 breaker_unshielded = false;
+breaker_eyes_awake = false;
+breaker_eye_light = undefined;
+breaker_eye_color = make_color_rgb(255, 18, 24);
+breaker_eye_halo_radius = 24;
+breaker_eye_light_strength = 0.85;
+breaker_eye_blink_start = 0.37;
+breaker_eye_blink_slow_interval = 0.24;
+breaker_eye_blink_fast_interval = 0.055;
 breaker_break_pending = false;
 breaker_hit_time = 0;
 breaker_hit_elapsed = 0;
@@ -47,8 +55,9 @@ breaker_play_hit_sound = function(_asset = sfxBreakerHit) {
     for (var _i = array_length(breaker_hit_sounds) - 1; _i >= 0; _i--) {
         if (!audio_is_playing(breaker_hit_sounds[_i])) array_delete(breaker_hit_sounds, _i, 1);
     }
-    var _gain = _asset == sfxBreakerHitNoShield ? 2 : 1;
-    var _sound = world_sfx_play(_asset, x, y, _gain);
+    var _gain = _asset == sfxBreakerHitNoShield ? 2 : 1.25;
+    // Impacts are combat feedback: remain audible across the pistol's range.
+    var _sound = world_sfx_play(_asset, x, y, _gain, 1, 2560);
     if (_sound != -1) array_push(breaker_hit_sounds, _sound);
 };
 facing_direction = 1;
@@ -94,6 +103,24 @@ variable_struct_set(breaker_foot_offsets, sprite_get_name(s_Breaker_land), [99, 
 variable_struct_set(breaker_foot_offsets, sprite_get_name(s_Breaker_land_unshielded), [115, 105, 95, 95, 95, 95, 95, 82, 82, 82, 82]);
 variable_struct_set(breaker_foot_offsets, sprite_get_name(s_Breaker_landrecovery), [88, 88, 88, 88, 88]);
 variable_struct_set(breaker_foot_offsets, sprite_get_name(s_Breaker_landrecovery_unshielded), [79, 80, 81, 76, 76]);
+
+// Eye axes sampled from the visible visor pixels of each cropped frame.
+breaker_eye_axes = {};
+variable_struct_set(breaker_eye_axes, sprite_get_name(s_Breaker_shieldbreak), [[28.5, 8.5, 31.5, 7.5], [35.5, 8.5, 38.5, 8.5], [36.5, 9.5, 39.5, 9.5], [36.5, 9.5, 39.5, 9.5], [38.5, 11.5, 41.5, 11.5], [39.5, 11.5, 42.5, 11.5], [39.5, 11.5, 42.5, 11.5], [39.5, 11.5, 42.5, 11.5], [39.5, 11.5, 42.5, 11.5], [40.5, 11.5, 43.5, 12.5], [41.5, 13.5, 43.5, 14.5], [41.5, 13.5, 43.5, 14.5], [41.5, 13.5, 43.5, 14.5], [41.5, 13.5, 43.5, 14.5], [41.5, 13.5, 43.5, 14.5], [41.5, 13.5, 43.5, 14.5], [41.5, 13.5, 43.5, 14.5], [41.5, 13.5, 43.5, 14.5], [40.5, 11.5, 43.5, 12.5], [39.5, 11.5, 42.5, 11.5], [38.5, 10.5, 41.5, 10.5], [39.5, 11.5, 42.5, 12.5], [41.5, 12.5, 44.5, 12.5]]);
+variable_struct_set(breaker_eye_axes, sprite_get_name(s_Breaker_idle_unshielded), [[35.5, 10.5, 38.5, 10.5]]);
+variable_struct_set(breaker_eye_axes, sprite_get_name(s_Breaker_walk_unshielded), [[45.5, 11.5, 48.5, 11.5], [45.5, 12.5, 48.5, 12.5], [45.5, 13.5, 48.5, 13.5], [45.5, 12.5, 48.5, 12.5], [45.5, 11.5, 48.5, 11.5], [45.5, 11.5, 48.5, 11.5], [45.5, 10.5, 48.5, 10.5], [45.5, 10.5, 48.5, 10.5], [45.5, 11.5, 48.5, 11.5], [45.5, 11.5, 48.5, 11.5], [45.5, 11.5, 48.5, 11.5], [45.5, 10.5, 48.5, 10.5]]);
+variable_struct_set(breaker_eye_axes, sprite_get_name(s_Breaker_block_unshielded), [[35.5, 11.5, 38.5, 11.5], [33.5, 9.5, 36.5, 9.5], [37.5, 12.5, 40.5, 12.5]]);
+variable_struct_set(breaker_eye_axes, sprite_get_name(s_Breaker_shieldbash_unshielded), [[41.5, 10.5, 44.5, 10.5], [41.5, 14.5, 44.5, 14.5], [41.5, 14.5, 44.5, 14.5], [41.5, 14.5, 44.5, 14.5], [41.5, 14.5, 44.5, 14.5], [41.5, 14.5, 44.5, 14.5], [55.5, 14.5, 58.5, 14.5], [69.5, 14.5, 72.5, 14.5], [70.5, 14.5, 73.5, 15.5], [71.5, 16.5, 73.5, 17.5], [70.5, 14.5, 73.5, 15.5], [69.5, 14.5, 72.5, 14.5]]);
+variable_struct_set(breaker_eye_axes, sprite_get_name(s_Breaker_bashcooldown_unshielded), [[48.5, 12.5, 51.5, 12.5], [48.5, 12.5, 51.5, 12.5], [48.5, 12.5, 51.5, 12.5], [48.5, 12.5, 51.5, 12.5], [48.5, 12.5, 51.5, 12.5], [48.5, 12.5, 51.5, 12.5], [48.5, 11.5, 51.5, 11.5], [48.5, 11.5, 51.5, 11.5], [48.5, 10.5, 51.5, 10.5]]);
+variable_struct_set(breaker_eye_axes, sprite_get_name(s_Breaker_jumpcharge_unshielded), [[35.5, 10.5, 38.5, 10.5], [38.5, 15.5, 41.5, 15.5], [39.5, 18.5, 42.5, 18.5], [40.5, 21.5, 43.5, 21.5], [41.5, 24.5, 44.5, 24.5], [42.5, 26.5, 45.5, 26.5], [42.5, 26.5, 45.5, 26.5], [42.5, 26.5, 45.5, 26.5], [42.5, 26.5, 45.5, 26.5], [42.5, 26.5, 45.5, 26.5], [42.5, 26.5, 45.5, 26.5], [42.5, 26.5, 45.5, 26.5], [42.5, 26.5, 45.5, 26.5], [43.5, 27.5, 46.5, 28.5], [44.5, 30.5, 46.5, 31.5]]);
+variable_struct_set(breaker_eye_axes, sprite_get_name(s_Breaker_jump_unshielded), [[41.5, 54.5, 43.5, 55.5], [38.5, 36.5, 41.5, 36.5], [38.5, 19.5, 35.5, 20.5], [38.5, 19.5, 35.5, 20.5], [38.5, 19.5, 35.5, 20.5], [36.5, 20.5, 38.5, 20.5], [37.5, 21.5, 40.5, 20.5]]);
+variable_struct_set(breaker_eye_axes, sprite_get_name(s_Breaker_slam_trans_unshielded), [[45.5, 39.5, 48.5, 38.5], [58.5, 48.5, 60.5, 48.5], [68.5, 60.5, 69.5, 61.5], undefined, undefined, [73.5, 80.5, 73.5, 83.5], [70.5, 85.5, 70.5, 88.5]]);
+variable_struct_set(breaker_eye_axes, sprite_get_name(s_Breaker_slam_unshielded), [[42.5, 85.5, 42.5, 88.5], [42.5, 85.5, 42.5, 88.5], [42.5, 85.5, 42.5, 88.5]]);
+variable_struct_set(breaker_eye_axes, sprite_get_name(s_Breaker_land_unshielded), [[66.5, 85.5, 66.5, 88.5], [73.5, 76.5, 73.5, 77.5], [79.5, 62.5, 80.5, 65.5], [79.5, 62.5, 80.5, 65.5], [79.5, 62.5, 80.5, 65.5], [79.5, 62.5, 80.5, 65.5], [79.5, 62.5, 80.5, 65.5], [79.5, 62.5, 80.5, 65.5], [80.5, 65.5, 79.5, 62.5], [80.5, 65.5, 79.5, 62.5], [80.5, 65.5, 79.5, 62.5]]);
+variable_struct_set(breaker_eye_axes, sprite_get_name(s_Breaker_landrecovery_unshielded), [[71.5, 42.5, 69.5, 39.5], [64.5, 32.5, 67.5, 34.5], [62.5, 24.5, 64.5, 27.5], [57.5, 18.5, 60.5, 20.5], [52.5, 10.5, 55.5, 10.5]]);
+variable_struct_set(breaker_eye_axes, sprite_get_name(s_Breaker_stun_enter_unshielded), [[35.5, 10.5, 38.5, 10.5], [39.5, 13.5, 41.5, 14.5], [41.5, 15.5, 44.5, 17.5], [42.5, 18.5, 44.5, 20.5], [45.5, 22.5, 46.5, 24.5]]);
+variable_struct_set(breaker_eye_axes, sprite_get_name(s_Breaker_stun_unshielded), [[37.5, 15.5, 38.5, 17.5], [37.5, 15.5, 38.5, 17.5], [37.5, 15.5, 38.5, 17.5], [37.5, 15.5, 38.5, 17.5], [37.5, 15.5, 38.5, 17.5], [37.5, 13.5, 39.5, 16.5], [37.5, 15.5, 38.5, 17.5], [37.5, 15.5, 38.5, 17.5], [37.5, 15.5, 38.5, 17.5], [37.5, 15.5, 38.5, 17.5], [37.5, 15.5, 38.5, 17.5], [37.5, 15.5, 38.5, 17.5], [37.5, 15.5, 38.5, 17.5], [37.5, 15.5, 38.5, 17.5], [37.5, 15.5, 38.5, 17.5]]);
+variable_struct_set(breaker_eye_axes, sprite_get_name(s_Breaker_stun_exit_unshielded), [[45.5, 22.5, 46.5, 24.5], [42.5, 18.5, 44.5, 20.5], [41.5, 15.5, 44.5, 17.5], [39.5, 13.5, 41.5, 14.5], [35.5, 10.5, 38.5, 10.5]]);
 
 // Shield stripe axes in cropped sprite pixels, indexed by animation frame.
 breaker_shield_axes = {};
@@ -197,6 +224,63 @@ slam_stun_duration = 0.2;
 slam_shield_damage_multiplier = 1;
 phase2_slam_damage_multiplier = 1;
 
+// Reuse the exact cropped-frame registration used to draw the body.
+breaker_update_eye_glow = function(_draw_x, _draw_y, _scale_x) {
+    breaker_eye_light = undefined;
+    // Start early and accelerate the flashes toward the end; phase two stays lit.
+    breaker_eyes_awake = breaker_unshielded;
+    if (breaker_state == BreakerState.SHIELD_BREAK) {
+        var _transition_duration = breaker_duration(s_Breaker_shieldbreak);
+        var _blink_time = breaker_time - _transition_duration * breaker_eye_blink_start;
+        var _blink_span = max(0.001, _transition_duration * (1 - breaker_eye_blink_start));
+        var _progress = clamp(_blink_time / _blink_span, 0, 1);
+        var _slow_rate = 1 / breaker_eye_blink_slow_interval;
+        var _fast_rate = 1 / breaker_eye_blink_fast_interval;
+        // Integrate a rising rate so the blink phase advances smoothly.
+        var _blink_phase = _blink_time * (_slow_rate
+            + (_fast_rate - _slow_rate) * _progress * _progress / 3);
+        breaker_eyes_awake = _blink_time >= 0
+            && (floor(_blink_phase) mod 2) == 0;
+    }
+    if (!breaker_eyes_awake || !visible || image_alpha <= 0) return;
+    var _name = sprite_get_name(sprite_index);
+    if (!variable_struct_exists(breaker_eye_axes, _name)) return;
+    var _axes = variable_struct_get(breaker_eye_axes, _name);
+    var _axis = _axes[clamp(floor(image_index), 0, array_length(_axes) - 1)];
+    if (is_undefined(_axis)) return; // The visor is hidden during the turn.
+    var _cos = dcos(image_angle);
+    var _sin = dsin(image_angle);
+    var _x1 = (_axis[0] - sprite_get_xoffset(sprite_index)) * _scale_x;
+    var _y1 = (_axis[1] - sprite_get_yoffset(sprite_index)) * image_yscale;
+    var _x2 = (_axis[2] - sprite_get_xoffset(sprite_index)) * _scale_x;
+    var _y2 = (_axis[3] - sprite_get_yoffset(sprite_index)) * image_yscale;
+    var _wx1 = _draw_x + _x1 * _cos + _y1 * _sin;
+    var _wy1 = _draw_y - _x1 * _sin + _y1 * _cos;
+    var _wx2 = _draw_x + _x2 * _cos + _y2 * _sin;
+    var _wy2 = _draw_y - _x2 * _sin + _y2 * _cos;
+    breaker_eye_light = { x: (_wx1 + _wx2) * 0.5, y: (_wy1 + _wy2) * 0.5,
+        x1: _wx1, y1: _wy1, x2: _wx2, y2: _wy2, scale: abs(image_yscale) };
+};
+breaker_draw_eye_glow = function() {
+    if (!breaker_eyes_awake || is_undefined(breaker_eye_light)
+        || !visible || image_alpha <= 0 || !layer_get_visible(layer)) return;
+    var _eye = breaker_eye_light;
+    var _old_color = draw_get_color();
+    var _old_alpha = draw_get_alpha();
+    gpu_set_blendmode(bm_add);
+    draw_set_alpha(0.22 * image_alpha);
+    draw_circle_colour(_eye.x, _eye.y, breaker_eye_halo_radius * _eye.scale,
+        breaker_eye_color, c_black, false);
+    draw_set_alpha(0.65 * image_alpha);
+    draw_circle_colour(_eye.x, _eye.y, 7 * _eye.scale, breaker_eye_color, c_black, false);
+    gpu_set_blendmode(bm_normal);
+    draw_set_alpha(image_alpha);
+    draw_set_color(breaker_eye_color);
+    draw_line_width(_eye.x1, _eye.y1, _eye.x2, _eye.y2, 1.4 * _eye.scale);
+    draw_set_color(_old_color);
+    draw_set_alpha(_old_alpha);
+};
+
 breaker_sprite = function(_shielded, _unshielded) {
     return breaker_unshielded ? _unshielded : _shielded;
 };
@@ -240,6 +324,7 @@ breaker_set_state = function(_state) {
     }
     if (_state == BreakerState.RISE) world_sfx_play(sfxBreakerJump, x, y);
     if (_state == BreakerState.SHIELD_BREAK) {
+        breaker_eyes_awake = false;
         for (var _i = 0; _i < array_length(breaker_hit_sounds); _i++) {
             audio_stop_sound(breaker_hit_sounds[_i]);
         }
@@ -329,9 +414,13 @@ miniboss_damage_player = function(_target, _damage) {
 };
 
 miniboss_parent_take_damage = take_damage;
+// The phase transition cannot be damaged by weapons, slams, or direct crashes.
+is_invulnerable = function() {
+    return breaker_state == BreakerState.SHIELD_BREAK;
+};
 take_damage = function(_damage, _knockback_dir = 0, _knockback_force = 0,
     _is_sword = false, _hit_x = undefined, _is_beam = false, _beam_coins = 1) {
-    if (_damage <= 0) return;
+    if (is_invulnerable() || _damage <= 0) return;
     var _attacker_x = _hit_x;
     if (is_undefined(_attacker_x)) {
         var _player = instance_nearest(x, y, o_Player);
@@ -363,8 +452,8 @@ take_damage = function(_damage, _knockback_dir = 0, _knockback_force = 0,
     if (shield_hp <= 0) _damage *= _is_beam ? phase2_beam_damage_multiplier
         : (_is_sword ? phase2_sword_damage_multiplier : phase2_bullet_damage_multiplier);
     if (_back) _damage *= back_damage_multiplier;
-    if (breaker_unshielded && _damage > 0) {
-        breaker_body_flash_time = breaker_shield_flash_duration;
+    if (_damage > 0) {
+        if (breaker_unshielded) breaker_body_flash_time = breaker_shield_flash_duration;
         breaker_play_hit_sound(sfxBreakerHitNoShield);
     }
     breaker_react_to_hit();
@@ -394,7 +483,7 @@ slam_interrupt = function() {
     }
 };
 slam_damage = function(_damage, _impact_x, _source) {
-    if (_damage <= 0) return;
+    if (is_invulnerable() || _damage <= 0) return;
     var _back = sign(_impact_x - (bbox_left + bbox_right) * 0.5) == -facing_direction;
     if (shield_hp > 0 && !_back) {
         shield_hp = max(0, shield_hp - _damage * slam_shield_damage_multiplier);
@@ -406,8 +495,8 @@ slam_damage = function(_damage, _impact_x, _source) {
     }
     if (shield_hp <= 0) _damage *= phase2_slam_damage_multiplier;
     if (_back) _damage *= back_damage_multiplier;
-    if (breaker_unshielded && _damage > 0) {
-        breaker_body_flash_time = breaker_shield_flash_duration;
+    if (_damage > 0) {
+        if (breaker_unshielded) breaker_body_flash_time = breaker_shield_flash_duration;
         breaker_play_hit_sound(sfxBreakerHitNoShield);
     }
     breaker_react_to_hit();
@@ -415,6 +504,7 @@ slam_damage = function(_damage, _impact_x, _source) {
 };
 // Shielded Breaker and active attacks take damage but resist crowd control.
 take_slam = function(_damage, _speed, _impact_x, _impact_y, _source) {
+    if (is_invulnerable()) return;
     if (!breaker_unshielded || breaker_attacking() || breaker_control_grace > 0
         || breaker_state == BreakerState.STUN || breaker_state == BreakerState.SHIELD_BREAK) {
         slam_damage(max(0, _damage * slam_damage_multiplier), _impact_x, _source);

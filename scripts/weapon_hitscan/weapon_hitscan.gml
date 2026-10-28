@@ -28,6 +28,7 @@ function weapon_hitscan(_damage, _range, _piercing)
     var max_hits = _piercing + 1;
     var hit_count = 0;
     var stopped = false;
+    var _coin_style = undefined;
 
     // Count each object only once.
     var already_hit = ds_list_create();
@@ -128,15 +129,17 @@ function weapon_hitscan(_damage, _range, _piercing)
             if (instance_exists(inst)
             && inst.object_index == o_Coin)
             {
-                coin_ricochet(
+                var _coin_x = inst.x;
+                var _coin_y = inst.y;
+                _coin_style = coin_ricochet(
                     inst,
                     _damage,
                     _range,
                     coin_split_y_speed_threshold
                 );
 
-                final_x = check_x;
-                final_y = check_y;
+                final_x = _coin_x;
+                final_y = _coin_y;
                 stopped = true;
                 break;
             }
@@ -223,4 +226,11 @@ function weapon_hitscan(_damage, _range, _piercing)
     shot.line_y1 = start_y;
     shot.line_x2 = final_x;
     shot.line_y2 = final_y;
+    // Give the muzzle-to-first-coin segment the same effect as the whole chain.
+    if (!is_undefined(_coin_style))
+    {
+        shot.line_color = _coin_style.color;
+        shot.line_width = _coin_style.width;
+        shot.set_coin_effects(_coin_style.bounces, _coin_style.bullet_flash);
+    }
 }
