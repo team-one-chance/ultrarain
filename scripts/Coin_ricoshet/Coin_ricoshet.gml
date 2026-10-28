@@ -59,6 +59,10 @@ function coin_ricochet(
         0.05;
 
     var _chain_perfect_apex = false;
+    var _ricochet_color = c_yellow;
+    var _ricochet_width = 1;
+    var _coin_bounces = 0;
+    var _shot_visuals = [];
 	
 	var _rounding_level = item_get_level(id, "coin_rounding");
 	
@@ -75,6 +79,11 @@ function coin_ricochet(
 
     while (instance_exists(_current_coin))
     {
+        // Apply the coin's boost to every outgoing shot, using the incoming style.
+        _ricochet_color = merge_color(_ricochet_color, c_red, 0.2);
+        _ricochet_width *= 1.2;
+        _coin_bounces++;
+
         var _last_x =
             _current_coin.x;
 
@@ -489,6 +498,7 @@ show_debug_message(
                 _enemy_visual.line_y1 = _last_y;
                 _enemy_visual.line_x2 = _trace.end_x;
                 _enemy_visual.line_y2 = _trace.end_y;
+                array_push(_shot_visuals, _enemy_visual);
 
             }
 
@@ -519,6 +529,7 @@ show_debug_message(
                 _chain_visual.line_y1 = _last_y;
                 _chain_visual.line_x2 = _chain_trace.end_x;
                 _chain_visual.line_y2 = _chain_trace.end_y;
+                array_push(_shot_visuals, _chain_visual);
 
                 // A blocked link cannot activate the coin behind the obstacle.
                 if (!_chain_trace.reached) _next_coin = noone;
@@ -558,8 +569,21 @@ show_debug_message(
         _coins
     );
 
+    // The whole hitscan resolves before drawing. Use the actual completed chain
+    // for every segment, including early links and split shots.
+    for (var _visual_index = 0; _visual_index < array_length(_shot_visuals); _visual_index++)
+    {
+        var _visual = _shot_visuals[_visual_index];
+        if (!instance_exists(_visual)) continue;
+        _visual.line_color = _ricochet_color;
+        _visual.line_width = _ricochet_width;
+        _visual.set_coin_effects(_coin_bounces, _chain_perfect_apex);
+    }
+
     // One cue for the entire shot, regardless of how many coins it chained.
     audio_play_sound(_chain_perfect_apex ? sfxBulletFlash : sfxRicochet, 1, false);
+    return { color: _ricochet_color, width: _ricochet_width,
+        bounces: _coin_bounces, bullet_flash: _chain_perfect_apex };
 }
 
 

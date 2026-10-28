@@ -88,6 +88,16 @@ draw_sprite_ext(sprite_index, image_index, _draw_x, _draw_y,
     _scale_x, image_yscale, image_angle, image_blend, image_alpha);
 if (_shield_flash || _body_flash) shader_reset();
 
+breaker_update_eye_glow(_draw_x, _draw_y, _scale_x);
+var _eye_lighting = instance_find(o_Lighting, 0);
+var _eye_deferred = false;
+if (instance_exists(_eye_lighting) && view_enabled) {
+    _eye_deferred = _eye_lighting.enabled && view_camera[view_current] != -1
+        && surface_exists(_eye_lighting.light_surface)
+        && !(variable_global_exists("dev_freecam") && global.dev_freecam);
+}
+if (!_eye_deferred) breaker_draw_eye_glow();
+
 // A small blue bar above the boss shows the remaining shield HP.
 // It disappears once the shield breaks; the red boss bar is unchanged.
 if (shield_hp > 0 && shield_hp_max > 0)

@@ -10,7 +10,7 @@
   "compression":0,
   "compressionQuality":4,
   "conversionMode":0,
-  "duration":0.3087982,
+  "duration":0.65705216,
   "exportDir":"",
   "name":"sfxSwordSlash1",
   "parent":{

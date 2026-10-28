@@ -1,4 +1,4 @@
-﻿# Repository Guidelines
+# Repository Guidelines
 
 ## Project Structure & Module Organization
 
@@ -22,3 +22,9 @@ No repository-wide automated test framework or coverage target is documented. Co
 ## Commits & Pull Requests
 
 Recent commits generally use short, informal, action-oriented subjects, such as `add parry effect and parry grace to scout`. Keep changes focused and describe their behavior. Pull requests should explain the problem and change, link relevant issues, list validation performed, and include screenshots or video for visible changes.
+
+# Code comments
+
+- Put a short inline description beside important settings and variables, including units and what changing the value does.
+- Explain abbreviations near their declarations. For example, `VFX` and `fx` mean visual effects.
+- Keep shared boss visual settings in one documented configuration, used by TESTING and every gameplay room.

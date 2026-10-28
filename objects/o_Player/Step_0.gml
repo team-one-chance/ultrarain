@@ -2061,7 +2061,8 @@ if (weapon_type == "pistol")
 	&& mouse_check_button(mb_left)
 	&& weapon_fire_timer <= 0)
     {
-        audio_play_sound(sfxGunshot, 1, false);
+        // Leave room in the mix for the target's impact cue.
+        audio_play_sound(sfxGunshot, 1, false, 0.55);
         weapon_hitscan(
             pistol_damage,
             pistol_range,

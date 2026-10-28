@@ -15,7 +15,7 @@
   "name":"sfxScoutRoll",
   "parent":{
     "name":"Scout",
-    "path":"folders/SFX/sfxEnemy/Drone/Scout.yy",
+    "path":"folders/SFX/sfxEnemy/Scout.yy",
   },
   "preload":false,
   "resourceType":"GMSound",

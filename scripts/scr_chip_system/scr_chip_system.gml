@@ -86,6 +86,7 @@ function chip_attach_heal(_target, _amount)
 function chip_crash_enemy(_target, _amount)
 {
     if (!instance_exists(_target)) return;
+    if (variable_instance_exists(_target, "is_invulnerable") && _target.is_invulnerable()) return;
     // A physical crash damages health directly, including through shields.
     _target.ehp = max(0, _target.ehp - _amount);
     _target.hit_timer = _target.hit_duration;
