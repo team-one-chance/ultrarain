@@ -86,6 +86,14 @@ with (o_ShotImpact)
         impact_enemy ? _renderer.enemy_impact_radius : _renderer.surface_impact_radius,
         spark_color_start, _renderer.impact_strength * _fade * _fade);
 }
+with (oEnemy_Breaker)
+{
+    if (!breaker_eyes_awake || is_undefined(breaker_eye_light)
+        || !visible || image_alpha <= 0 || !layer_get_visible(layer)) continue;
+    var _eye = breaker_eye_light;
+    _renderer.draw_soft_light(_eye.x, _eye.y, breaker_eye_halo_radius * _eye.scale,
+        breaker_eye_color, breaker_eye_light_strength * image_alpha);
+}
 surface_reset_target();
 matrix_set(matrix_world, _world);
 matrix_set(matrix_view, _view);
@@ -99,6 +107,17 @@ gpu_set_blendmode(bm_normal);
 with (o_HitscanVisual)
 {
     if (emissive) draw_emissive_streak();
+}
+// Keep the red visor bright after ambient dimming, including during transition.
+with (oEnemy_Breaker)
+{
+    breaker_draw_eye_glow();
+}
+// Keep Breaker's white pressure burst readable against the dark room.
+with (oBreakerSlamVFX)
+{
+    // Depth-spawned impacts can have no named layer; they are still visible.
+    if (defer_to_lighting && visible && (layer == -1 || layer_get_visible(layer))) draw_pressure_burst();
 }
 // Extract bright scene pixels, blur horizontally and vertically, then add the glow.
 if (bloom_enabled && (bloom_strength > 0 || scout_bloom_strength > 0 || player_bloom_strength > 0 || lava_bloom_strength > 0)
@@ -154,12 +173,14 @@ if (bloom_enabled && (bloom_strength > 0 || scout_bloom_strength > 0 || player_b
         {
             if (emissive && _renderer.hitscan_bloom_strength > 0)
             {
-                draw_set_color(line_color);
+                draw_set_color(bullet_lightning ? make_color_rgb(65, 155, 255)
+                    : (bullet_fiery ? make_color_rgb(255, 105, 15) : line_color));
                 draw_set_alpha(clamp(_renderer.hitscan_bloom_strength, 0, 1));
                 draw_line_width(
                     (line_x1 - _cx) * _bw / _vw, (line_y1 - _cy) * _bh / _vh,
                     (line_x2 - _cx) * _bw / _vw, (line_y2 - _cy) * _bh / _vh,
-                    max(1, _renderer.hitscan_bloom_width) * _bh / _vh
+                    max(1, _renderer.hitscan_bloom_width)
+                        * line_width * _bh / _vh
                 );
             }
         }

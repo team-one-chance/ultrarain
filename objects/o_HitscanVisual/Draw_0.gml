@@ -12,8 +12,13 @@ if (emissive && instance_exists(_lighting) && view_enabled)
 if (!_deferred)
 {
     // Keep the outlined style when there is no emissive lighting pass.
-    draw_set_color(c_black);
-    draw_line_width(line_x1, line_y1, line_x2, line_y2, 3);
+    if (life > 0 && !bullet_lightning)
+    {
+        draw_set_color(c_black);
+        draw_set_alpha(0.55);
+        draw_line_width(line_x1, line_y1, line_x2, line_y2, line_width + 0.6);
+        draw_set_alpha(1);
+    }
     draw_emissive_streak();
 }
 draw_set_alpha(1);
