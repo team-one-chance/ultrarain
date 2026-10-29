@@ -141,7 +141,7 @@ if (instance_exists(_player))
 
     if (player_near
     && _player.hacking_controller == noone
-    && keyboard_check_pressed(ord("E")))
+    && controls_pressed("interact"))
     {
         reader = _player;
         reading = true;

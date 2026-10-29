@@ -44,6 +44,9 @@ breaker_control_grace_duration = 0.75;
 breaker_stun_budget = 0;
 breaker_stun_elapsed = 0;
 breaker_bash_hit = false;
+breaker_slide_turn_lock = 0; // Seconds remaining before turning after a slide under the body.
+breaker_slide_turn_lock_duration = 0.8; // Seconds; longer gives the sliding player more time behind him.
+breaker_slide_bash_lock = false; // Keep a committed melee facing fixed until it ends.
 breaker_grab_target = noone;
 breaker_grab_stabbed = false;
 breaker_throw_flipped = false;
@@ -333,7 +336,11 @@ breaker_set_state = function(_state) {
     breaker_hit_time = 0;
     breaker_hit_elapsed = 0;
     path_end();
-    if (_state == BreakerState.BASH) breaker_bash_hit = false;
+    if (_state == BreakerState.BASH) {
+        breaker_bash_hit = false;
+        breaker_slide_bash_lock = breaker_slide_turn_lock > 0;
+    }
+    else breaker_slide_bash_lock = false;
     if (_state == BreakerState.JUMP_CHARGE) {
         breaker_leap_hit = false;
     }
@@ -388,6 +395,10 @@ breaker_try_grab = function(_target, _side) {
     breaker_throw_flipped = false;
     if (_side != 0) facing_direction = _side;
     _target.breaker_grab_owner = id;
+    // Stop the dash/run animation immediately when the player is caught.
+    _target.sprite_index = s_Player;
+    _target.image_index = 0;
+    _target.image_speed = 0;
     // The throw crosses the core; discard the previous collision exit side.
     var _contact_key = string(id);
     if (variable_struct_exists(_target.breaker_body_sides, _contact_key))

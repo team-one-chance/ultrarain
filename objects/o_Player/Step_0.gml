@@ -21,6 +21,16 @@ if (variable_global_exists("dev_freecam") && global.dev_freecam)
     exit;
 }
 
+// The tutorial vent transition owns the physics position while fading.
+if (room == LE_TUTORIAL_WIP && instance_exists(o_TutorialCheckpoint)
+    && o_TutorialCheckpoint.vent_skip_state != 0 && pHP > 0 && !grinder_dying)
+{
+    stop_movement_sfx();
+    phy_speed_x = 0;
+    phy_speed_y = 0;
+    exit;
+}
+
 chip_player_tick();
 
 if (grinder_dying)
@@ -74,6 +84,10 @@ if (instance_exists(breaker_grab_owner)
     && !(variable_instance_exists(breaker_grab_owner, "train_departing") && breaker_grab_owner.train_departing))
 {
     stop_movement_sfx();
+    // A held player uses a still pose until normal animation selection resumes.
+    sprite_index = s_Player;
+    image_index = 0;
+    image_speed = 0;
     phy_speed_x = 0;
     phy_speed_y = 0;
     exit;
@@ -428,14 +442,14 @@ if (on_ground)
 
 var move = 0;
 
-if (keyboard_check(vk_right)
-|| keyboard_check(ord("D")))
+if ((controls_key_unassigned(vk_right) && keyboard_check(vk_right))
+|| controls_down("right"))
 {
     move += 1;
 }
 
-if (keyboard_check(vk_left)
-|| keyboard_check(ord("A")))
+if ((controls_key_unassigned(vk_left) && keyboard_check(vk_left))
+|| controls_down("left"))
 {
     move -= 1;
 }
@@ -446,7 +460,7 @@ if (keyboard_check(vk_left)
 // =====================================
 
 var mantle_held =
-    keyboard_check(ord("W")); 
+    controls_down("up");
 
 
 // =====================================
@@ -749,7 +763,7 @@ if (_mantle_needs_slide || !player_can_stand())
     on_ground = true;
     coyote_timer = 0;
 }
-else if (keyboard_check(ord("W"))
+else if (controls_down("up")
 && move != 0)
 {
     is_mantle_lunging = true;
@@ -807,7 +821,7 @@ else if (keyboard_check(ord("W"))
 // SLIDING INPUT / EXIT / COLLIDER
 // =====================================
 
-var slide_held = keyboard_check(vk_control);
+var slide_held = controls_down("slide");
 
 var _slide_check_direction = is_sliding
     ? slide_direction
@@ -1103,8 +1117,8 @@ if (!on_ground
 && !is_ledge_climbing
 && slam_cooldown_timer <= 0)
 {
-    if (keyboard_check_pressed(ord("S"))
-|| keyboard_check_pressed(vk_down))
+    if (controls_pressed("slam")
+|| (controls_key_unassigned(vk_down) && keyboard_check_pressed(vk_down)))
 {
     is_slamming = true;
 
@@ -1497,7 +1511,7 @@ if (dash_iframe_is_ground && !dash_active)
 // =====================================
 
 var dash_pressed =
-    keyboard_check_pressed(vk_shift);
+    controls_pressed("dash");
 
 if (dash_pressed && !is_sliding)
 {
@@ -1598,9 +1612,9 @@ phy_speed_x =
 // =====================================
 
 var pressing_away_from_wall =
-    (touching_left_wall && keyboard_check(ord("D")))
+    (touching_left_wall && controls_down("right"))
     ||
-    (touching_right_wall && keyboard_check(ord("A")));
+    (touching_right_wall && controls_down("left"));
 
 if (pressing_away_from_wall && wall_slide_active)
 {
@@ -1728,9 +1742,9 @@ if (slide_double_boost_stage > 0)
 // =====================================
 
 var jump_pressed =
-    keyboard_check_pressed(ord("W"))
-    || keyboard_check_pressed(vk_up)
-    || keyboard_check_pressed(vk_space);
+    controls_pressed("up")
+    || (controls_key_unassigned(vk_up) && keyboard_check_pressed(vk_up))
+    || controls_pressed("jump");
 
 
 if (jump_pressed
@@ -1997,7 +2011,7 @@ parry_cooldown = max(0, parry_cooldown - _parry_dt);
 // WEAPON SYSTEM
 // =====================================
 
-if (keyboard_check_pressed(ord("1")))
+if (controls_pressed("pistol"))
 {
     if (weapon_type != "pistol")
     {
@@ -2009,7 +2023,7 @@ if (keyboard_check_pressed(ord("1")))
     sword_swing_pending_hit = false;
 }
 
-if (keyboard_check_pressed(ord("2")))
+if (controls_pressed("sword"))
 {
     if (weapon_type != "sword")
     {
@@ -2067,7 +2081,7 @@ var _syringe_combo =
     && !_basher_ui_mouse && mouse_check_button(mb_left)
     && mouse_check_button(mb_right);
 
-if (keyboard_check_pressed(ord("H")) || (_syringe_combo
+if (controls_pressed("heal") || (_syringe_combo
 && (mouse_check_button_pressed(mb_left)
     || mouse_check_button_pressed(mb_right))))
 {
@@ -2079,7 +2093,7 @@ if (weapon_type == "pistol")
 {
     // Keep the existing hold-to-fire behaviour.
     if (!_basher_ui_mouse && !_syringe_combo
-	&& mouse_check_button(mb_left)
+	&& controls_down("fire")
 	&& weapon_fire_timer <= 0)
     {
         // Leave room in the mix for the target's impact cue.
@@ -2098,7 +2112,7 @@ else if (weapon_type == "sword")
 {
     // Start one swing per click; show its trail during the downward strike.
     if (!_basher_ui_mouse && !_syringe_combo
-	&& mouse_check_button_pressed(mb_left)
+	&& controls_pressed("fire")
 	&& sword_swing_timer <= 0
     && chip_sword_cooldown_timer <= 0)
     {
@@ -2237,7 +2251,7 @@ coin.pin_owner = noone;
 
 if (!_basher_ui_mouse && !_syringe_combo
 && weapon_type == "sword"
-&& mouse_check_button_pressed(mb_right)
+&& controls_pressed("coin")
 && parry_timer <= 0
 && parry_cooldown <= 0)
 {
@@ -2255,7 +2269,7 @@ if (!_basher_ui_mouse && !_syringe_combo
 
 if (!_basher_ui_mouse && !_syringe_combo
 && weapon_type == "pistol"
-&& mouse_check_button_pressed(mb_right))
+&& controls_pressed("coin"))
 {
     // Only throw if we actually have a coin.
     if (coin_count > 0)
@@ -2410,7 +2424,7 @@ if (
 if (
     item_coin_anchor
     && !_basher_ui_mouse
-    && mouse_check_button_pressed(mb_middle)
+    && controls_pressed("pin")
     && coin_anchor_cooldown_timer <= 0
     && pinned_coin == noone
 )

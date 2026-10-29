@@ -7,6 +7,11 @@ checkpoint_layers = undefined;
 checkpoint_layers_pending = false;
 checkpoint_first_door_open = false; // Remember the first tutorial door across a retry.
 checkpoint_first_door_pending = false;
+vent_skip_state = 0; // 0 = idle, 1 = fade out, 2 = fade in.
+vent_skip_alpha = 0; // Black overlay opacity, from 0 to 1.
+vent_skip_fade_seconds = 0.4; // Seconds per fade; larger values slow the transition.
+vent_skip_hold_x = 0;
+vent_skip_hold_y = 0;
 
 first_door_is_open = function()
 {

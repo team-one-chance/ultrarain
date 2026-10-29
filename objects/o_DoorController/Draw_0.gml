@@ -2,11 +2,11 @@ draw_self();
 
 if (player_near && controller_state < 2)
 {
-    var _prompt = "E - USE";
+    var _prompt = controls_key_name(controls_key("interact")) + " - USE";
 
     if (controller_state == 1)
     {
-        _prompt = "E - HIJACK WIRES";
+        _prompt = controls_key_name(controls_key("interact")) + " - HIJACK WIRES";
     }
 
 draw_set_color(c_black);

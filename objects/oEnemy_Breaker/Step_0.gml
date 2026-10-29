@@ -21,10 +21,12 @@ hit_timer = max(0, hit_timer - dt);
 normal_attack_cooldown = max(0, normal_attack_cooldown - dt);
 leap_cooldown = max(0, leap_cooldown - dt);
 breaker_intercept_cooldown = max(0, breaker_intercept_cooldown - dt);
+breaker_slide_turn_lock = max(0, breaker_slide_turn_lock - dt);
 var _player = instance_nearest(x, y, o_Player);
 var _centre = (bbox_left + bbox_right) * 0.5;
 if (_player != noone && breaker_state != BreakerState.GRAB && breaker_state != BreakerState.THROW
-    && !(breaker_intercept && breaker_contact_active())) {
+    && !(breaker_intercept && breaker_contact_active())
+    && !(breaker_slide_turn_lock > 0 || (breaker_state == BreakerState.BASH && breaker_slide_bash_lock))) {
     var _facing = sign(_player.x - _centre);
     if (_facing != 0) facing_direction = _facing;
 }
@@ -164,6 +166,11 @@ if (!_stunned && !_stagger) switch (breaker_state) {
                     var _left = facing_direction > 0 ? bbox_left : bbox_left - normal_attack_range;
                     var _right = facing_direction > 0 ? bbox_right + normal_attack_range : bbox_right;
                     var _target = collision_rectangle(_left, bbox_top, _right, bbox_bottom, o_Player, false, true);
+                    // The usual rectangle includes the body; a slide that passed behind
+                    // a locked attack must not be hit by that rear half.
+                    if (_target != noone && breaker_slide_bash_lock
+                        && (_target.x - (bbox_left + bbox_right) * 0.5) * facing_direction < 0)
+                        _target = noone;
                     if (_target != noone) {
                         breaker_bash_hit = true;
                         if (breaker_unshielded)

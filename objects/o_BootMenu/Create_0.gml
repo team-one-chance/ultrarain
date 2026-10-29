@@ -12,11 +12,14 @@ enum BootMenuState
     DIFFICULTY = 13,
     SETTINGS = 14,
     CREDITS = 15,
-    CONFIRM_EXIT = 16
+    CONFIRM_EXIT = 16,
+    CONTROLS = 17
 }
 
 boot_state = BootMenuState.MAIN;
 menu_selection = 0;
+controls_page = 0;
+controls_capture = ""; // Action awaiting a new binding, or empty.
 exit_flash = 0;
 if (!variable_global_exists("exhibition_exit_locked")) global.exhibition_exit_locked = false;
 menu_mouse_x = device_mouse_x_to_gui(0);
@@ -100,6 +103,12 @@ boot_menu_layout = function()
         text_indent: 39 };
 };
 
+boot_controls_layout = function(_layout)
+{
+    var _scale = min(1.2, _layout.width / 600, max(0.1, (display_get_gui_height() - _layout.y - 100) / 370));
+    return { x: _layout.x + _layout.width * 0.5, row_top: _layout.y, scale: _scale };
+};
+
 boot_menu_options = function()
 {
     switch (boot_state)
@@ -112,7 +121,8 @@ boot_menu_options = function()
         case BootMenuState.SETTINGS:
             return ["Fullscreen: " + (window_get_fullscreen() ? "On" : "Off"),
                 "Pixelization: " + (menu_pixelization_active() ? "On" : "Off"),
-                "Mouse combo heal: " + (global.heal_mouse_combo ? "On" : "Off"), "Back"];
+                "Mouse combo heal: " + (global.heal_mouse_combo ? "On" : "Off"), "Controls", "Back"];
+        case BootMenuState.CONTROLS: return controls_menu_options(controls_page, controls_capture);
         case BootMenuState.CREDITS: return ["Back"];
         case BootMenuState.CONFIRM_EXIT: return ["Cancel", "Quit game"];
     }
@@ -138,6 +148,10 @@ boot_menu_open = function(_page)
             boot_add_line("PS C:\\SYSTEM> .\\menu.exe settings", console_white, false);
             boot_add_line("Display settings", console_green, false);
             boot_add_line("F11 also toggles fullscreen", console_dim, false);
+            break;
+        case BootMenuState.CONTROLS:
+            boot_add_line("PS C:\\SYSTEM> .\\controls.exe", console_white, false);
+            boot_add_line("Configure controls", console_green, false);
             break;
         case BootMenuState.CREDITS:
             boot_add_line("PS C:\\SYSTEM> .\\menu.exe credits", console_white, false);
@@ -184,7 +198,18 @@ boot_menu_activate = function()
             if (menu_selection == 0) window_set_fullscreen(!window_get_fullscreen());
             else if (menu_selection == 1) menu_toggle_pixelization();
             else if (menu_selection == 2) global.heal_mouse_combo = !global.heal_mouse_combo;
+            else if (menu_selection == 3) { controls_page = 0; boot_menu_open(BootMenuState.CONTROLS); }
             else boot_menu_open(BootMenuState.MAIN);
+            break;
+        case BootMenuState.CONTROLS:
+            var _names = controls_names();
+            var _count = min(8, array_length(_names) - controls_page * 8);
+            var _pages = ceil(array_length(_names) / 8);
+            if (menu_selection < _count) controls_capture = _names[controls_page * 8 + menu_selection];
+            else if (menu_selection == _count) { controls_page = (controls_page + _pages - 1) mod _pages; menu_selection = 0; }
+            else if (menu_selection == _count + 1) { controls_page = (controls_page + 1) mod _pages; menu_selection = 0; }
+            else if (menu_selection == _count + 2) { global.controls_bindings = controls_defaults(); controls_save(); }
+            else { boot_menu_open(BootMenuState.SETTINGS); menu_selection = 3; }
             break;
         case BootMenuState.CREDITS:
             boot_menu_open(BootMenuState.MAIN);

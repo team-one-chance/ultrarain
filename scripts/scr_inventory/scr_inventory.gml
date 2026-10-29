@@ -207,8 +207,8 @@ function item_get_definition(_key)
             return {
                 name: "Pinhouse",
                 icon: object_get_sprite(o_pinhouse),
-                description: "Press middle mouse to pin your oldest thrown coin in place. Recharges in 8 seconds.",
-                short_description: "Middle mouse pins a coin.",
+                description: "Press " + controls_key_name(controls_key("pin")) + " to pin your oldest thrown coin in place. Recharges in 8 seconds.",
+                short_description: controls_key_name(controls_key("pin")) + " pins a coin.",
                 quality: 4
             };
     }

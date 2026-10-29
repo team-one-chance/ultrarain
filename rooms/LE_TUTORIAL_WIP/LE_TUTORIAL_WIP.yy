@@ -6,7 +6,6 @@
   "inheritCreationOrder":false,
   "inheritLayers":false,
   "instanceCreationOrder":[
-    {"name":"inst_InputPromptMove","path":"rooms/LE_TUTORIAL_WIP/LE_TUTORIAL_WIP.yy",},
     {"name":"inst_SecretBackgroundPreview","path":"rooms/LE_TUTORIAL_WIP/LE_TUTORIAL_WIP.yy",},
     {"name":"inst_TrainPlayerBarrier","path":"rooms/LE_TUTORIAL_WIP/LE_TUTORIAL_WIP.yy",},
     {"name":"inst_CheckpointStart","path":"rooms/LE_TUTORIAL_WIP/LE_TUTORIAL_WIP.yy",},
@@ -550,7 +549,6 @@
         {"$GMRInstance":"v4","%Name":"inst_RobotScrapEmitter","colour":4294967295,"frozen":false,"hasCreationCode":false,"ignore":false,"imageIndex":0,"imageSpeed":0.0,"inheritCode":false,"inheritedItemId":null,"inheritItemSettings":false,"isDnd":false,"name":"inst_RobotScrapEmitter","objectId":{"name":"o_RobotScrapEmitter","path":"objects/o_RobotScrapEmitter/o_RobotScrapEmitter.yy",},"properties":[],"resourceType":"GMRInstance","resourceVersion":"2.0","rotation":0.0,"scaleX":1.0,"scaleY":1.0,"x":4448.0,"y":2208.0,},
       ],"layers":[],"name":"RobotScrap","properties":[],"resourceType":"GMRInstanceLayer","resourceVersion":"2.0","userdefinedDepth":true,"visible":true,},
     {"$GMRInstanceLayer":"","%Name":"Player","depth":0,"effectEnabled":true,"effectType":null,"gridX":32,"gridY":32,"hierarchyFrozen":false,"inheritLayerDepth":false,"inheritLayerSettings":false,"inheritSubLayers":true,"inheritVisibility":true,"instances":[
-        {"$GMRInstance":"v4","%Name":"inst_InputPromptMove","colour":4294967295,"frozen":false,"hasCreationCode":false,"ignore":false,"imageIndex":0,"imageSpeed":0.0,"inheritCode":false,"inheritedItemId":null,"inheritItemSettings":false,"isDnd":false,"name":"inst_InputPromptMove","objectId":{"name":"o_InputPrompt","path":"objects/o_InputPrompt/o_InputPrompt.yy",},"properties":[],"resourceType":"GMRInstance","resourceVersion":"2.0","rotation":0.0,"scaleX":1.0,"scaleY":1.0,"x":96.0,"y":160.0,},
         {"$GMRInstance":"v4","%Name":"inst_74361124","colour":4294967295,"frozen":false,"hasCreationCode":false,"ignore":false,"imageIndex":0,"imageSpeed":1.0,"inheritCode":false,"inheritedItemId":null,"inheritItemSettings":false,"isDnd":false,"name":"inst_74361124","objectId":{"name":"o_Player","path":"objects/o_Player/o_Player.yy",},"properties":[],"resourceType":"GMRInstance","resourceVersion":"2.0","rotation":0.0,"scaleX":1.0,"scaleY":1.0,"x":96.0,"y":160.0,},
       ],"layers":[],"name":"Player","properties":[],"resourceType":"GMRInstanceLayer","resourceVersion":"2.0","userdefinedDepth":true,"visible":true,},
     {"$GMRInstanceLayer":"","%Name":"Pickups","depth":-2,"effectEnabled":true,"effectType":null,"gridX":32,"gridY":32,"hierarchyFrozen":false,"inheritLayerDepth":false,"inheritLayerSettings":false,"inheritSubLayers":true,"inheritVisibility":true,"instances":[
