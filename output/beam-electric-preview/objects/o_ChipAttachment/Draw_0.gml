@@ -1,0 +1,10 @@
+var _old_color = draw_get_color();
+var _old_alpha = draw_get_alpha();
+draw_set_alpha(detached ? max(0, 1 - fall_timer / 0.6) : 1);
+var _colors = [c_lime, c_red, make_color_rgb(255, 140, 30), c_yellow, c_white];
+draw_set_color(is_healing ? c_lime : _colors[effect]);
+draw_rectangle(x - 3, y - 3, x + 3, y + 3, false);
+draw_set_color(c_white);
+draw_rectangle(x - 1, y - 1, x + 1, y + 1, false);
+draw_set_color(_old_color);
+draw_set_alpha(_old_alpha);

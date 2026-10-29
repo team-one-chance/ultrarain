@@ -126,6 +126,12 @@ with (o_HitscanVisual)
 {
     if (emissive) draw_emissive_streak();
 }
+// Four-coin sword beams share Bulletflash's bright electrical core and scene bloom.
+with (oSwordBeam)
+{
+    if (beam_lightning && visible && image_alpha > 0 && layer_get_visible(layer))
+        draw_electrical_beam();
+}
 // Keep eye warnings and the visor emissive after ambient dimming.
 with (oEnemy_Breaker)
 {

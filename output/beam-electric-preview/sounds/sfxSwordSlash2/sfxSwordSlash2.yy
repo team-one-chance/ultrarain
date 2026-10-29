@@ -1,0 +1,26 @@
+{
+  "$GMSound":"v2",
+  "%Name":"sfxSwordSlash2",
+  "audioGroupId":{
+    "name":"audiogroup_default",
+    "path":"audiogroups/audiogroup_default",
+  },
+  "bitDepth":1,
+  "channelFormat":0,
+  "compression":0,
+  "compressionQuality":4,
+  "conversionMode":0,
+  "duration":0.6798413,
+  "exportDir":"",
+  "name":"sfxSwordSlash2",
+  "parent":{
+    "name":"SwordGun",
+    "path":"folders/SFX/sfxPlayer/SwordGun.yy",
+  },
+  "preload":false,
+  "resourceType":"GMSound",
+  "resourceVersion":"2.0",
+  "sampleRate":44100,
+  "soundFile":"sfxSwordSlash2.wav",
+  "volume":1.0,
+}

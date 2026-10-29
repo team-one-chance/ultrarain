@@ -113,16 +113,7 @@ for (var i = 0; i < ds_list_size(hits); i++)
     {
         ds_list_add(hit_enemies, enemy);
 
-        // Include the consumed coin count for shield knockback tiers.
-        enemy.take_damage(
-            beam_damage,
-            move_dir,
-            knockback_force,
-            false,
-            x,
-            true,
-            beam_coins_used
-        );
+        apply_beam_hit(enemy);
     }
 }
 

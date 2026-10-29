@@ -202,6 +202,16 @@ slam_interrupt = function()
 // =====================================
 // CROWD SPACING
 // =====================================
+scout_receive_electric_stun = function(_seconds)
+{
+    scout_stop_charge_sound();
+    scout_stop_roll_sound();
+    slam_interrupt();
+    scout_hit_pending = false;
+    attack_state = 5;
+    stun_timer = max(stun_timer, _seconds); // Seconds; do not shorten a longer existing stun.
+};
+
 crowd_spacing_enabled = true;
 
 // Minimum centre spacing; collision-box widths also set a lower limit.

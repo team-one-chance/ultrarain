@@ -1,0 +1,26 @@
+{
+  "$GMSound":"v2",
+  "%Name":"sfxInitEnter1",
+  "audioGroupId":{
+    "name":"audiogroup_default",
+    "path":"audiogroups/audiogroup_default",
+  },
+  "bitDepth":1,
+  "channelFormat":0,
+  "compression":0,
+  "compressionQuality":4,
+  "conversionMode":0,
+  "duration":1.6227211,
+  "exportDir":"",
+  "name":"sfxInitEnter1",
+  "parent":{
+    "name":"sfxInitialize",
+    "path":"folders/SFX/sfxInitialize.yy",
+  },
+  "preload":false,
+  "resourceType":"GMSound",
+  "resourceVersion":"2.0",
+  "sampleRate":44100,
+  "soundFile":"sfxInitEnter1.wav",
+  "volume":1.0,
+}

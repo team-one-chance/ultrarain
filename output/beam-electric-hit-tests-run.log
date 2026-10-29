@@ -1,0 +1,74 @@
+
+***************************************
+ *     GameMaker v2026.0.0.23    *
+***************************************
+Setting scheduler resolution to 1
+Attempting to use high process priority settings
+Set process priority to HIGH_PRIORITY_CLASS
+Set main thread priority to HIGHEST
+Registered with MMCSS 'Games' task
+Set MMCSS thread priority to CRITICAL
+Reading File C:\Users\ali.shirzad\Desktop\UltraRain\ultrarain\output\beam-electric-preview\ULTRA RAIN.win took 5 ms
+DirectX11: Using hardware device
+Collision Event time(microsecs)=16
+Variable_Global_Init()
+PrepareGame()
+Audio_Init()
+Audio group 0 -> Loaded
+Attempting to set gamepadcount to 12
+Game_Prepare()
+Script_Prepare() 
+TimeLine_Prepare() 
+Object_Prepare() 
+Room_Prepare() 
+Finished PrepareGame() 
+Run_Start
+Done g_EffectsManager.Init()
+Done RenderStateManager
+CreateColPairs took 0.000000s 9 usecs for 81 object types obj_col_numb=0 physobjcount=16 resizes 0 final size 21
+Done ObjectLists
+Done Extension_Initialize
+About to startroom
+BEAM TEST PASS: existing damage scaling
+Enemy damaged: 1000000000 | HP: 0
+BEAM TEST PASS: electricity kills a billion-HP drone through normal death handling
+Enemy damaged: 40 | HP: 999999960
+BEAM TEST PASS: fire does ordinary drone damage
+Enemy damaged: 50 | HP: 9950
+BEAM TEST PASS: Scout takes damage and interrupts into a two-second stun
+BEAM TEST PASS: Scout remains stunned after one second
+BEAM TEST PASS: Scout recovers after two seconds
+Enemy damaged: 40 | HP: 9910
+BEAM TEST PASS: fire does not apply Scout electrical stun
+BEAM TEST PASS: 50-damage electric shield hit deals 60 without body stun
+BEAM TEST PASS: fire has no shield bonus
+Enemy damaged: 50 | HP: 9950
+BEAM TEST PASS: rear electrical hit adds ten shield damage while retaining normal body damage
+BEAM TEST PASS: shield-breaking electric hit preserves the phase transition
+BEAM TEST PASS: shield-break transition remains invulnerable
+Enemy damaged: 50 | HP: 9950
+BEAM TEST PASS: unshielded boss takes damage and stuns despite an attack and control grace
+BEAM TEST PASS: boss remains stunned after one second
+BEAM TEST PASS: boss recovers after 1.5 seconds
+Enemy damaged: 40 | HP: 9910
+BEAM TEST PASS: fire does not apply boss electrical stun
+Enemy damaged: 50 | HP: 9860
+BEAM TEST PASS: electrical interruption releases a grabbed player
+Enemy damaged: 50 | HP: 9810
+BEAM TEST PASS: electricity does not shorten a longer boss stun
+Enemy damaged: 50 | HP: -40
+BEAM TEST PASS: lethal boss hit does not access a destroyed enemy
+Enemy damaged: 50 | HP: 9950
+BEAM TEST PASS: collision sweep applies electrical damage and stun
+BEAM TEST PASS: an overlapping beam only hits each enemy once
+ALL ELECTRIC BEAM TESTS PASSED
+###game_end###0
+Total memory used = 41586525 (0x027a8f5d) bytes 39.66MB
+Free memory = 5441872 (0x00530950) bytes 5.19MB
+Peak memory used = 41586525 (0x027a8f5d) bytes 39.66MB
+**********************************.
+Entering main loop.
+**********************************.
+Attempting to set gamepadcount to 0
+Script_Free called with 569 and global 18
+Unsetting previous scheduler resolution of 1

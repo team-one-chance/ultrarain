@@ -1,0 +1,12 @@
+{
+  "$GMShader":"",
+  "%Name":"sh_BreakerShieldFlash",
+  "name":"sh_BreakerShieldFlash",
+  "parent":{
+    "name":"shaders",
+    "path":"folders/shaders.yy"
+  },
+  "resourceType":"GMShader",
+  "resourceVersion":"2.0",
+  "type":1
+}

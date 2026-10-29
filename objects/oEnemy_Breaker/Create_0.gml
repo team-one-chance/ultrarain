@@ -654,9 +654,11 @@ is_invulnerable = function() {
     return breaker_state == BreakerState.SHIELD_BREAK;
 };
 take_damage = function(_damage, _knockback_dir = 0, _knockback_force = 0,
-    _is_sword = false, _hit_x = undefined, _is_beam = false, _beam_coins = 1) {
+    _is_sword = false, _hit_x = undefined, _is_beam = false, _beam_coins = 1,
+    _electric_shield_bonus = 0, _electric_stun_seconds = 0) {
     if (is_invulnerable() || _damage <= 0) return;
     var _back = breaker_hit_from_back(_hit_x);
+    var _electric_shield_damage = _is_beam ? _damage * max(0, _electric_shield_bonus) : 0;
     // Shield impacts and phase-two body hits share the same coin-scaled push.
     if (_is_beam && (breaker_unshielded || (shield_hp > 0 && !_back))
         && !breaker_attacking()
@@ -671,7 +673,9 @@ take_damage = function(_damage, _knockback_dir = 0, _knockback_force = 0,
     if (shield_hp > 0 && !_back) {
         var _mult = _is_beam ? shield_front_beam_multiplier
             : (_is_sword ? shield_front_sword_multiplier : shield_front_bullet_multiplier);
-        shield_hp = max(0, shield_hp - _damage * _mult);
+        var _shield_damage = _damage * _mult;
+        _shield_damage += _electric_shield_damage;
+        shield_hp = max(0, shield_hp - _shield_damage);
         if (shield_hp > 0 && (_is_sword || _is_beam)) breaker_play_hit_sound(); // Bullet impacts play their ricochet cue at the bounce.
         breaker_shield_flash_time = breaker_shield_flash_duration;
         if (shield_hp <= 0) breaker_request_break();
@@ -689,6 +693,35 @@ take_damage = function(_damage, _knockback_dir = 0, _knockback_force = 0,
     // Block reactions handle stagger; beam pushback is handled separately above.
     // Avoid invoking the parent's Scout-specific dash parry or knockback.
     miniboss_parent_take_damage(_damage, _knockback_dir, 0, false);
+    // Rear hits retain their normal body damage and also discharge into an intact shield.
+    if (instance_exists(id) && ehp > 0 && _back && shield_hp > 0 && _electric_shield_damage > 0) {
+        shield_hp = max(0, shield_hp - _electric_shield_damage);
+        breaker_shield_flash_time = breaker_shield_flash_duration;
+        if (shield_hp <= 0) breaker_request_break();
+    }
+    if (_is_beam && instance_exists(id) && ehp > 0 && breaker_unshielded
+        && shield_hp <= 0 && _electric_stun_seconds > 0)
+        breaker_receive_electric_stun(_electric_stun_seconds);
+};
+// Electricity interrupts phase-two attacks, bypassing ordinary slam immunity.
+breaker_receive_electric_stun = function(_seconds) {
+    if (!breaker_unshielded || shield_hp > 0 || is_invulnerable() || ehp <= 0) return;
+    var _remaining = max(stun_timer, max(slam_stun_timer, slam_knockback_timer));
+    var _was_stunned = breaker_state == BreakerState.STUN;
+    if (instance_exists(breaker_grab_target))
+        breaker_grab_target.breaker_grab_owner = noone;
+    breaker_grab_target = noone;
+    breaker_stop_bash_sound();
+    breaker_clear_control();
+    breaker_beam_knockback_time = 0;
+    breaker_beam_knockback_distance = 0;
+    breaker_intercept = false;
+    breaker_leap_hit = true;
+    vertical_speed = max(0, vertical_speed); // Stop a rising attack; normal gravity still brings him down.
+    breaker_set_state(BreakerState.STUN);
+    if (!_was_stunned) breaker_stun_elapsed = 0;
+    stun_timer = max(_remaining, _seconds); // Seconds; a new hit never shortens an existing stun.
+    breaker_stun_budget = stun_timer; // Preserve the full electrical duration through the normal stun tick.
 };
 slam_interrupt = function() {
     if (breaker_state == BreakerState.STUN) {
