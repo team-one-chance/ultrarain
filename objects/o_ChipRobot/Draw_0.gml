@@ -28,23 +28,8 @@ if (chip_has_chip)
 }
 if (chip_state == ChipRobotState.WINDUP)
 {
-    draw_set_alpha(0.25);
     draw_set_color(c_lime);
-	if (chip_state == ChipRobotState.WINDUP
-|| chip_state == ChipRobotState.DASH)
-{
-    draw_set_color(c_lime);
-    draw_set_alpha(0.8);
-    draw_rectangle(x - 27, y - 35, x + 27, y + 3, true);
-}
-else if (chip_state == ChipRobotState.THROW && !chip_throw_is_healing)
-{
-    draw_set_color(c_blue);
-    draw_set_alpha(0.8);
-    draw_rectangle(x - 27, y - 35, x + 27, y + 3, true);
-}
-
-draw_set_alpha(1);
+    draw_set_alpha(1);
     draw_line_width(x, y - 16, x + chip_dash_direction * 180, y - 16, 2);
     draw_set_alpha(1);
 }
@@ -58,12 +43,5 @@ draw_set_color(c_black);
 draw_rectangle(x - 22, y - 45, x + 22, y - 40, false);
 draw_set_color(c_red);
 draw_rectangle(x - 21, y - 44, x - 21 + 42 * clamp(ehp / ehp_max, 0, 1), y - 41, false);
-// Blue warning before the offensive wall chip throw.
-if (chip_state == ChipRobotState.THROW && !chip_throw_is_healing)
-{
-    draw_set_color(make_color_rgb(50, 150, 255));
-    draw_set_alpha(1);
-    draw_rectangle(x - 27, y - 35, x + 27, y + 3, true);
-}
 draw_set_color(_old_color);
 draw_set_alpha(_old_alpha);

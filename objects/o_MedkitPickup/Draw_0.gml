@@ -1,2 +1,1 @@
-// Draw the assigned medkit sprite and its current animation frame.
-draw_self();
+item_draw_pickup_outline();

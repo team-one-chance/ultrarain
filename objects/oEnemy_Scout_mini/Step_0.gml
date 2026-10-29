@@ -795,7 +795,7 @@ if (attack_state == 0 && attack_rocking && sprite_index == bite_sprite
     if (bite_target != noone
         && bite_target.dmg_cooldown <= 0)
     {
-if (bite_target.parry_melee(id, false))
+if (bite_target.parry_melee(id, ParryState.FULL))
     exit;
 
 if (bite_target.take_damage(attack_bite_damage, x))

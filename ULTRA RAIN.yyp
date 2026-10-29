@@ -174,6 +174,7 @@
     {"id":{"name":"LE_TUTORIAL_WIP","path":"rooms/LE_TUTORIAL_WIP/LE_TUTORIAL_WIP.yy",},},
     {"id":{"name":"TESTING","path":"rooms/TESTING/TESTING.yy",},},
     {"id":{"name":"Coin_ricoshet","path":"scripts/Coin_ricoshet/Coin_ricoshet.yy",},},
+    {"id":{"name":"draw_charge_ring","path":"scripts/draw_charge_ring/draw_charge_ring.yy",},},
     {"id":{"name":"draw_ik_arm","path":"scripts/draw_ik_arm/draw_ik_arm.yy",},},
     {"id":{"name":"player_rig_pose","path":"scripts/player_rig_pose/player_rig_pose.yy",},},
     {"id":{"name":"ray_bbox_fraction","path":"scripts/ray_bbox_fraction/ray_bbox_fraction.yy",},},
@@ -434,15 +435,14 @@
   "resourceType":"GMProject",
   "resourceVersion":"2.0",
   "RoomOrderNodes":[
-    {"roomId":{"name":"LE_MENU","path":"rooms/LE_MENU/LE_MENU.yy",},},
+    {"roomId":{"name":"TESTING","path":"rooms/TESTING/TESTING.yy",},},
     {"roomId":{"name":"LE_TUTORIAL_WIP","path":"rooms/LE_TUTORIAL_WIP/LE_TUTORIAL_WIP.yy",},},
+    {"roomId":{"name":"LE_MENU","path":"rooms/LE_MENU/LE_MENU.yy",},},
     {"roomId":{"name":"LE_PWR","path":"rooms/LE_PWR/LE_PWR.yy",},},
     {"roomId":{"name":"LE_TUTORIAL_WIP","path":"rooms/LE_TUTORIAL_WIP/LE_TUTORIAL_WIP.yy",},},
     {"roomId":{"name":"LE_DEMO_END","path":"rooms/LE_DEMO_END/LE_DEMO_END.yy",},},
     {"roomId":{"name":"LE_TRAIN","path":"rooms/LE_TRAIN/LE_TRAIN.yy",},},
-    {"children":[
-        {"roomId":{"name":"TESTING","path":"rooms/TESTING/TESTING.yy",},},
-      ],"groupName":"testing_ALWAYS_LAST",},
+    {"children":[],"groupName":"testing_ALWAYS_LAST",},
   ],
   "templateType":"game",
   "TextureGroups":[

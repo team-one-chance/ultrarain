@@ -160,7 +160,7 @@ chip_dash_move = function(_amount)
             if (_player != noone)
             {
                 chip_dash_hit_tested = true;
-				if (_player.parry_melee(id, true))
+				if (_player.parry_melee(id, ParryState.FULL))
 {
     ds_list_destroy(_hits);
     return true;

@@ -8,6 +8,9 @@ if (variable_instance_exists(id, "train_departing") && train_departing)
 if (variable_global_exists("dev_freeze_enemies") && global.dev_freeze_enemies) exit;
 
 var dt = (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) / 1000000;
+if (attack_state == 2 || attack_state == 3 || (attack_state == 4 && scout_parry_grace_timer > 0))
+    scout_ring_time += dt;
+else scout_ring_time = 0;
 var scout_start_x = x;
 // Count gameplay time even while knockback suppresses the stopping animation.
 scout_parry_grace_timer = attack_state == 4
@@ -251,9 +254,17 @@ else
                     break;
                 }
 
-                // Roll has its own reach; wind up here instead of walking
-                // into the old 55-90px attack positioning band first.
-                if (attack_cooldown <= 0 && scout_roll_spacing_timer <= 0 && scout_can_roll_at(player))
+                // A committed bite can yield to a roll only between complete bite cycles.
+                var _bite_cycle_boundary = false;
+                if (attack_rocking && scout_attack_enter_complete && sprite_index == bite_sprite)
+                {
+                    var _bite_cycle_seconds = scout_animation_duration(bite_sprite); // Seconds per complete bite cycle.
+                    _bite_cycle_boundary = floor(scout_animation_time / _bite_cycle_seconds)
+                        > floor(max(0, scout_animation_time - dt) / _bite_cycle_seconds);
+                }
+                // Roll has its own reach; wait until any current bite has finished.
+                if ((!attack_rocking || _bite_cycle_boundary)
+                    && attack_cooldown <= 0 && scout_roll_spacing_timer <= 0 && scout_can_roll_at(player))
                 {
                     path_end();
                     attack_rocking = false;
@@ -335,15 +346,30 @@ if (player_y_distance <= attack_vertical_tolerance)
                         attack_rocking = true;
                         attack_bite_damage_timer = attack_bite_damage_delay;
                         scout_attack_enter_complete = false;
+                        scout_bite_exit_after = -1;
                         image_index = 0;
 
                     }
                 }
                 else if (!scout_bite_in_range(player))
                 {
-                    attack_rocking = false;
-                    repath_timer = 0;
+                    var _bite_duration = scout_animation_duration(bite_sprite); // Seconds per bite cycle; the entry must also finish first.
+                    if (!scout_attack_enter_complete || sprite_index != bite_sprite)
+                        scout_bite_exit_after = _bite_duration;
+                    else if (scout_bite_exit_after < 0)
+                        scout_bite_exit_after = _bite_cycle_boundary
+                            ? scout_animation_time
+                            : (floor(scout_animation_time / _bite_duration) + 1) * _bite_duration;
+
+                    if (scout_attack_enter_complete && sprite_index == bite_sprite
+                        && scout_animation_time >= scout_bite_exit_after)
+                    {
+                        attack_rocking = false;
+                        scout_bite_exit_after = -1;
+                        repath_timer = 0;
+                    }
                 }
+                else scout_bite_exit_after = -1; // Re-entry before the cycle ends keeps the current attack running.
                 // Stay planted throughout attackEnter and the looping attack.
 
                 break;
@@ -815,10 +841,7 @@ if (attack_state == 0 && attack_rocking && sprite_index == bite_sprite
     if (bite_target != noone && scout_bite_in_range(bite_target)
         && bite_target.dmg_cooldown <= 0)
     {
-if (bite_target.parry_melee(id, false))
-    exit;
-
-if (bite_target.take_damage(attack_bite_damage, x))
-    bite_target.dmg_cooldown = 1;
+        if (bite_target.take_damage(attack_bite_damage, x))
+            bite_target.dmg_cooldown = 1;
     }
 }
