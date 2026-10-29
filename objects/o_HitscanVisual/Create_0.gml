@@ -112,3 +112,5 @@ draw_emissive_streak = function()
 
 // The bullet and all its effects disappear together.
 life = 0.005;
+bounce_travel = false; // True animates only Breaker's ricochet; ordinary coin trails remain immediate.
+bounce_elapsed = 0; // Seconds since the outgoing ricochet began.

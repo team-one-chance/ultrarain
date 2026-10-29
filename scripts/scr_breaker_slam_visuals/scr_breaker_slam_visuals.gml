@@ -8,6 +8,13 @@ function breaker_slam_visual_settings()
         global.breaker_slam_visuals = {
             camera_shake_pixels: 2, // Maximum camera displacement per axis in room pixels; zero disables shake.
             camera_shake_seconds: 0.16, // Shake lifetime in seconds; larger values make the impact rumble longer.
+            shield_bullet_ricochet: {
+                range_pixels: 1200, // Maximum outgoing travel in room pixels; five times the previous reach.
+                random_spread_degrees: 89, // Random angle across nearly the full outward half-circle; larger values vary bounces more.
+                trail_speed_pixels_per_second: 3200, // Visible travel speed in room pixels per second; lower values slow the trail.
+                trail_length_pixels: 60, // Visible trail length in room pixels behind the moving tip.
+                damage_fraction: 0.25 // Fraction of the incoming bullet damage dealt after the bounce.
+            },
             stun_stars: {
                 head_gap_pixels: 22, // Room pixels above the head or collision box; larger values raise the orbit.
                 orbit_width_pixels: 11, // Sprite pixels before scaling; larger values widen the orbit.

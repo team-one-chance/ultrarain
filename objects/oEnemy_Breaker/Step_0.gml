@@ -151,8 +151,9 @@ if (!_stunned && !_stagger) switch (breaker_state) {
         var _fps = breaker_fps(_bash);
         var _active_start = breaker_bash_windup_seconds();
         var _active_end = _active_start + (breaker_bash_last_frame - breaker_bash_first_frame + 1) / _fps;
-        if (_previous_time < _active_start && breaker_time >= _active_start) {
-            world_sfx_play(breaker_unshielded ? sfxBreakerStabAttack : sfxBreakerShieldAttack, x, y);
+        if (!breaker_bash_hit && _previous_time < _active_start && breaker_time >= _active_start) {
+            breaker_bash_sound = world_sfx_play(
+                breaker_unshielded ? sfxBreakerStabAttack : sfxBreakerShieldAttack, x, y);
         }
         // Integrate just the part of this Step inside frames 7 through 9.
         var _active_dt = max(0, min(breaker_time, _active_end) - max(_previous_time, _active_start));
