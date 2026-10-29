@@ -1,0 +1,26 @@
+{
+  "$GMSound":"v2",
+  "%Name":"sfxNoShieldBashParried",
+  "audioGroupId":{
+    "name":"audiogroup_default",
+    "path":"audiogroups/audiogroup_default",
+  },
+  "bitDepth":1,
+  "channelFormat":0,
+  "compression":0,
+  "compressionQuality":4,
+  "conversionMode":0,
+  "duration":1.4243084,
+  "exportDir":"",
+  "name":"sfxNoShieldBashParried",
+  "parent":{
+    "name":"sfxBreaker",
+    "path":"folders/SFX/sfxEnemy/sfxBreaker.yy",
+  },
+  "preload":false,
+  "resourceType":"GMSound",
+  "resourceVersion":"2.0",
+  "sampleRate":44100,
+  "soundFile":"sfxNoShieldBashParried.wav",
+  "volume":1.0,
+}

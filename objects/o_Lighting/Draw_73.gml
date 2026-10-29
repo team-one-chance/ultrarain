@@ -131,11 +131,8 @@ with (oEnemy_Breaker)
 {
     breaker_draw_eye_glow();
 }
-// Keep the pickup outlines visible after dark rooms apply ambient lighting.
-with (o_pinhouse)
-{
-    if (visible && image_alpha > 0 && layer_get_visible(layer)) item_draw_pickup_outline();
-}
+// Keep medkit outlines visible after dark rooms apply ambient lighting.
+// Inventory pickups use their hovering renderer after bloom below.
 with (o_MedkitPickup)
 {
     if (visible && image_alpha > 0 && layer_get_visible(layer)) item_draw_pickup_outline();

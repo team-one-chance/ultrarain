@@ -1,3 +1,39 @@
+// Send a blocked bullet back out at a random angle using the coin target trace.
+function breaker_bullet_ricochet(_breaker, _hit_x, _hit_y, _damage)
+{
+    if (!instance_exists(_breaker)) return;
+    var _settings = breaker_slam_visual_settings().shield_bullet_ricochet;
+    var _side = _breaker.facing_direction; // Horizontal side from which the shield faces, -1 or +1.
+    var _start_x = _side > 0 ? _breaker.bbox_right + 2 : _breaker.bbox_left - 2;
+    var _start_y = clamp(_hit_y, _breaker.bbox_top + 2, _breaker.bbox_bottom - 2);
+    var _out_direction = (_side > 0 ? 0 : 180)
+        + random_range(-_settings.random_spread_degrees, _settings.random_spread_degrees);
+    var _end_x = _start_x + lengthdir_x(_settings.range_pixels, _out_direction);
+    var _end_y = _start_y + lengthdir_y(_settings.range_pixels, _out_direction);
+    var _chain = { walls_left: 0, enemies_left: 0 }; // Stop at the first target or wall.
+    var _hit_enemies = ds_list_create();
+    var _trace = coin_chain_trace(_start_x, _start_y, _end_x, _end_y,
+        _damage * _settings.damage_fraction, _chain, _hit_enemies, false);
+    ds_list_destroy(_hit_enemies);
+    var _visual = instance_create_layer(0, 0, "Instances", o_HitscanVisual);
+    _visual.line_x1 = _hit_x;
+    _visual.line_y1 = _hit_y;
+    _visual.line_x2 = _trace.end_x;
+    _visual.line_y2 = _trace.end_y;
+    _visual.line_color = c_yellow;
+    _visual.line_width = 1.2;
+    _visual.set_coin_effects(1, false);
+    _visual.bounce_travel = true;
+    _visual.bounce_origin_x = _hit_x;
+    _visual.bounce_origin_y = _hit_y;
+    _visual.bounce_target_x = _trace.end_x;
+    _visual.bounce_target_y = _trace.end_y;
+    _visual.bounce_speed = _settings.trail_speed_pixels_per_second; // Room pixels per second.
+    _visual.bounce_tail_length = _settings.trail_length_pixels; // Room pixels of visible streak.
+    var _ricochet_sounds = [sfxBreakerBulletRicochet1, sfxBreakerBulletRicochet2, sfxBreakerBulletRicochet3];
+    _breaker.breaker_play_hit_sound(_ricochet_sounds[irandom(2)]); // Choose one of the three shield ricochet cues per impact.
+}
+
 function coin_ricochet(
     _coin,
     _damage,
@@ -593,7 +629,7 @@ ds_list_destroy(_chain_hit_enemies);
 // Repeated pixels inside one wall consume only one hit per ray.
 function coin_chain_trace(
     _sx, _sy, _ex, _ey,
-    _damage, _chain, _chain_hit_enemies
+    _damage, _chain, _chain_hit_enemies, _allow_shield_bounce = true
 )
 {
     var _seen = ds_list_create();
@@ -636,13 +672,8 @@ function coin_chain_trace(
 
             ds_list_add(_seen, _hit);
 
-            instance_create_depth(
-                _px, _py, -10000, o_ShotImpact,
-                {
-                    impact_direction: point_direction(_sx, _sy, _ex, _ey),
-                    impact_enemy: _enemy
-                }
-            );
+            weapon_bullet_impact(_hit, _px, _py,
+                point_direction(_sx, _sy, _ex, _ey), _enemy);
 
 if (_enemy)
 {
@@ -660,7 +691,16 @@ if (_enemy)
         + " | damage=" + string(_hit_damage)
     );
 
+    var _shield_bounce = _allow_shield_bounce
+        && variable_instance_exists(_hit, "breaker_hit_from_back")
+        && _hit.shield_hp > 0 && !_hit.is_invulnerable()
+        && !_hit.breaker_hit_from_back();
     _hit.take_damage(_hit_damage);
+    if (_shield_bounce)
+    {
+        breaker_bullet_ricochet(_hit, _px, _py, _hit_damage);
+        _stopped = true; // The shield blocks the incoming coin segment.
+    }
                 if (_chain.enemies_left > 0)
                     _chain.enemies_left--;
                 else

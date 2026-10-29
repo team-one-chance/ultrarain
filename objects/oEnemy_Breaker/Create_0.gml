@@ -68,6 +68,12 @@ breaker_intercept = false;
 breaker_landed = false;
 breaker_shield_debris_spawned = false;
 breaker_shield_break_sound = -1;
+breaker_bash_sound = -1; // Playback handle for this Breaker's current bash; stop it if that bash is parried.
+breaker_stop_bash_sound = function() {
+    if (breaker_bash_sound == -1) return;
+    audio_stop_sound(breaker_bash_sound);
+    breaker_bash_sound = -1;
+};
 breaker_hit_sounds = [];
 breaker_play_hit_sound = function(_asset = sfxBreakerHit) {
     if (breaker_shield_break_sound != -1 && audio_is_playing(breaker_shield_break_sound)) return;
@@ -487,7 +493,6 @@ breaker_set_state = function(_state) {
     if (_state == BreakerState.BASH) {
         breaker_bash_hit = false;
         breaker_bash_serial += 1;
-    }
         breaker_slide_bash_lock = breaker_slide_turn_lock > 0;
     }
     else breaker_slide_bash_lock = false;
@@ -598,6 +603,7 @@ breaker_request_break = function() {
     breaker_set_state(BreakerState.SHIELD_BREAK);
 };
 breaker_receive_full_parry = function() {
+    breaker_stop_bash_sound();
     breaker_clear_control();
     breaker_set_state(BreakerState.STUN);
     breaker_stun_elapsed = 0;
@@ -633,6 +639,15 @@ miniboss_damage_player = function(_target, _damage, _parry_state = ParryState.UN
         _target.take_damage(_damage, x, _parry_state);
 };
 
+// Share front/back classification with bullet impact visuals, including coin shots.
+breaker_hit_from_back = function(_attacker_x = undefined) {
+    if (is_undefined(_attacker_x)) {
+        var _player = instance_nearest(x, y, o_Player);
+        if (_player != noone) _attacker_x = _player.x;
+    }
+    return !is_undefined(_attacker_x)
+        && sign(_attacker_x - (bbox_left + bbox_right) * 0.5) == -facing_direction;
+};
 miniboss_parent_take_damage = take_damage;
 // The phase transition cannot be damaged by weapons, slams, or direct crashes.
 is_invulnerable = function() {
@@ -641,13 +656,7 @@ is_invulnerable = function() {
 take_damage = function(_damage, _knockback_dir = 0, _knockback_force = 0,
     _is_sword = false, _hit_x = undefined, _is_beam = false, _beam_coins = 1) {
     if (is_invulnerable() || _damage <= 0) return;
-    var _attacker_x = _hit_x;
-    if (is_undefined(_attacker_x)) {
-        var _player = instance_nearest(x, y, o_Player);
-        if (_player != noone) _attacker_x = _player.x;
-    }
-    var _back = !is_undefined(_attacker_x)
-        && sign(_attacker_x - (bbox_left + bbox_right) * 0.5) == -facing_direction;
+    var _back = breaker_hit_from_back(_hit_x);
     // Shield impacts and phase-two body hits share the same coin-scaled push.
     if (_is_beam && (breaker_unshielded || (shield_hp > 0 && !_back))
         && !breaker_attacking()
@@ -663,7 +672,7 @@ take_damage = function(_damage, _knockback_dir = 0, _knockback_force = 0,
         var _mult = _is_beam ? shield_front_beam_multiplier
             : (_is_sword ? shield_front_sword_multiplier : shield_front_bullet_multiplier);
         shield_hp = max(0, shield_hp - _damage * _mult);
-        if (shield_hp > 0) breaker_play_hit_sound();
+        if (shield_hp > 0 && (_is_sword || _is_beam)) breaker_play_hit_sound(); // Bullet impacts play their ricochet cue at the bounce.
         breaker_shield_flash_time = breaker_shield_flash_duration;
         if (shield_hp <= 0) breaker_request_break();
         else breaker_react_to_hit();

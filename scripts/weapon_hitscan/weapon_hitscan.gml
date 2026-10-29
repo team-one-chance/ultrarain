@@ -9,6 +9,20 @@ function ceiling_light_break(_lamp)
     _lamp.image_blend = make_color_rgb(55, 55, 55);
 }
 
+// Bullet visual effects use the same shield-side decision as Breaker's damage handling.
+function weapon_bullet_impact(_target, _x, _y, _direction, _enemy)
+{
+    var _shield = false;
+    if (instance_exists(_target) && variable_instance_exists(_target, "breaker_hit_from_back"))
+    {
+        _shield = _target.shield_hp > 0 && !_target.is_invulnerable()
+            && !_target.breaker_hit_from_back();
+    }
+    if (_shield) return; // The outgoing ricochet is the shield hit's visual feedback.
+    instance_create_depth(_x, _y, -10000, o_ShotImpact,
+        { impact_direction: _direction, impact_enemy: _enemy });
+}
+
 function weapon_hitscan(_damage, _range, _piercing)
 {
     // =====================================
@@ -46,6 +60,9 @@ function weapon_hitscan(_damage, _range, _piercing)
     var hit_count = 0;
     var stopped = false;
     var _coin_style = undefined;
+    var _shield_bounce = noone;
+    var _shield_bounce_x = 0;
+    var _shield_bounce_y = 0;
 
     // Count each object only once.
     var already_hit = ds_list_create();
@@ -136,14 +153,10 @@ if (instance_exists(inst)
     var _enemy_impact = inst.object_index == oEnemyParent
         || object_is_ancestor(inst.object_index, oEnemyParent);
 
-    instance_create_depth(
+    weapon_bullet_impact(inst,
         check_x - lengthdir_x(1, shoot_direction),
         check_y - lengthdir_y(1, shoot_direction),
-        -10000, o_ShotImpact,
-        {
-            impact_direction: shoot_direction,
-            impact_enemy: _enemy_impact
-        }
+        shoot_direction, _enemy_impact
     );
 }
 
@@ -211,6 +224,14 @@ if (instance_exists(inst)
                 || object_is_ancestor(inst.object_index, oEnemyParent)
             ))
             {
+                if (variable_instance_exists(inst, "breaker_hit_from_back")
+                    && inst.shield_hp > 0 && !inst.is_invulnerable()
+                    && !inst.breaker_hit_from_back())
+                {
+                    _shield_bounce = inst;
+                    _shield_bounce_x = check_x;
+                    _shield_bounce_y = check_y;
+                }
                 inst.take_damage(_damage);
             }
 
@@ -226,7 +247,7 @@ if (instance_exists(inst)
 
             hit_count++;
 
-            if (hit_count >= max_hits)
+            if (hit_count >= max_hits || inst == _shield_bounce)
             {
                 final_x = check_x;
                 final_y = check_y;
@@ -247,6 +268,10 @@ if (instance_exists(inst)
 
     ds_list_destroy(point_hits);
     ds_list_destroy(already_hit);
+
+    if (instance_exists(_shield_bounce))
+        breaker_bullet_ricochet(_shield_bounce, _shield_bounce_x,
+            _shield_bounce_y, _damage);
 
     // =====================================
     // HITSCAN VISUAL

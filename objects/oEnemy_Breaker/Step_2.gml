@@ -20,6 +20,7 @@ if (!breaker_unshielded) {
 }
 else if (_target.parry_is_active() && breaker_can_melee_parry(_target, ParryState.HALF)) {
     breaker_bash_hit = true;
+    breaker_stop_bash_sound(); // Cut this bash's attack cue before the parry cue starts.
     _target.parry_cooldown = 0; // The half parry blocks damage without healing or stunning Breaker.
     var _push_side = sign((_target.bbox_left + _target.bbox_right) - (bbox_left + bbox_right));
     if (_push_side == 0) _push_side = facing_direction;
@@ -42,6 +43,7 @@ else if (_target.parry_is_active() && breaker_can_melee_parry(_target, ParryStat
     _spark_effect.spark_color_start = _spark_settings.bright_color;
     _spark_effect.spark_color_end = _spark_settings.fade_color;
     _spark_effect.flash_radius = _spark_settings.flash_radius_pixels;
+    world_sfx_play(sfxNoShieldBashParried, _spark_x, _spark_y, 1, 1, 1280); // Unshielded bash parry cue, audible near the clash.
     exit;
 }
 if (breaker_time >= _window.end_seconds) {
