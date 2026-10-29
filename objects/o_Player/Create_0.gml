@@ -208,6 +208,9 @@ stop_wall_slide_sfx = function()
     wall_slide_sound = -1;
 };
 
+slide_sound_pitch = 0.83; // Pitch/speed multiplier: 83% playback speed; smaller values deepen and slow the loop.
+slide_sound_gain = 0.5; // Linear volume multiplier: 50% amplitude; smaller values make ground sliding quieter.
+slide_sound_fade_in_ms = 60; // Milliseconds to reach slide volume; larger values soften the start further.
 slide_sound = -1;
 stop_slide_sfx = function()
 {
@@ -871,7 +874,7 @@ coin_recharge_timer = 0;
 
 // Coin counts as being near its apex if its
 // vertical speed is within this range.
-coin_split_y_speed_threshold = 0.75;
+coin_split_y_speed_threshold = 1.25;
 
 // =====================================
 // MANTLE LUNGE

@@ -10,7 +10,7 @@
   "compression":0,
   "compressionQuality":4,
   "conversionMode":0,
-  "duration":7.848345,
+  "duration":1.2,
   "exportDir":"",
   "name":"sfxSlide",
   "parent":{
@@ -20,7 +20,7 @@
   "preload":false,
   "resourceType":"GMSound",
   "resourceVersion":"2.0",
-  "sampleRate":44100,
-  "soundFile":"sfxSlide.mp3",
+  "sampleRate":48000,
+  "soundFile":"sfxSlide.wav",
   "volume":1.0,
 }

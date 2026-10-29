@@ -152,22 +152,50 @@ if (instance_exists(_player))
         command_feedback = "";
         command_cursor_timer = 0;
 
-        terminal_display_text = terminal_text;
+var _difficulty = variable_global_exists("game_difficulty")
+    ? global.game_difficulty
+    : 1;
 
-        if (!global.demo_took_damage)
-        {
-            terminal_display_text +=
-                "\n\n" + terminal_no_damage_text;
-        }
-        else if (!global.demo_used_healing)
-        {
-            terminal_display_text +=
-                "\n\n" + terminal_no_healing_text;
-        }
-        else
-        {
-            terminal_display_text = terminal_text_none;
-        }
+// Easy
+if (_difficulty == 0)
+{
+    terminal_display_text =
+        "You have reached the end of the ULTRARAIN demo."
+        + "\n\n"
+        + "Thank you for playing."
+        + "\n\n"
+        + "Ready for more? Try the demo on a harder difficulty.";
+}
+// Normal
+else if (_difficulty == 1)
+{
+    terminal_display_text =
+        "You have reached the end of the ULTRARAIN demo on Normal."
+        + "\n\n"
+        + "Good job making it this far."
+        + "\n\n"
+        + "Think you can handle more? Try Hard difficulty.";
+}
+// Hard
+else
+{
+    terminal_display_text = terminal_text;
+
+    if (!global.demo_took_damage)
+    {
+        terminal_display_text +=
+            "\n\n" + terminal_no_damage_text;
+    }
+    else if (!global.demo_used_healing)
+    {
+        terminal_display_text +=
+            "\n\n" + terminal_no_healing_text;
+    }
+    else
+    {
+        terminal_display_text = terminal_text_none;
+    }
+}
 
         // Lock normal player controls while reading.
         reader.hacking_controller = id;

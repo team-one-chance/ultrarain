@@ -116,12 +116,6 @@ with (oEnemy_Breaker)
 {
     breaker_draw_eye_glow();
 }
-// Keep Breaker's white pressure burst readable against the dark room.
-with (oBreakerSlamVFX)
-{
-    // Depth-spawned impacts can have no named layer; they are still visible.
-    if (defer_to_lighting && visible && (layer == -1 || layer_get_visible(layer))) draw_pressure_burst();
-}
 // Extract bright scene pixels, blur horizontally and vertically, then add the glow.
 if (bloom_enabled && (bloom_strength > 0 || scout_bloom_strength > 0 || player_bloom_strength > 0 || lava_bloom_strength > 0)
 && surface_exists(application_surface)

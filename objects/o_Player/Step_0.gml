@@ -2035,6 +2035,19 @@ if (controls_pressed("sword"))
 aim_rig_mode = (weapon_type == "sword")
     ? AimRigMode.TWO_HANDED
     : AimRigMode.ONE_HANDED;
+	
+	// Aim from the actual firing shoulder while sliding.
+if (weapon_type == "pistol" && is_sliding)
+{
+    var _slide_aim = player_get_muzzle();
+
+    aim_angle = point_direction(
+        _slide_aim.aim_x,
+        _slide_aim.aim_y,
+        mouse_x,
+        mouse_y
+    );
+}
 
 if (weapon_fire_timer > 0)
 {
@@ -2098,14 +2111,18 @@ if (weapon_type == "pistol")
     {
         // Leave room in the mix for the target's impact cue.
         audio_play_sound(sfxGunshot, 1, false, 0.55);
-        weapon_hitscan(
-            pistol_damage,
-            pistol_range,
-            pistol_piercing
-        );
+var _shot_visible = weapon_hitscan(
+    pistol_damage,
+    pistol_range,
+    pistol_piercing
+);
 
-        weapon_fire_timer = pistol_cooldown * chip_attack_multiplier();
-        gun_reticle_flash_timer = gun_reticle_flash_duration;
+weapon_fire_timer = pistol_cooldown * chip_attack_multiplier();
+
+if (_shot_visible)
+{
+    gun_reticle_flash_timer = gun_reticle_flash_duration;
+}
     }
 }
 else if (weapon_type == "sword")
@@ -2580,7 +2597,7 @@ if (_wall_slide_sounding)
 {
     if (wall_slide_sound == -1 || !audio_is_playing(wall_slide_sound))
     {
-        wall_slide_sound = audio_play_sound(sfxWallSlide, 1, true);
+        wall_slide_sound = audio_play_sound(sfxSlide, 1, true);
     }
 }
 else
@@ -2601,7 +2618,9 @@ if (_slide_sounding)
 {
     if (slide_sound == -1 || !audio_is_playing(slide_sound))
     {
-        slide_sound = audio_play_sound(sfxSlide, 1, true);
+        slide_sound = audio_play_sound(sfxSlide, 1, true, 0);
+        audio_sound_pitch(slide_sound, slide_sound_pitch);
+        audio_sound_gain(slide_sound, slide_sound_gain, slide_sound_fade_in_ms);
     }
 }
 else

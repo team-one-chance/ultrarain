@@ -46,7 +46,12 @@ if (controls_key_unassigned(ord("M")) && keyboard_check_pressed(ord("M")))
     update_enemy_freeze();
     exit;
 }
-if (!opened && controls_key_unassigned(ord("R")) && !keyboard_check(vk_shift) && keyboard_check_pressed(ord("R")))
+// Keep R available for command typing while the demo end terminal is open.
+if (!opened
+    && controls_key_unassigned(ord("R"))
+    && !(instance_exists(o_DemoTerminal) && o_DemoTerminal.reading)
+    && !keyboard_check(vk_shift)
+    && keyboard_check_pressed(ord("R")))
 {
     cursor_position = [mouse_x, mouse_y];
     run_action(5);

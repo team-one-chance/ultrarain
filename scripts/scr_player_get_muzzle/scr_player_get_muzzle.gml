@@ -65,15 +65,18 @@ function player_get_muzzle()
         (rig_muzzle_y - sprite_get_yoffset(s_Pistol))
         * _part_facing;
 
-    return {
-        muzzle_x:
-            _weapon_x
-            + _dx * dcos(aim_angle)
-            + _dy * dsin(aim_angle),
+return {
+    aim_x: _aim_x,
+    aim_y: _aim_y,
 
-        muzzle_y:
-            _weapon_y
-            - _dx * dsin(aim_angle)
-            + _dy * dcos(aim_angle)
+    muzzle_x:
+        _weapon_x
+        + _dx * dcos(aim_angle)
+        + _dy * dsin(aim_angle),
+
+    muzzle_y:
+        _weapon_y
+        - _dx * dsin(aim_angle)
+        + _dy * dcos(aim_angle)
+};
     };
-}
