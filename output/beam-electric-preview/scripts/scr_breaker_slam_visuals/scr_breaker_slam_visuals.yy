@@ -1,0 +1,10 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_breaker_slam_visuals",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_breaker_slam_visuals",
+  "parent":{"name":"Scripts","path":"folders/Scripts.yy",},
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

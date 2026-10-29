@@ -35,7 +35,7 @@ function seamless_capture(_player, _gate, _destination)
         "slide_double_boost_stage2_multiplier", "slide_double_boost_stage3_duration", "slide_double_boost_timer", "slide_double_jump_direction", "slide_double_jump_launch_multiplier",
         "slide_double_jump_timer", "slide_double_jump_window", "slide_exit_delay", "slide_exit_timer", "slide_jump_speed",
         "slide_movespeed_multiplier", "slide_speed_multiplier", "slide_time", "sprite_index", "sword_config",
-        "sfx_was_grounded", "sword_combat_facing_duration", "sword_combat_facing_timer", "sword_last_move_facing", "sword_slash_sound_index", "sword_swing_facing", "sword_swing_pending_hit", "sword_swing_timer", "syringe_count", "syringe_max",
+        "sfx_was_grounded", "sword_slash_sound_index", "sword_swing_facing", "sword_swing_pending_hit", "sword_swing_timer", "syringe_count", "syringe_max",
         "take_damage", "timerf3", "trap_bounce_pending", "trap_bounce_speed", "trap_knockback_speed_x",
         "trap_knockback_timer", "use_syringe", "visible", "wall_jump_forced_direction", "wall_jump_lock_duration",
         "wall_jump_lock_time", "wall_jump_x", "wall_jump_y", "wall_slide_active", "wall_slide_decel",

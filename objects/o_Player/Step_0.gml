@@ -948,21 +948,6 @@ if (abs(aim_dx) > 1)
     aim_facing = sign(aim_dx);
 }
 
-if (move != 0)
-{
-    sword_last_move_facing = sign(move);
-}
-
-if (weapon_type != "sword")
-{
-    sword_combat_facing_timer = 0;
-}
-else if (sword_swing_timer <= 0)
-{
-    sword_combat_facing_timer = max(0, sword_combat_facing_timer
-        - (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) / 1000000);
-}
-
 // =====================================
 // SPRITE / ANIMATION
 // =====================================
@@ -2135,7 +2120,6 @@ else if (weapon_type == "sword")
     && chip_sword_cooldown_timer <= 0)
     {
         sword_swing_timer = max(0.001, sword_config.swing_duration);
-        sword_combat_facing_timer = sword_combat_facing_duration;
         chip_sword_cooldown_timer = sword_swing_timer * chip_attack_multiplier();
         sword_swing_pending_hit = true;
         // Lock the swing to the cursor's direction when the attack starts.
@@ -2158,22 +2142,18 @@ else if (weapon_type == "sword")
         sword_slash_sound_index = 1 - sword_slash_sound_index;
 
         var slash = instance_create_depth(
-            x + sword_config.slash_forward * sword_swing_facing,
-            y + sword_config.slash_down,
+            x,
+            y,
             depth - 1,
-            oSlashEffect
+            oSwordSlash
         );
 
-        slash.image_xscale = sword_swing_facing * sword_config.slash_scale;
-        slash.image_yscale = sword_config.slash_scale;
         slash.slash_owner = id;
         slash.sync_sword_swing();
-        slash.slash_damage = sword_config.slash_damage;
-        slash.knockback_force = sword_config.slash_knockback;
     }
 }
 
-// Sword combat temporarily turns the body toward the cursor. The swing itself
+// Equipping the sword keeps the body facing the cursor. The swing itself
 // stays locked to its starting direction, as does its slash.
 if (weapon_type == "sword")
 {
@@ -2182,7 +2162,7 @@ if (weapon_type == "sword")
         || (!on_ground && touching_wall && coyote_timer <= 0);
     if (!_sword_facing_locked)
     {
-        image_xscale = sword_combat_facing_timer > 0 ? aim_facing : sword_last_move_facing;
+        image_xscale = aim_facing;
         if (sprite_index == s_Player_Run && move != 0)
         {
             image_speed *= move * sign(image_xscale);

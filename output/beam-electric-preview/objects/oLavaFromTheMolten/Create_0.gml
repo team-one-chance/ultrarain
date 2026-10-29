@@ -1,0 +1,1 @@
+if (layer != layer_get_id("Hazards")) depth = o_Player.depth + 2;

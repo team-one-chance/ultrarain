@@ -1,0 +1,68 @@
+// =====================================
+// CALCULATE NEXT POSITION
+// =====================================
+
+var next_x = x + lengthdir_x(bullet_speed, direction);
+var next_y = y + lengthdir_y(bullet_speed, direction);
+
+
+// =====================================
+// CHECK PLAYER
+// =====================================
+
+var player_hit = collision_line(
+    x,
+    y,
+    next_x,
+    next_y,
+    o_Player,
+    false,
+    true
+);
+
+if (player_hit != noone)
+{
+    if (player_hit.take_damage(bullet_damage, x))
+    {
+
+        show_debug_message(
+            "PLAYER HIT! HP: " + string(player_hit.pHP)
+        );
+    }
+
+    instance_destroy();
+    exit;
+}
+
+
+// =====================================
+// CHECK WALL
+// =====================================
+
+var wall_objects = [
+    o_Block,
+	o_Door_UNB,
+	o_Block_scary
+];
+
+if (collision_line(
+    x,
+    y,
+    next_x,
+    next_y,
+    wall_objects,
+    false,
+    true
+) != noone)
+{
+    instance_destroy();
+    exit;
+}
+
+
+// =====================================
+// MOVE BULLET
+// =====================================
+
+x = next_x;
+y = next_y;

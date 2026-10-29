@@ -1,0 +1,26 @@
+{
+  "$GMSound":"v2",
+  "%Name":"sfxSwordBeamMax",
+  "audioGroupId":{
+    "name":"audiogroup_default",
+    "path":"audiogroups/audiogroup_default",
+  },
+  "bitDepth":1,
+  "channelFormat":0,
+  "compression":0,
+  "compressionQuality":4,
+  "conversionMode":0,
+  "duration":2.1913152,
+  "exportDir":"",
+  "name":"sfxSwordBeamMax",
+  "parent":{
+    "name":"SwordGun",
+    "path":"folders/SFX/sfxPlayer/SwordGun.yy",
+  },
+  "preload":false,
+  "resourceType":"GMSound",
+  "resourceVersion":"2.0",
+  "sampleRate":44100,
+  "soundFile":"sfxSwordBeamMax.wav",
+  "volume":1.0,
+}

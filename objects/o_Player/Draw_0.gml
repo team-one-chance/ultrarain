@@ -1,5 +1,33 @@
 var _grinder_old_matrix = matrix_get(matrix_world);
 
+// Draw offset red silhouettes behind the assembled pose. An active shader also
+// guards the repeated Draw calls and leaves the lighting extraction pass intact.
+if (pHP > 0 && pHP_max > 0 && pHP <= pHP_max * low_health_outline_threshold
+    && !grinder_dying && shader_current() == -1 && shader_is_compiled(sh_PlayerLowHealth))
+{
+    var _pulse = 0.5 + 0.5 * cos(
+        (current_time / 1000) * 2 * pi / max(0.001, low_health_outline_period)
+    );
+    shader_set(sh_PlayerLowHealth);
+    shader_set_uniform_f(low_health_outline_uniform,
+        lerp(low_health_outline_alpha_min, low_health_outline_alpha_max, _pulse));
+
+    for (var _outline_pass = 0; _outline_pass < 8; _outline_pass++)
+    {
+        var _outline_angle = _outline_pass * 45; // Degrees; eight directions cover the silhouette corners.
+        var _outline_matrix = matrix_build(
+            lengthdir_x(low_health_outline_width, _outline_angle),
+            lengthdir_y(low_health_outline_width, _outline_angle), 0,
+            0, 0, 0, 1, 1, 1
+        );
+        matrix_set(matrix_world, matrix_multiply(_outline_matrix, _grinder_old_matrix));
+        event_perform(ev_draw, 0);
+    }
+
+    matrix_set(matrix_world, _grinder_old_matrix);
+    shader_reset();
+}
+
 if (grinder_dying)
 {
     var _crush = clamp(
@@ -117,14 +145,10 @@ if (weapon_type == "sword")
     {
         _part_facing = sword_swing_facing;
     }
-    else if (sword_combat_facing_timer > 0)
+    else
     {
         _part_facing = aim_facing;
         if (_part_facing == 0) _part_facing = _body_facing;
-    }
-    else if (sprite_index != s_Player_Slide_Right && sprite_index != s_Player_Slide_Left)
-    {
-        _part_facing = _body_facing;
     }
 }
 

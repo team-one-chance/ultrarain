@@ -13,6 +13,13 @@ pHP_max = !variable_global_exists("game_difficulty") ? 150
 pHP = pHP_max;
 dmg_cooldown = 0;
 
+low_health_outline_threshold = 0.20; // Fraction of maximum HP; warn at or below this value.
+low_health_outline_width = 2; // Room pixels around the complete pose; larger values thicken the outline.
+low_health_outline_period = 0.9; // Seconds per pulse; lower values pulse faster.
+low_health_outline_alpha_min = 0.08; // Minimum opacity per silhouette pass; keeps the warning visible between pulses.
+low_health_outline_alpha_max = 0.65; // Maximum opacity per silhouette pass; raises the pulse brightness.
+low_health_outline_uniform = shader_get_uniform(sh_PlayerLowHealth, "u_alpha");
+
 // =====================================
 // SWORD PARRY
 // =====================================
@@ -99,9 +106,9 @@ parry_melee = function(_enemy, _parry_state = ParryState.FULL)
         var _push_side = sign((_enemy.bbox_left + _enemy.bbox_right) - (bbox_left + bbox_right)); // -1 or 1 pushes away from the player; 0 uses parry facing.
         if (_push_side == 0) _push_side = parry_animation_facing;
         var _push_angle = _push_side >= 0 ? 0 : 180; // Degrees; push Scout away from the player's centre.
-        // Match sword knockback while avoiding a second application of the parry damage multiplier.
-        _enemy.take_damage(sword_config.slash_damage * _enemy.parry_damage_multiplier,
-            _push_angle, sword_config.slash_knockback, false);
+        // Apply Scout's parry multiplier once; parry tuning is independent of slash tuning.
+        _enemy.take_damage(sword_config.parry_damage * _enemy.parry_damage_multiplier,
+            _push_angle, sword_config.parry_knockback, false);
         return true;
     }
 
@@ -766,9 +773,6 @@ gun_reticle_flash_timer = 0;
 sword_swing_timer = 0;
 sword_swing_pending_hit = false;
 sword_swing_facing = 1;
-sword_combat_facing_timer = 0;
-sword_combat_facing_duration = 3;
-sword_last_move_facing = 1;
 sword_slash_sound_index = 0;
 
 // Dark Repulsor tuning. Angles are degrees; distances are pixels;
@@ -794,11 +798,8 @@ sword_config = {
     support_hand_down: 6,
     main_hand_up: 3,
 
-    slash_forward: 80, // distance from player to slash hitbox
-    slash_down: 0,
-    slash_scale: 1, // scales slash art and hitbox
-    slash_damage: 10,
-    slash_knockback: 100
+    parry_damage: 10, // Base HP damage for Scout parries, before the enemy's multiplier.
+    parry_knockback: 100 // Force for Scout parries; higher values push harder.
 };
 
 // Primary and alternate fire
