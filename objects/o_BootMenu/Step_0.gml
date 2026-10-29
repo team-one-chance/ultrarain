@@ -1,3 +1,15 @@
+if (boot_state == BootMenuState.CONTROLS && controls_capture != "")
+{
+    var _bind = controls_capture_key();
+    if (_bind == -4) { controls_capture = ""; keyboard_clear(vk_escape); }
+    else if (_bind != 0)
+    {
+        controls_assign(controls_capture, _bind);
+        controls_capture = "";
+        if (_bind > 0) keyboard_clear(_bind); else mouse_clear(-_bind);
+    }
+    exit;
+}
 if (room == LE_MENU) menu_exhibition_hotkey();
 if (!menu_exhibition_active() && keyboard_check(vk_shift)
 && keyboard_check_pressed(ord("Z")))
@@ -29,7 +41,7 @@ state_elapsed += _dt;
 boot_elapsed += _dt;
 exit_flash = max(0, exit_flash - _dt);
 
-if (boot_state >= BootMenuState.MAIN && boot_state <= BootMenuState.CONFIRM_EXIT)
+if (boot_state >= BootMenuState.MAIN && boot_state <= BootMenuState.CONTROLS)
 {
     var _options = boot_menu_options();
     var _option_count = array_length(_options);
@@ -40,7 +52,20 @@ if (boot_state >= BootMenuState.MAIN && boot_state <= BootMenuState.CONFIRM_EXIT
     menu_mouse_x = _mx;
     menu_mouse_y = _my;
     var _hover = -1;
-    if (_mx >= _layout.x && _mx <= _layout.x + _layout.width
+    if (boot_state == BootMenuState.CONTROLS)
+    {
+        var _control_layout = boot_controls_layout(_layout);
+        for (var _i = 0; _i < _option_count; _i++)
+        {
+            var _item = controls_menu_item_layout(_i, _option_count - 4, _control_layout);
+            if (abs(_mx - _item.x) <= _item.width * 0.5 && abs(_my - _item.y) <= _item.height * 0.5)
+            {
+                _hover = _i;
+                break;
+            }
+        }
+    }
+    else if (_mx >= _layout.x && _mx <= _layout.x + _layout.width
     && _my >= _layout.y && _my < _layout.y + _option_count * _layout.row_height)
     {
         _hover = floor((_my - _layout.y) / _layout.row_height);
@@ -49,14 +74,37 @@ if (boot_state >= BootMenuState.MAIN && boot_state <= BootMenuState.CONFIRM_EXIT
     var _previous_selection = menu_selection;
     if (_mouse_moved && _hover >= 0) menu_selection = _hover;
     var _move = keyboard_check_pressed(vk_down) - keyboard_check_pressed(vk_up);
-    if (keyboard_check_pressed(vk_tab)) _move = keyboard_check(vk_shift) ? -1 : 1;
-    menu_selection = (menu_selection + _move + _option_count) mod _option_count;
+    if (keyboard_check_pressed(vk_tab))
+        menu_selection = (menu_selection + (keyboard_check(vk_shift) ? -1 : 1) + _option_count) mod _option_count;
+    else if (boot_state == BootMenuState.CONTROLS)
+    {
+        var _action_count = _option_count - 4;
+        var _horizontal = keyboard_check_pressed(vk_right) - keyboard_check_pressed(vk_left);
+        if (menu_selection < _action_count)
+        {
+            if (_horizontal != 0 && menu_selection + _horizontal >= 0 && menu_selection + _horizontal < _action_count
+                && floor((menu_selection + _horizontal) / 2) == floor(menu_selection / 2)) menu_selection += _horizontal;
+            if (_move > 0) menu_selection = menu_selection + 2 < _action_count ? menu_selection + 2 : _action_count;
+            else if (_move < 0) menu_selection = menu_selection >= 2 ? menu_selection - 2 : _action_count + 3;
+        }
+        else
+        {
+            var _nav = menu_selection - _action_count;
+            if (_horizontal < 0 && _nav == 1) _nav = 0;
+            if (_horizontal > 0 && _nav == 0) _nav = 1;
+            if (_move < 0) menu_selection = _nav < 2 ? _action_count - 1 : _action_count + (_nav == 2 ? 0 : 2);
+            else if (_move > 0) menu_selection = _nav < 2 ? _action_count + 2 : (_nav == 2 ? _action_count + 3 : 0);
+            else menu_selection = _action_count + _nav;
+        }
+    }
+    else menu_selection = (menu_selection + _move + _option_count) mod _option_count;
 
     var _click = mouse_check_button_pressed(mb_left) && _hover >= 0;
     if (_click) menu_selection = _hover;
     if (keyboard_check_pressed(vk_escape))
     {
-        if (boot_state != BootMenuState.MAIN) boot_menu_open(BootMenuState.MAIN);
+        if (boot_state == BootMenuState.CONTROLS) { boot_menu_open(BootMenuState.SETTINGS); menu_selection = 3; }
+        else if (boot_state != BootMenuState.MAIN) boot_menu_open(BootMenuState.MAIN);
     }
     else if (keyboard_check_pressed(vk_enter) || _click)
     {

@@ -44,8 +44,25 @@ function item_controller_init(_pickup)
 {
     item_run_inventory();
 
+    // A retry rebuilds room pickups, while collected controllers persist.
+    // Suppress the rebuilt copy of a pickup already owned in this run.
+    for (var _i = 0; _i < array_length(global.item_controllers); _i++)
+    {
+        var _owned = global.item_controllers[_i];
+        if (instance_exists(_owned) && _owned.object_index == _pickup.object_index
+        && _owned.item_source_room == room && _owned.item_source_x == _pickup.x
+        && _owned.item_source_y == _pickup.y)
+        {
+            instance_destroy(_pickup);
+            return;
+        }
+    }
+
     _pickup.item_collected = false;
     _pickup.item_owner = noone;
+    _pickup.item_source_room = room;
+    _pickup.item_source_x = _pickup.x;
+    _pickup.item_source_y = _pickup.y;
 
     // Uncollected pickups remain in their original room.
     _pickup.persistent = false;
@@ -83,6 +100,9 @@ function item_controller_collect(_pickup, _player)
     _pickup.phy_active = false;
 
     array_push(global.item_controllers, _pickup);
+
+    _player.item_notice_key = _pickup.item_key;
+    _player.item_notice_time = 5; // Seconds the full pickup description remains visible.
 
     return true;
 }
@@ -206,13 +226,17 @@ function item_get_definition(_key)
             return {
                 name: "PI-tastic",
                 icon: object_get_sprite(o_PI_tastic),
+                description: "Coin ricochets round their damage down, then add 1, 2 or 4 damage at levels 1, 2 or 3.",
+                short_description: "Coin ricochets gain damage.",
                 quality: 1
             };
 
         case "coin_anchor":
             return {
-                name: "Pin House",
+                name: "Pinhouse",
                 icon: object_get_sprite(o_pinhouse),
+                description: "Press " + controls_key_name(controls_key("pin")) + " to pin your oldest thrown coin in place. Recharges in 8 seconds.",
+                short_description: controls_key_name(controls_key("pin")) + " pins a coin.",
                 quality: 4
             };
     }
@@ -220,8 +244,48 @@ function item_get_definition(_key)
     return {
         name: _key,
         icon: -1,
+        description: "",
+        short_description: "",
         quality: 1
     };
+}
+
+
+// Draw an uncollected item hovering above its pickup body.
+function item_draw_pickup(_pickup)
+{
+    var _definition = item_get_definition(_pickup.item_key);
+    var _border = make_color_rgb(192, 192, 192);
+    switch (_definition.quality)
+    {
+        case 2: _border = make_color_rgb(70, 220, 90); break;
+        case 3: _border = make_color_rgb(235, 65, 65); break;
+        case 4: _border = make_color_rgb(255, 200, 45); break;
+    }
+
+    var _float_y = _pickup.y - 6 + sin(current_time / 500) * 3;
+    if (shader_is_compiled(sh_ItemOutline))
+    {
+        shader_set(sh_ItemOutline);
+        shader_set_uniform_f(shader_get_uniform(sh_ItemOutline, "u_time"), (current_time mod 60000) / 1000);
+        shader_set_uniform_f(shader_get_uniform(sh_ItemOutline, "u_rainbow"), _definition.quality == 5 ? 1 : 0);
+        shader_set_uniform_f(shader_get_uniform(sh_ItemOutline, "u_q4"), _definition.quality == 4 ? 1 : 0);
+        for (var _ox = -1; _ox <= 1; _ox++)
+        {
+            for (var _oy = -1; _oy <= 1; _oy++)
+            {
+                if (_ox == 0 && _oy == 0) continue;
+                draw_sprite_ext(_pickup.sprite_index, _pickup.image_index,
+                    _pickup.x + _ox * 2, _float_y + _oy * 2,
+                    _pickup.image_xscale, _pickup.image_yscale, _pickup.image_angle,
+                    _border, _pickup.image_alpha);
+            }
+        }
+        shader_reset();
+    }
+    draw_sprite_ext(_pickup.sprite_index, _pickup.image_index, _pickup.x, _float_y,
+        _pickup.image_xscale, _pickup.image_yscale, _pickup.image_angle,
+        _pickup.image_blend, _pickup.image_alpha);
 }
 
 
@@ -272,6 +336,7 @@ function item_draw_hud(_player)
     draw_set_valign(fa_middle);
 
     var _outline_available = shader_is_compiled(sh_ItemOutline);
+    var _hovered = undefined;
 
     for (var _i = 0; _i < _count; _i++)
     {
@@ -302,6 +367,8 @@ function item_draw_hud(_player)
         var _bottom = _top + _size;
         var _cx = (_left + _right) * 0.5;
         var _cy = (_top + _bottom) * 0.5;
+        if (point_in_rectangle(device_mouse_x_to_gui(0), device_mouse_y_to_gui(0),
+            _left, _top, _right, _bottom)) _hovered = _definition;
 
         var _border = make_color_rgb(192, 192, 192);
 
@@ -420,6 +487,35 @@ function item_draw_hud(_player)
 
         draw_set_color(c_white);
         draw_text(_text_x, _text_y, _text);
+    }
+
+    // Show the full description on pickup and a compact reminder on hover.
+    var _notice = undefined;
+    var _notice_text = "";
+    if (is_struct(_hovered))
+    {
+        _notice = _hovered;
+        _notice_text = _notice.short_description;
+    }
+    else if (_player.item_notice_time > 0)
+    {
+        _notice = item_get_definition(_player.item_notice_key);
+        _notice_text = _notice.description;
+    }
+    if (is_struct(_notice))
+    {
+        var _box_width = min(440, _gw - 32);
+        var _box_bottom = _gh - _bottom_margin - _rows * _size - (_rows - 1) * _gap - 8;
+        var _box_height = 68;
+        draw_set_color(c_black);
+        draw_set_alpha(0.85);
+        draw_rectangle((_gw - _box_width) * 0.5, _box_bottom - _box_height,
+            (_gw + _box_width) * 0.5, _box_bottom, false);
+        draw_set_alpha(1);
+        draw_set_color(c_white);
+        draw_set_valign(fa_top);
+        draw_text(_gw * 0.5, _box_bottom - _box_height + 6, _notice.name);
+        draw_text_ext(_gw * 0.5, _box_bottom - _box_height + 24, _notice_text, 16, _box_width - 16);
     }
 
     draw_set_color(_old_color);

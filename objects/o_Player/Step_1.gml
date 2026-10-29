@@ -1,5 +1,6 @@
 item_controllers_update(id);
 parry_breaker_windows = []; // Only a newly accepted press this frame can parry Breaker's steady green/yellow interval.
+item_notice_time = max(0, item_notice_time - (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) / 1000000);
 // Record both bodies before movement and the physics update.
 // Match the physics fixture, independent of animation bounds and facing.
 breaker_body_start_left = phy_position_x + 0.5 - player_collider_half_width;

@@ -29,7 +29,7 @@ if (keyboard_check_pressed(vk_f5))
 }
 
 // Direct shortcuts share the dev menu's exhibition and pause guards above.
-if (keyboard_check_pressed(ord("M")))
+if (controls_key_unassigned(ord("M")) && keyboard_check_pressed(ord("M")))
 {
     if (opened && map_open) resume_game();
     else
@@ -47,8 +47,11 @@ if (keyboard_check_pressed(ord("M")))
     exit;
 }
 // Keep R available for command typing while the demo end terminal is open.
-if (!opened && !(instance_exists(o_DemoTerminal) && o_DemoTerminal.reading)
-&& !keyboard_check(vk_shift) && keyboard_check_pressed(ord("R")))
+if (!opened
+    && controls_key_unassigned(ord("R"))
+    && !(instance_exists(o_DemoTerminal) && o_DemoTerminal.reading)
+    && !keyboard_check(vk_shift)
+    && keyboard_check_pressed(ord("R")))
 {
     cursor_position = [mouse_x, mouse_y];
     run_action(5);

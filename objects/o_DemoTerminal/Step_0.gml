@@ -33,6 +33,7 @@ if (reading)
 
     if (keyboard_check_pressed(vk_escape))
     {
+        keyboard_clear(vk_escape); // Consume close so the pause menu cannot also open.
         if (reader.hacking_controller == id)
         {
             reader.hacking_controller = noone;
@@ -140,7 +141,7 @@ if (instance_exists(_player))
 
     if (player_near
     && _player.hacking_controller == noone
-    && keyboard_check_pressed(ord("E")))
+    && controls_pressed("interact"))
     {
         reader = _player;
         reading = true;

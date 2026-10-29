@@ -82,6 +82,16 @@ for (var b = 0; b < ds_list_size(_blocks); b++)
 
 ds_list_destroy(_blocks);
 
+var _lamps = ds_list_create();
+collision_rectangle_list(bbox_left, bbox_top, bbox_right, bbox_bottom,
+    [o_light_ceil_long, o_light_ceil_long_strong, o_light_ceil_long_ow], false, true, _lamps, false);
+for (var _lamp_i = 0; _lamp_i < ds_list_size(_lamps); _lamp_i++)
+{
+    var _lamp = _lamps[| _lamp_i];
+    if (instance_exists(_lamp) && layer_get_visible(_lamp.layer)) ceiling_light_break(_lamp);
+}
+ds_list_destroy(_lamps);
+
 // =====================================
 // ONE COIN CONTACT CONSUMES ALL FIELD COINS
 // =====================================

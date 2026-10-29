@@ -1,3 +1,7 @@
+// Entering the main menu starts a fresh run, including direct level launches.
+item_controllers_reset();
+if (!variable_global_exists("heal_mouse_combo")) global.heal_mouse_combo = false; // Optional two-button healing input.
+
 // Carry the final white overlay into the tutorial.
 persistent = true;
 depth = 100;
@@ -8,11 +12,14 @@ enum BootMenuState
     DIFFICULTY = 13,
     SETTINGS = 14,
     CREDITS = 15,
-    CONFIRM_EXIT = 16
+    CONFIRM_EXIT = 16,
+    CONTROLS = 17
 }
 
 boot_state = BootMenuState.MAIN;
 menu_selection = 0;
+controls_page = 0;
+controls_capture = ""; // Action awaiting a new binding, or empty.
 exit_flash = 0;
 if (!variable_global_exists("exhibition_exit_locked")) global.exhibition_exit_locked = false;
 menu_mouse_x = device_mouse_x_to_gui(0);
@@ -35,9 +42,20 @@ scroll_timer = 0;
 scroll_interval = 0.1;
 
 console_green = make_color_rgb(90, 235, 130);
+console_blue = make_color_rgb(145, 210, 255);
 console_red = make_color_rgb(255, 55, 65);
+console_purple = make_color_rgb(195, 110, 255);
 console_white = make_color_rgb(215, 225, 220);
 console_dim = make_color_rgb(90, 110, 100);
+console_difficulty = 1;
+
+// Replace these placeholders with the final difficulty descriptions.
+difficulty_descriptions = [
+    "200 health - Slower, less aggressive enemies with more time between attacks. Have some fun.",
+    "150 health - The game's intended difficulty.",
+    "100 health - Faster, more aggressive enemies with less room for error.",
+    "100 health - You will not survive."
+];
 
 boot_add_line = function(_text, _color, _play_sfx = true)
 {
@@ -85,15 +103,26 @@ boot_menu_layout = function()
         text_indent: 39 };
 };
 
+boot_controls_layout = function(_layout)
+{
+    var _scale = min(1.2, _layout.width / 600, max(0.1, (display_get_gui_height() - _layout.y - 100) / 370));
+    return { x: _layout.x + _layout.width * 0.5, row_top: _layout.y, scale: _scale };
+};
+
 boot_menu_options = function()
 {
     switch (boot_state)
     {
         case BootMenuState.MAIN: return ["Start", "Settings", "Credits", "Exit"];
-        case BootMenuState.DIFFICULTY: return ["Easy", "Normal", "Hard", "Back"];
+        case BootMenuState.DIFFICULTY:
+            if (!menu_exhibition_active() && variable_global_exists("dev_futile_unlocked") && global.dev_futile_unlocked)
+                return ["Easy", "Normal", "Hard", "Futile", "Back"];
+            return ["Easy", "Normal", "Hard", "Back"];
         case BootMenuState.SETTINGS:
             return ["Fullscreen: " + (window_get_fullscreen() ? "On" : "Off"),
-                "Pixelization: " + (menu_pixelization_active() ? "On" : "Off"), "Back"];
+                "Pixelization: " + (menu_pixelization_active() ? "On" : "Off"),
+                "Mouse combo heal: " + (global.heal_mouse_combo ? "On" : "Off"), "Controls", "Back"];
+        case BootMenuState.CONTROLS: return controls_menu_options(controls_page, controls_capture);
         case BootMenuState.CREDITS: return ["Back"];
         case BootMenuState.CONFIRM_EXIT: return ["Cancel", "Quit game"];
     }
@@ -119,6 +148,10 @@ boot_menu_open = function(_page)
             boot_add_line("PS C:\\SYSTEM> .\\menu.exe settings", console_white, false);
             boot_add_line("Display settings", console_green, false);
             boot_add_line("F11 also toggles fullscreen", console_dim, false);
+            break;
+        case BootMenuState.CONTROLS:
+            boot_add_line("PS C:\\SYSTEM> .\\controls.exe", console_white, false);
+            boot_add_line("Configure controls", console_green, false);
             break;
         case BootMenuState.CREDITS:
             boot_add_line("PS C:\\SYSTEM> .\\menu.exe credits", console_white, false);
@@ -153,13 +186,30 @@ boot_menu_activate = function()
             }
             break;
         case BootMenuState.DIFFICULTY:
-            if (menu_selection != 3) global.game_difficulty = menu_selection;
-            boot_menu_open(menu_selection == 3 ? BootMenuState.MAIN : 0);
+            var _back = array_length(boot_menu_options()) - 1;
+            if (menu_selection != _back)
+            {
+                global.game_difficulty = menu_selection;
+                console_difficulty = menu_selection;
+            }
+            boot_menu_open(menu_selection == _back ? BootMenuState.MAIN : 0);
             break;
         case BootMenuState.SETTINGS:
             if (menu_selection == 0) window_set_fullscreen(!window_get_fullscreen());
             else if (menu_selection == 1) menu_toggle_pixelization();
+            else if (menu_selection == 2) global.heal_mouse_combo = !global.heal_mouse_combo;
+            else if (menu_selection == 3) { controls_page = 0; boot_menu_open(BootMenuState.CONTROLS); }
             else boot_menu_open(BootMenuState.MAIN);
+            break;
+        case BootMenuState.CONTROLS:
+            var _names = controls_names();
+            var _count = min(8, array_length(_names) - controls_page * 8);
+            var _pages = ceil(array_length(_names) / 8);
+            if (menu_selection < _count) controls_capture = _names[controls_page * 8 + menu_selection];
+            else if (menu_selection == _count) { controls_page = (controls_page + _pages - 1) mod _pages; menu_selection = 0; }
+            else if (menu_selection == _count + 1) { controls_page = (controls_page + 1) mod _pages; menu_selection = 0; }
+            else if (menu_selection == _count + 2) { global.controls_bindings = controls_defaults(); controls_save(); }
+            else { boot_menu_open(BootMenuState.SETTINGS); menu_selection = 3; }
             break;
         case BootMenuState.CREDITS:
             boot_menu_open(BootMenuState.MAIN);

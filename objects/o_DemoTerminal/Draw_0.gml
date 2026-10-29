@@ -4,7 +4,7 @@ if (player_near && !reading)
 {
     var _tx = (bbox_left + bbox_right) * 0.5;
     var _ty = bbox_top - 24;
-    var _prompt = "[E] READ TERMINAL";
+    var _prompt = "[" + controls_key_name(controls_key("interact")) + "] READ TERMINAL";
 
     draw_set_alpha(1);
     draw_set_halign(fa_center);
