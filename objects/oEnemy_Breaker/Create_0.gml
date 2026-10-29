@@ -2,7 +2,7 @@ event_inherited();
 
 // Keep the placed miniboss body and room references; Breaker owns its movement.
 enum BreakerState { CHASE, APPROACH, BASH, COOLDOWN, JUMP_CHARGE, RISE,
-    SLAM_TURN, DIVE, LAND, LAND_RECOVERY, SHIELD_BREAK, STUN }
+    SLAM_TURN, DIVE, LAND, LAND_RECOVERY, SHIELD_BREAK, STUN, GRAB, THROW }
 mask_index = sMiniBoss;
 image_speed = 0;
 // Compare standing bodies; the shield extends above Breaker's head.
@@ -44,6 +44,16 @@ breaker_control_grace_duration = 0.75;
 breaker_stun_budget = 0;
 breaker_stun_elapsed = 0;
 breaker_bash_hit = false;
+breaker_slide_turn_lock = 0; // Seconds remaining before turning after a slide under the body.
+breaker_slide_turn_lock_duration = 0.8; // Seconds; longer gives the sliding player more time behind him.
+breaker_slide_bash_lock = false; // Keep a committed melee facing fixed until it ends.
+breaker_grab_target = noone;
+breaker_grab_stabbed = false;
+breaker_throw_flipped = false;
+breaker_grab_hand = [[64,25], [65,17], [65,17], [65,17], [65,17], [52,26], [58,22], [64,20], [64,22], [64,22], [64,22], [64,22]]; // Cropped sprite pixels, grab frames 2-13.
+breaker_throw_hand = [[68,25], [63,20], [44,6], [44,6], [63,9], [79,27]]; // Cropped sprite pixels, throw frames 2-7.
+breaker_throw_speed = 10; // Physics speed in pixels per game frame; higher throws farther.
+breaker_throw_lift = 5; // Upward physics speed in pixels per game frame.
 breaker_leap_hit = false;
 breaker_intercept = false;
 breaker_landed = false;
@@ -83,6 +93,8 @@ variable_struct_set(breaker_crop_offsets, sprite_get_name(s_Breaker_shieldbash_u
 variable_struct_set(breaker_crop_offsets, sprite_get_name(s_Breaker_block_unshielded), [40, 126]);
 variable_struct_set(breaker_crop_offsets, sprite_get_name(s_Breaker_bashcooldown_unshielded), [27, 130]);
 variable_struct_set(breaker_crop_offsets, sprite_get_name(s_Breaker_idle_unshielded), [42, 128]);
+variable_struct_set(breaker_crop_offsets, sprite_get_name(s_Breaker_grab_unshielded), [34, 126]);
+variable_struct_set(breaker_crop_offsets, sprite_get_name(s_Breaker_throw_unshielded), [30, 123]);
 variable_struct_set(breaker_crop_offsets, sprite_get_name(s_Breaker_jump_unshielded), [45, 104]);
 variable_struct_set(breaker_crop_offsets, sprite_get_name(s_Breaker_jumpcharge_unshielded), [42, 128]);
 variable_struct_set(breaker_crop_offsets, sprite_get_name(s_Breaker_land_unshielded), [5, 74]);
@@ -143,9 +155,10 @@ ground_move_speed = 180;
 // Approximate authored stride, scaled into room pixels.
 breaker_walk_cycle_distance = 144 * breaker_scale;
 normal_attack_approach_speed = ground_move_speed;
-breaker_unshielded_move_multiplier = 1.2;
-breaker_unshielded_damage_multiplier = 1.25;
-breaker_unshielded_cooldown_multiplier = 0.6;
+// Hard mode makes the shield-break phase a sharper escalation.
+breaker_unshielded_move_multiplier = enemy_difficulty >= 2 ? 1.45 : 1.2;
+breaker_unshielded_damage_multiplier = enemy_difficulty >= 2 ? 1.5 : 1.25;
+breaker_unshielded_cooldown_multiplier = enemy_difficulty >= 2 ? 0.45 : 0.6;
 // The narrow core allows overlap with the outside of the visible silhouette.
 breaker_body_core_fraction = 0.36;
 breaker_body_height_fraction = 0.8; // Keep the feet fixed; lower the blocking top.
@@ -155,9 +168,9 @@ maximum_fall_speed = 500;
 vertical_speed = 0;
 ground_check_distance = 1;
 is_grounded = false;
-ehp_max = 500;
+ehp_max = 1000;
 ehp = ehp_max;
-shield_hp_max = ehp_max * 0.5;
+shield_hp_max = ehp_max * (enemy_difficulty == 3 ? 0.5 : 0.25); // Shield health as a fraction of boss health; Futile retains its tuning.
 shield_hp = shield_hp_max;
 shield_bar_width = 28;
 shield_bar_height = 3;
@@ -177,7 +190,7 @@ hit_timer = 0;
 normal_attack_damage = 12;
 normal_attack_range = 36;
 normal_attack_vertical_tolerance = 30;
-var _breaker_wait = enemy_difficulty == 0 ? 1.25 : (enemy_difficulty == 2 ? 0.85 : 1);
+var _breaker_wait = enemy_difficulty == 0 ? 1.75 : (enemy_difficulty == 3 ? 0.6 : (enemy_difficulty == 2 ? 0.85 : 1.4)); // Longer attack intervals on Easy and Normal.
 normal_attack_cooldown_min = 0.6 * _breaker_wait;
 normal_attack_cooldown_max = 0.9 * _breaker_wait;
 normal_attack_cooldown = random_range(normal_attack_cooldown_min, normal_attack_cooldown_max);
@@ -194,9 +207,12 @@ leap_trigger_max_distance = 720;
 leap_vertical_tolerance = 90;
 leap_jump_speed = -560;
 leap_launch_speed = leap_jump_speed;
-leap_max_horizontal_speed = 520;
-leap_fall_gravity_multiplier = 4;
-leap_max_fall_speed = 1200;
+// Higher difficulties cover more ground and accelerate into the slam faster.
+var _leap_travel_scale = enemy_difficulty == 3 ? 1.55 : (enemy_difficulty == 2 ? 1.3 : 1);
+var _slam_speed_scale = enemy_difficulty == 3 ? 1.4 : (enemy_difficulty == 2 ? 1.2 : 1);
+leap_max_horizontal_speed = 520 * _leap_travel_scale;
+leap_fall_gravity_multiplier = 4 * _slam_speed_scale;
+leap_max_fall_speed = 1200 * _slam_speed_scale;
 leap_landing_range = 48;
 leap_landing_height = 20;
 leap_cooldown_min = 5 * _breaker_wait;
@@ -210,7 +226,9 @@ breaker_intercept_max_height = 420;
 breaker_intercept_max_jump_speed = 900;
 breaker_intercept_prediction_time = 0.20;
 breaker_intercept_max_lead = 80;
-breaker_intercept_cooldown_duration = 2 * _breaker_wait;
+// Close-range aerial intercepts are occasional on Futile; distant slams
+// retain their own shorter cooldown to punish players who stay away.
+breaker_intercept_cooldown_duration = enemy_difficulty == 3 ? 9 : 2 * _breaker_wait;
 breaker_intercept_cooldown = 0;
 // Fit the entire turn to the apex instead of hovering for the authored duration.
 breaker_turn_duration = 0.18;
@@ -318,7 +336,11 @@ breaker_set_state = function(_state) {
     breaker_hit_time = 0;
     breaker_hit_elapsed = 0;
     path_end();
-    if (_state == BreakerState.BASH) breaker_bash_hit = false;
+    if (_state == BreakerState.BASH) {
+        breaker_bash_hit = false;
+        breaker_slide_bash_lock = breaker_slide_turn_lock > 0;
+    }
+    else breaker_slide_bash_lock = false;
     if (_state == BreakerState.JUMP_CHARGE) {
         breaker_leap_hit = false;
     }
@@ -357,9 +379,43 @@ breaker_start_entrance_slam = function() {
     image_index = 0;
 };
 breaker_attacking = function() {
-    return breaker_state == BreakerState.BASH || breaker_state == BreakerState.JUMP_CHARGE
+    return breaker_state == BreakerState.GRAB || breaker_state == BreakerState.THROW
+        || breaker_state == BreakerState.BASH || breaker_state == BreakerState.JUMP_CHARGE
         || breaker_airborne_attack() || breaker_state == BreakerState.LAND
         || breaker_state == BreakerState.LAND_RECOVERY;
+};
+// Catch a dash crossing the unshielded core, including during the close stab.
+breaker_try_grab = function(_target, _side) {
+    if (!breaker_unshielded || !instance_exists(_target) || _target.pHP <= 0
+        || _target.grinder_dying || instance_exists(_target.breaker_grab_owner)
+        || breaker_hit_time > 0 || breaker_state == BreakerState.STUN
+        || breaker_state == BreakerState.SHIELD_BREAK
+        || (breaker_attacking() && breaker_state != BreakerState.BASH)) return false;
+    breaker_grab_target = _target;
+    breaker_grab_stabbed = false;
+    breaker_throw_flipped = false;
+    if (_side != 0) facing_direction = _side;
+    _target.breaker_grab_owner = id;
+    // Stop the dash/run animation immediately when the player is caught.
+    _target.sprite_index = s_Player;
+    _target.image_index = 0;
+    _target.image_speed = 0;
+    // The throw crosses the core; discard the previous collision exit side.
+    var _contact_key = string(id);
+    if (variable_struct_exists(_target.breaker_body_sides, _contact_key))
+        variable_struct_remove(_target.breaker_body_sides, _contact_key);
+    _target.dash_active = false;
+    _target.dash_iframe_timer = 0;
+    _target.is_slamming = false;
+    _target.is_sliding = false;
+    _target.is_ledge_climbing = false;
+    _target.is_mantle_lunging = false;
+    _target.damage_knockback_timer = 0;
+    _target.damage_knockback_pending = false;
+    _target.phy_speed_x = 0;
+    _target.phy_speed_y = 0;
+    breaker_set_state(BreakerState.GRAB);
+    return true;
 };
 breaker_airborne_attack = function() {
     return breaker_state == BreakerState.RISE || breaker_state == BreakerState.SLAM_TURN

@@ -9,7 +9,7 @@ if (!instance_exists(o_PauseMenu)) instance_create_depth(0, 0, -15000, o_PauseMe
 // =====================================
 
 pHP_max = !variable_global_exists("game_difficulty") ? 150
-    : (global.game_difficulty == 0 ? 200 : (global.game_difficulty == 2 ? 100 : 150));
+    : (global.game_difficulty == 0 ? 200 : (global.game_difficulty >= 2 ? 100 : 150));
 pHP = pHP_max;
 dmg_cooldown = 0;
 
@@ -24,7 +24,7 @@ parry_timer = 0;
 parry_duration = 0;
 parry_animation_facing = 1;
 
-// Difficulty: 0 = easy, 1 = normal, 2 = hard.
+// Difficulty: 0 = easy, 1 = normal, 2 = hard, 3 = futile.
 parry_get_difficulty = function()
 {
     if (!variable_global_exists("game_difficulty"))
@@ -39,6 +39,7 @@ parry_get_duration = function()
     {
         case 0: return 0.50; // Easy
         case 2: return 0.33; // Hard
+        case 3: return 0.33; // Futile uses Hard's parry rules.
         default: return 0.40; // Normal
     }
 };
@@ -49,6 +50,7 @@ parry_get_heal_fraction = function()
     {
         case 0: return 0.10; // Easy
         case 2: return 0.05; // Hard
+        case 3: return 0.05; // Futile uses Hard's parry rules.
         default: return 0.08; // Normal
     }
 };
@@ -739,6 +741,9 @@ gun_reticle_flash_timer = 0;
 sword_swing_timer = 0;
 sword_swing_pending_hit = false;
 sword_swing_facing = 1;
+sword_combat_facing_timer = 0;
+sword_combat_facing_duration = 3;
+sword_last_move_facing = 1;
 sword_slash_sound_index = 0;
 
 // Dark Repulsor tuning. Angles are degrees; distances are pixels;
@@ -1114,8 +1119,11 @@ begin_grinder_death = function(_gear)
 };
 
 inventory = item_run_inventory();
+item_notice_key = "";
+item_notice_time = 0; // Seconds remaining for the latest pickup description.
 // Begin/End Step snapshots let Breaker's core stop a fast dash crossing in one tick.
 breaker_body_snapshot = [];
+breaker_grab_owner = noone; // Breaker holding this player, or noone when free.
 breaker_body_sides = {};
 
 // Sweep from the torso to the aimed muzzle; do not spawn physics through terrain.

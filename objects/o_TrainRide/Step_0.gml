@@ -1,3 +1,9 @@
+if (instance_exists(boss_door_barrier) && train_boarding_unlocked())
+{
+    instance_destroy(boss_door_barrier);
+    boss_door_barrier = noone;
+}
+
 if (!ride_started)
 {
     var _boarding_player = instance_find(o_Player, 0);

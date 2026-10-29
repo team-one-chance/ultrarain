@@ -7,15 +7,20 @@ last_mouse_x = device_mouse_x_to_gui(0);
 last_mouse_y = device_mouse_y_to_gui(0);
 accent = make_color_rgb(0, 186, 225);
 controller = noone;
+controls_page = 0;
+controls_capture = ""; // Action awaiting a keyboard or mouse binding, or empty.
 if (!variable_global_exists("exhibition_exit_locked")) global.exhibition_exit_locked = false;
+if (!variable_global_exists("heal_mouse_combo")) global.heal_mouse_combo = false; // Optional two-button healing input.
 
 pause_options = function()
 {
     switch (page)
     {
         case 1: return ["Fullscreen: " + (window_get_fullscreen() ? "On" : "Off"),
-            "Pixelization: " + (menu_pixelization_active() ? "On" : "Off"), "Back"];
+            "Pixelization: " + (menu_pixelization_active() ? "On" : "Off"),
+            "Mouse combo heal: " + (global.heal_mouse_combo ? "On" : "Off"), "Controls", "Back"];
         case 2: return ["Back"];
+        case 3: return controls_menu_options(controls_page, controls_capture);
     }
     return ["Resume", "Restart from Checkpoint", "Restart Level", "Settings", "Credits", "Exit to Main Menu"];
 };
@@ -27,7 +32,7 @@ pause_layout = function()
     return { x: display_get_gui_width() * 0.5,
         top: (display_get_gui_height() - _height) * 0.5,
         width: 600 * _scale, height: _height, scale: _scale,
-        row_height: 54 * _scale, row_top: (display_get_gui_height() - _height) * 0.5 + 150 * _scale };
+        row_height: (page == 3 ? 40 : 54) * _scale, row_top: (display_get_gui_height() - _height) * 0.5 + 150 * _scale };
 };
 
 pause_resume = function()
@@ -66,6 +71,8 @@ pause_activate = function()
     {
         if (selected == 0) window_set_fullscreen(!window_get_fullscreen());
         else if (selected == 1) menu_toggle_pixelization();
+        else if (selected == 2) global.heal_mouse_combo = !global.heal_mouse_combo;
+        else if (selected == 3) { page = 3; selected = 0; controls_page = 0; }
         else { page = 0; selected = 3; }
         selection_age = 0;
         return;
@@ -74,6 +81,18 @@ pause_activate = function()
     {
         page = 0;
         selected = 4;
+        selection_age = 0;
+        return;
+    }
+    if (page == 3)
+    {
+        var _names = controls_names();
+        var _count = min(8, array_length(_names) - controls_page * 8);
+        if (selected < _count) controls_capture = _names[controls_page * 8 + selected];
+        else if (selected == _count) { controls_page = (controls_page + ceil(array_length(_names) / 8) - 1) mod ceil(array_length(_names) / 8); selected = 0; }
+        else if (selected == _count + 1) { controls_page = (controls_page + 1) mod ceil(array_length(_names) / 8); selected = 0; }
+        else if (selected == _count + 2) { global.controls_bindings = controls_defaults(); controls_save(); }
+        else { page = 1; selected = 3; }
         selection_age = 0;
         return;
     }
@@ -88,7 +107,8 @@ pause_activate = function()
                 var _checkpoint = instance_find(o_TutorialCheckpoint, 0);
                 global.tutorial_checkpoint_retry = {
                     x: _checkpoint.respawn_x, y: _checkpoint.respawn_y,
-                    cleared: _checkpoint.big_room_cleared, layers: _checkpoint.checkpoint_layers
+                    cleared: _checkpoint.big_room_cleared, layers: _checkpoint.checkpoint_layers,
+                    first_door_open: _checkpoint.checkpoint_first_door_open || _checkpoint.first_door_is_open()
                 };
                 global.demo_travel_state = undefined;
                 with (o_SeamlessTravel)
@@ -103,7 +123,6 @@ pause_activate = function()
                     }
                 }
                 room_persistent = false;
-				item_controllers_reset();
                 room_restart();
             }
             else if (variable_global_exists("menu_checkpoint") && is_struct(global.menu_checkpoint))

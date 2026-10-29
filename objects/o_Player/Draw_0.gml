@@ -117,10 +117,14 @@ if (weapon_type == "sword")
     {
         _part_facing = sword_swing_facing;
     }
-    else
+    else if (sword_combat_facing_timer > 0)
     {
-        _part_facing = is_sliding ? aim_facing : _body_facing;
+        _part_facing = aim_facing;
         if (_part_facing == 0) _part_facing = _body_facing;
+    }
+    else if (sprite_index != s_Player_Slide_Right && sprite_index != s_Player_Slide_Left)
+    {
+        _part_facing = _body_facing;
     }
 }
 

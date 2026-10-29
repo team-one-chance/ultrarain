@@ -35,14 +35,17 @@ with (o_PointLight)
 }
 with (o_light_ceil_long)
 {
+    if (variable_instance_exists(id, "lamp_broken") && lamp_broken) continue;
     _renderer.draw_light_cone(id, _renderer.ceiling_light);
 }
 with (o_light_ceil_long_strong)
 {
+    if (variable_instance_exists(id, "lamp_broken") && lamp_broken) continue;
     _renderer.draw_light_cone(id, _renderer.ceiling_light_strong);
 }
 with (o_light_ceil_long_ow)
 {
+    if (variable_instance_exists(id, "lamp_broken") && lamp_broken) continue;
     var _brightness = image_index < 1 ? _renderer.ceiling_flicker.dim_multiplier : 1;
     _renderer.draw_light_cone(id, _renderer.ceiling_light, _brightness);
 }
@@ -181,10 +184,11 @@ if (bloom_enabled && (bloom_strength > 0 || scout_bloom_strength > 0 || player_b
         // Bloom comes from glowing sources, never from the wide illumination cones.
         gpu_set_blendmode(bm_add);
         with (o_light_ceil_long)
-            _renderer.draw_lamp_bloom(id, _renderer.ceiling_light);
+            if (!variable_instance_exists(id, "lamp_broken") || !lamp_broken) _renderer.draw_lamp_bloom(id, _renderer.ceiling_light);
         with (o_light_ceil_long_strong)
-            _renderer.draw_lamp_bloom(id, _renderer.ceiling_light_strong);
+            if (!variable_instance_exists(id, "lamp_broken") || !lamp_broken) _renderer.draw_lamp_bloom(id, _renderer.ceiling_light_strong);
         with (o_light_ceil_long_ow)
+        if (!variable_instance_exists(id, "lamp_broken") || !lamp_broken)
             _renderer.draw_lamp_bloom(id, _renderer.ceiling_light,
                 image_index < 1 ? _renderer.ceiling_flicker.dim_multiplier : 1);
         with (o_DoorController)
@@ -436,6 +440,19 @@ if (bloom_enabled && (bloom_strength > 0 || scout_bloom_strength > 0 || player_b
         gpu_set_blendmode(bm_normal);
         gpu_set_texfilter(_old_filter);
     }
+}
+// Pickups retain their original colours and outline after world lighting.
+// Draw after bloom so they do not feed the glow buffers or illuminate the room.
+gpu_set_blendmode(bm_normal);
+draw_set_color(c_white);
+draw_set_alpha(1);
+with (o_pinhouse)
+{
+    if (visible && layer_get_visible(layer) && !item_collected) item_draw_pickup(id);
+}
+with (o_PI_tastic)
+{
+    if (visible && layer_get_visible(layer) && !item_collected) item_draw_pickup(id);
 }
 // Final world pass runs after bloom and before Draw GUI, keeping the HUD sharp.
 if (pixelation_enabled && pixelation_size > 1 && surface_exists(application_surface)

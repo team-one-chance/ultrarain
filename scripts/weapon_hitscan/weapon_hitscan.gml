@@ -1,3 +1,14 @@
+// A broken lamp remains as a dark fixture but emits no light or bloom.
+function ceiling_light_break(_lamp)
+{
+    if (!instance_exists(_lamp)) return;
+    if (variable_instance_exists(_lamp, "lamp_broken") && _lamp.lamp_broken) return;
+    _lamp.lamp_broken = true;
+    _lamp.image_speed = 0;
+    _lamp.image_index = 0;
+    _lamp.image_blend = make_color_rgb(55, 55, 55);
+}
+
 function weapon_hitscan(_damage, _range, _piercing)
 {
     // =====================================
@@ -64,6 +75,7 @@ function weapon_hitscan(_damage, _range, _piercing)
                 o_SecurityCamera,
                 o_Door_Breakable,
                 o_Chute_Breakable,
+				o_light_ceil_long, o_light_ceil_long_strong, o_light_ceil_long_ow,
 				o_Door_UNB
             ],
             false,
@@ -79,6 +91,11 @@ function weapon_hitscan(_damage, _range, _piercing)
         for (var i = 0; i < ds_list_size(point_hits); i++)
         {
             var inst = point_hits[| i];
+
+            var _lamp = instance_exists(inst) && (inst.object_index == o_light_ceil_long
+                || inst.object_index == o_light_ceil_long_strong || inst.object_index == o_light_ceil_long_ow);
+            if (_lamp && ((variable_instance_exists(inst, "lamp_broken") && inst.lamp_broken)
+                || !layer_get_visible(inst.layer))) continue;
 
             // Broken doors no longer stop shots.
             if (instance_exists(inst)
@@ -171,6 +188,8 @@ if (instance_exists(inst)
             {
                 inst.camera_break();
             }
+
+            if (_lamp) ceiling_light_break(inst);
 
             // =================================
             // BREAKABLE DOORS AND CHUTES

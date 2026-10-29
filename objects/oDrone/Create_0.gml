@@ -56,7 +56,7 @@ drone_shot_range = 900;
 drone_attack_distance = 420;
 
 // Personal recovery and spacing between drones' turns.
-var _drone_wait = enemy_difficulty == 0 ? 1.3 : (enemy_difficulty == 2 ? 0.8 : 1);
+var _drone_wait = enemy_difficulty == 0 ? 1.3 : (enemy_difficulty == 3 ? 0.55 : (enemy_difficulty == 2 ? 0.8 : 1));
 drone_recovery_min = 1.2 * _drone_wait;
 drone_recovery_max = 2.0 * _drone_wait;
 drone_attack_cooldown = random_range(0.3, 1.0);

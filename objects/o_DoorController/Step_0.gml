@@ -18,7 +18,7 @@ if (instance_exists(_player))
 
 // First E breaks the controller.
 // Second E starts the wire puzzle.
-if (player_near && keyboard_check_pressed(ord("E")))
+if (player_near && controls_pressed("interact"))
 {
     if (controller_state == 0)
     {
@@ -95,7 +95,7 @@ if (instance_exists(_player))
 
 
 // Interact with the controller.
-if (player_near && keyboard_check_pressed(ord("E")))
+if (player_near && controls_pressed("interact"))
 {
     if (controller_state == 0)
     {

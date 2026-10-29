@@ -391,7 +391,7 @@ menu_actions = function()
         case 2: return [12, 5, 6, 7, 8, 9, 99];
         case 3: return [20, 25, 21, 22, 26, 23, 24, 99];
         case 4: return [30, 31, 34, 33, 36, 35, 32, 99];
-        case 5: return [0, 99];
+        case 5: return [0, 13, 99];
     }
     return [101, 102, 103, 104, 105, 10];
 };
@@ -418,6 +418,7 @@ menu_label = function(_action)
         case 9: return "Restart room";
         case 10: return "Close menu";
         case 12: return "Open level map / click to teleport [M]";
+        case 13: return "Reveal Futile in main menu: " + ((variable_global_exists("dev_futile_unlocked") && global.dev_futile_unlocked) ? "ON" : "OFF");
 		case 11: return "Freecam [F6]: " + (global.dev_freecam ? "ON" : "OFF");
         case 20: return "Spawn scout at captured cursor";
         case 21: return "Spawn drone at captured cursor";
@@ -469,6 +470,11 @@ run_action = function(_action)
     if (_action >= 101 && _action <= 105) { page = _action - 100; selected = 0; return; }
     if (_action == 99) { page = 0; selected = 0; return; }
     if (_action == 0) { global.dev_collisions = !global.dev_collisions; return; }
+    if (_action == 13)
+    {
+        global.dev_futile_unlocked = !(variable_global_exists("dev_futile_unlocked") && global.dev_futile_unlocked);
+        return;
+    }
     if (_action == 1) { global.dev_invincible = !global.dev_invincible; return; }
     if (_action == 23) { global.dev_freeze_enemies = !global.dev_freeze_enemies; return; }
     if (_action == 30) { time_paused = !time_paused; return; }

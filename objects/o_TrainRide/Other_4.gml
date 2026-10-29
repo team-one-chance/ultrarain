@@ -1,6 +1,14 @@
 // Bind the boarding lock after all room instances exist, before any Step input.
 train_find_entrance();
 
+// Extend the existing overhead player boundary down across the entrance until
+// Breaker and his queued spawn are gone. Enemies are unaffected by this fixture.
+if (!train_boarding_unlocked())
+{
+    boss_door_barrier = instance_create_depth(train_left - 4, train_floor - 64,
+        depth, o_PlayerBarrier, { image_yscale: 2 });
+}
+
 // These objects are authored at the destination, but the scenery starts
 // one journey away. Capture only fixtures belonging to that station.
 if (array_length(station_lights) == 0)
