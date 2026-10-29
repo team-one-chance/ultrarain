@@ -10,9 +10,7 @@ if (vent_skip_alpha > 0)
 else
 {
     var _player = instance_find(o_Player, 0);
-    if (instance_exists(_player) && _player.pHP > 0 && !_player.grinder_dying
-        && _player.is_sliding && _player.x >= 1450 && _player.x <= 2000
-        && _player.y >= 2592 && _player.y <= 2632 && _player.hacking_controller == noone)
+    if (vent_skip_available(_player))
     {
         draw_set_alpha(1);
         draw_set_color(c_white);

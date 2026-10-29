@@ -384,12 +384,13 @@ breaker_attacking = function() {
         || breaker_airborne_attack() || breaker_state == BreakerState.LAND
         || breaker_state == BreakerState.LAND_RECOVERY;
 };
-// Catch a dash crossing the unshielded core; active attacks retain priority.
+// Catch a dash crossing the unshielded core, including during the close stab.
 breaker_try_grab = function(_target, _side) {
     if (!breaker_unshielded || !instance_exists(_target) || _target.pHP <= 0
         || _target.grinder_dying || instance_exists(_target.breaker_grab_owner)
         || breaker_hit_time > 0 || breaker_state == BreakerState.STUN
-        || breaker_state == BreakerState.SHIELD_BREAK || breaker_attacking()) return false;
+        || breaker_state == BreakerState.SHIELD_BREAK
+        || (breaker_attacking() && breaker_state != BreakerState.BASH)) return false;
     breaker_grab_target = _target;
     breaker_grab_stabbed = false;
     breaker_throw_flipped = false;

@@ -71,8 +71,13 @@ for (var _i = 0; _i < array_length(breaker_body_snapshot); _i++) {
     // Air dashes use their iframe timer rather than dash_active. Sweep their
     // movement too, including the height at which the core is entered.
     var _grab_side = sign(_previous_separation);
-    var _grab_travel = (_previous_separation - _separation) * _grab_side;
     var _grab_air_dash = !dash_iframe_is_ground && dash_iframe_timer > 0;
+    var _grab_direction = dash_active ? dash_direction : sign(phy_speed_x);
+    if (_grab_side == 0) _grab_side = -_grab_direction;
+    var _grab_travel = (_previous_separation - _separation) * _grab_side;
+    // Already against the core: use the dash direction even before physics moves.
+    var _grab_inside = abs(_previous_separation) <= _limit
+        && _grab_direction == -_grab_side;
     var _grab_entry = _grab_travel > 0
         ? clamp((_previous_separation * _grab_side - _limit) / _grab_travel, 0, 1) : 0;
     var _grab_vertical_overlap = lerp(breaker_body_start_bottom, _player_bottom, _grab_entry)
@@ -81,7 +86,8 @@ for (var _i = 0; _i < array_length(breaker_body_snapshot); _i++) {
         <= lerp(_record.bottom, _boss.bbox_bottom, _grab_entry);
     if ((dash_active || _grab_air_dash) && _boss.breaker_unshielded
         && !(variable_global_exists("dev_freeze_enemies") && global.dev_freeze_enemies)
-        && _grab_side != 0 && _grab_travel > 0 && _separation * _grab_side <= _limit
+        && _grab_side != 0 && (_grab_inside
+            || (_grab_travel > 0 && _separation * _grab_side <= _limit))
         && _grab_vertical_overlap
         && _boss.breaker_try_grab(id, _grab_side)) exit;
     // Sweep the relative bodies on both axes before horizontal separation.

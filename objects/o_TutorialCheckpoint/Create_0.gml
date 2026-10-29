@@ -12,6 +12,16 @@ vent_skip_alpha = 0; // Black overlay opacity, from 0 to 1.
 vent_skip_fade_seconds = 0.4; // Seconds per fade; larger values slow the transition.
 vent_skip_hold_x = 0;
 vent_skip_hold_y = 0;
+vent_skip_used = false; // A completed skip cannot be triggered again in this room.
+vent_skip_start_x = 1024; // Room pixels: start of the vent passage.
+vent_skip_end_x = 6171; // Room pixels: Breaker chute at the end of the passage.
+vent_skip_available = function(_player)
+{
+    return instance_exists(_player) && _player.pHP > 0 && !_player.grinder_dying
+        && !vent_skip_used && _player.is_sliding
+        && _player.x >= vent_skip_start_x && _player.x <= vent_skip_end_x
+        && _player.y >= 2592 && _player.y <= 2632 && _player.hacking_controller == noone;
+};
 
 first_door_is_open = function()
 {

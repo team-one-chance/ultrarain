@@ -5,6 +5,11 @@ if (!opened)
     || instance_exists(o_BootMenu) || instance_exists(oGameOver)) exit;
     var _player = instance_find(o_Player, 0);
     if (!instance_exists(_player) || _player.pHP <= 0 || _player.grinder_dying) exit;
+    // Begin Step runs before the terminal's Step, which consumes Escape to close.
+    // Let the active terminal handle it before the pause menu freezes the world.
+    var _interaction = _player.hacking_controller;
+    if (instance_exists(_interaction) && _interaction.object_index == o_DemoTerminal
+        && _interaction.reading) exit;
     controller = instance_find(o_DevMenu, 0);
     if (!instance_exists(controller) || controller.opened) exit;
     opened = true;

@@ -21,11 +21,8 @@ if (!instance_exists(_player) || _player.pHP <= 0 || _player.grinder_dying)
 }
 if (variable_global_exists("dev_freecam") && global.dev_freecam) exit;
 
-// The optional skip starts after the medkit and entry reveal triggers, and
-// ends before the Breaker chute so its normal break/ambush sequence still runs.
-var _vent_skip_available = _player.is_sliding && _player.x >= 1450 && _player.x <= 2000
-    && _player.y >= 2592 && _player.y <= 2632 && _player.hacking_controller == noone;
-if (vent_skip_state == 0 && _vent_skip_available && controls_pressed("interact"))
+// The skip is available throughout the passage and stops before the chute.
+if (vent_skip_state == 0 && vent_skip_available(_player) && controls_pressed("interact"))
 {
     vent_skip_state = 1;
     vent_skip_hold_x = _player.phy_position_x;
@@ -45,12 +42,31 @@ if (vent_skip_state != 0)
         vent_skip_alpha = min(1, vent_skip_alpha + _skip_dt / vent_skip_fade_seconds);
         if (vent_skip_alpha >= 1)
         {
-            var _destination_x = 6080; // Room pixels: inside the passage before the chute.
+            var _destination_x = max(6080, vent_skip_hold_x); // Never move a player near the exit backwards.
             var _destination_y = 2623; // Feet one pixel above the vent floor.
             // Do not move the player if a future room edit blocks the short collider.
             if (collision_rectangle(_destination_x - 29, _destination_y - 27,
                 _destination_x + 30, _destination_y - 1, o_Block, false, true) == noone)
             {
+                // Apply the passage's reveal triggers skipped by the teleport.
+                var _skip_start_x = vent_skip_hold_x;
+                with (o_Reveal)
+                {
+                    if (x < _skip_start_x || x > _destination_x
+                        || y + reveal_trigger_height * 0.5 < _destination_y - 27
+                        || y - reveal_trigger_height * 0.5 > _destination_y) continue;
+                    var _layer = layer_get_id(layer_to_hide);
+                    if (_layer != -1) { layer_set_visible(_layer, false); layer_hidden = true; }
+                }
+                with (o_Show)
+                {
+                    if (x < _skip_start_x || x > _destination_x
+                        || y + reveal_trigger_height * 0.5 < _destination_y - 27
+                        || y - reveal_trigger_height * 0.5 > _destination_y) continue;
+                    var _layer = layer_get_id(layer_to_hide);
+                    if (_layer != -1) { layer_set_visible(_layer, true); layer_hidden = false; }
+                }
+                vent_skip_used = true;
                 vent_skip_hold_x = _destination_x;
                 vent_skip_hold_y = _destination_y;
                 _player.player_set_collider(true);
