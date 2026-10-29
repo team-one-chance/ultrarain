@@ -5,6 +5,28 @@
 // Direct room launches default to Normal. Children tune their own idle delays.
 enemy_difficulty = variable_global_exists("game_difficulty") ? global.game_difficulty : 1;
 
+// Shared by full-size and miniature Scouts so Futile pressure stays consistent.
+scout_apply_futile_pressure = function()
+{
+    if (enemy_difficulty != 3) return;
+    ground_move_speed = 390; // Pixels/second; outruns the player's base run.
+    climb_speed = 225; // Pixels/second; reach elevated players sooner.
+    attack_cooldown_min = 0.65; // Seconds chasing between rolls.
+    attack_cooldown_max = 1.25; // Seconds; keep the next roll unpredictable.
+    attack_cooldown = random_range(attack_cooldown_min, attack_cooldown_max);
+    attack_dash_speed = 720; // Pixels/second; roll movement still checks the route.
+    scout_roll_range = 384; // Room pixels; threaten a retreat earlier.
+    scout_charge_playback_rate = 2.4; // Faster anticipation with all frames retained.
+    scout_charge_rate_variation_min = 0.8; // Vary windup timing between attacks.
+    scout_charge_rate_variation_max = 1.2;
+    scout_melee_enter_playback_rate = 2.1; // Faster close-range bite preparation.
+    scout_stop_playback_rate = 1.6; // Recover sooner after a hit or missed roll.
+    scout_roll_prediction_time = 0.35; // Seconds of player movement to anticipate.
+    scout_roll_prediction_limit = 120; // Room pixels; cap the predicted destination.
+    scout_group_roll_delay_min = 0.16; // Seconds between nearby pack windups.
+    scout_group_roll_delay_max = 0.32; // Overlapping rolls still arrive in a stagger.
+};
+
 var cell_size = 16;
 
 nav_grid = mp_grid_create(

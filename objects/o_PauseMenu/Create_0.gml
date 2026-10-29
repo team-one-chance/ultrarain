@@ -108,7 +108,9 @@ pause_activate = function()
                 global.tutorial_checkpoint_retry = {
                     x: _checkpoint.respawn_x, y: _checkpoint.respawn_y,
                     cleared: _checkpoint.big_room_cleared, layers: _checkpoint.checkpoint_layers,
-                    first_door_open: _checkpoint.checkpoint_first_door_open || _checkpoint.first_door_is_open()
+                    first_door_open: _checkpoint.checkpoint_first_door_open || _checkpoint.first_door_is_open(),
+                    medkit_owned: _checkpoint.checkpoint_medkit_owned,
+                    syringe_count: _checkpoint.checkpoint_syringe_count, syringe_max: _checkpoint.checkpoint_syringe_max
                 };
                 global.demo_travel_state = undefined;
                 with (o_SeamlessTravel)

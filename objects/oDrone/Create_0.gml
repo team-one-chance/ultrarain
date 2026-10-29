@@ -63,6 +63,22 @@ drone_attack_cooldown = random_range(0.3, 1.0);
 
 drone_turn_gap = 0.25;
 drone_turn_wait = 0;
+drone_attack_slots = 1; // Maximum drones charging or firing together in this room.
+drone_launch_gap = 0; // Seconds between new windups; zero preserves normal turn-taking.
+
+if (enemy_difficulty == 3)
+{
+    drone_attack_slots = 2; // Overlap two volleys to pressure dodges from different angles.
+    drone_launch_gap = 0.16; // Seconds; stagger the two aiming warnings.
+    drone_charge_duration = 0.55; // Seconds of visible warning before the first shot.
+    drone_aim_lock_duration = 0.14; // Seconds of frozen aim before each shot; dodge window.
+    drone_aim_turn_speed = 220; // Degrees/second; keep up with fast lateral movement.
+    drone_burst_count = 4; // Shots per volley; each later shot tracks then locks again.
+    drone_shot_interval = 0.28; // Seconds between shots, longer than the aim-lock window.
+    drone_recovery_min = 0.35; // Seconds before this drone can begin another volley.
+    drone_recovery_max = 0.65;
+    drone_turn_gap = 0.10; // Seconds before another ready drone can take a vacant slot.
+}
 
 drone_separation_radius = 64;
 drone_separation_speed = 120;

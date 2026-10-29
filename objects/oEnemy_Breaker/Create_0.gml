@@ -236,6 +236,21 @@ breaker_land_lead = 0.08;
 // Shared impact-to-chase timing; both phases play every frame within this budget.
 breaker_land_duration = 0.30;
 breaker_land_recovery_duration = 0.25;
+breaker_recovery_playback_rate = 1; // Animation multiplier for bash recovery and block reactions.
+
+if (enemy_difficulty == 3)
+{
+    ground_move_speed = 300; // Pixels/second; walking away no longer opens a safe gap.
+    normal_attack_approach_speed = 360; // Pixels/second during the committed melee approach.
+    normal_attack_cooldown_min = 0.15; // Seconds before another melee approach can start.
+    normal_attack_cooldown_max = 0.30;
+    normal_attack_cooldown = random_range(normal_attack_cooldown_min, normal_attack_cooldown_max);
+    breaker_bash_windup = 0.16; // Seconds of anticipation; keep active hit frames unchanged.
+    breaker_jump_charge_duration = 0.45; // Seconds of visible preparation before jumping.
+    breaker_land_duration = 0.22; // Seconds for landing animation after impact.
+    breaker_land_recovery_duration = 0.18; // Seconds until pursuit resumes after landing.
+    breaker_recovery_playback_rate = 1.6; // Shorter reactions and recovery in both phases.
+}
 slam_knockback_multiplier = 0.35;
 slam_knockback_duration = 0.16;
 slam_stun_duration = 0.2;
@@ -314,6 +329,9 @@ breaker_fps = function(_sprite) {
         _fps *= game_get_speed(gamespeed_fps);
     if (_sprite == s_Breaker_bashcooldown_unshielded)
         _fps /= breaker_unshielded_cooldown_multiplier;
+    if (_sprite == s_Breaker_bashcooldown || _sprite == s_Breaker_bashcooldown_unshielded
+        || _sprite == s_Breaker_block || _sprite == s_Breaker_block_unshielded)
+        _fps *= breaker_recovery_playback_rate;
     return max(0.001, _fps);
 };
 breaker_duration = function(_sprite) {

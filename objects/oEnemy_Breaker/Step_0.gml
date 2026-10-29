@@ -130,8 +130,9 @@ if (!_stunned && !_stagger) switch (breaker_state) {
             breaker_set_state(BreakerState.JUMP_CHARGE);
         }
         else if (_distance <= stand_range && _bash_vertical_range) {
-            // Stationary waiting replaces the old cooldown shuffle.
             if (normal_attack_cooldown <= 0) breaker_set_state(BreakerState.APPROACH);
+            else if (enemy_difficulty == 3 && _distance > normal_attack_range)
+                breaker_move_x(facing_direction * ground_move_speed * dt, true);
         }
         else breaker_move_x(facing_direction * ground_move_speed * dt, true);
         break;
