@@ -822,6 +822,7 @@ if (_slide_check_direction != 0)
 // Start only while grounded and with space ahead.
 if (!is_sliding
 && !is_ledge_climbing
+&& !parry_is_active()
 && slide_held
 && on_ground
 && move != 0
@@ -2234,6 +2235,16 @@ if (!_basher_ui_mouse && !_syringe_combo
 {
     parry_duration = parry_get_duration();
     parry_timer = parry_duration;
+    parry_breaker_windows = breaker_body_snapshot; // Capture only on a new accepted press, never while holding an early parry.
+
+    // Starting a parry cancels a slide and removes its horizontal momentum.
+    if (is_sliding)
+    {
+        is_sliding = false;
+        slide_direction = 0;
+        slide_exit_timer = 0;
+        phy_speed_x = 0;
+    }
 
     // A successful parry clears this cooldown.
     parry_cooldown = parry_miss_cooldown;

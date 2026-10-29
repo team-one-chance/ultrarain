@@ -63,6 +63,21 @@ with (o_DemoTerminal)
         (bbox_top + bbox_bottom) * 0.5, _renderer.terminal_radius,
         _renderer.demo_terminal_color, _renderer.terminal_strength);
 }
+// Pickups illuminate their surroundings only while their visible instance exists.
+with (o_pinhouse)
+{
+    if (!visible || image_alpha <= 0 || !layer_get_visible(layer)) continue;
+    _renderer.draw_soft_light((bbox_left + bbox_right) * 0.5,
+        (bbox_top + bbox_bottom) * 0.5, _renderer.pickup_light_radius,
+        _renderer.pickup_light_color, _renderer.pickup_light_strength * image_alpha);
+}
+with (o_MedkitPickup)
+{
+    if (!visible || image_alpha <= 0 || !layer_get_visible(layer)) continue;
+    _renderer.draw_soft_light((bbox_left + bbox_right) * 0.5,
+        (bbox_top + bbox_bottom) * 0.5, _renderer.pickup_light_radius,
+        _renderer.pickup_light_color, _renderer.pickup_light_strength * image_alpha);
+}
 with (o_Block_wires)
 {
     if (!layer_get_visible(layer)) continue;
@@ -91,8 +106,8 @@ with (oEnemy_Breaker)
     if (!breaker_eyes_awake || is_undefined(breaker_eye_light)
         || !visible || image_alpha <= 0 || !layer_get_visible(layer)) continue;
     var _eye = breaker_eye_light;
-    _renderer.draw_soft_light(_eye.x, _eye.y, breaker_eye_halo_radius * _eye.scale,
-        breaker_eye_color, breaker_eye_light_strength * image_alpha);
+    _renderer.draw_soft_light(_eye.x, _eye.y, breaker_eye_halo_radius * _eye.scale * breaker_eye_glow_scale,
+        breaker_eye_color, breaker_eye_light_strength * breaker_eye_glow_gain * image_alpha);
 }
 surface_reset_target();
 matrix_set(matrix_world, _world);
@@ -108,10 +123,19 @@ with (o_HitscanVisual)
 {
     if (emissive) draw_emissive_streak();
 }
-// Keep the red visor bright after ambient dimming, including during transition.
+// Keep eye warnings and the visor emissive after ambient dimming.
 with (oEnemy_Breaker)
 {
     breaker_draw_eye_glow();
+}
+// Keep the pickup outlines visible after dark rooms apply ambient lighting.
+with (o_pinhouse)
+{
+    if (visible && image_alpha > 0 && layer_get_visible(layer)) item_draw_pickup_outline();
+}
+with (o_MedkitPickup)
+{
+    if (visible && image_alpha > 0 && layer_get_visible(layer)) item_draw_pickup_outline();
 }
 // Extract bright scene pixels, blur horizontally and vertically, then add the glow.
 if (bloom_enabled && (bloom_strength > 0 || scout_bloom_strength > 0 || player_bloom_strength > 0 || lava_bloom_strength > 0)

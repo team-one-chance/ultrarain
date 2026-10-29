@@ -21,8 +21,11 @@ breaker_footstep_index = -1;
 breaker_unshielded = false;
 breaker_eyes_awake = false;
 breaker_eye_light = undefined;
-breaker_eye_color = make_color_rgb(255, 18, 24);
-breaker_eye_halo_radius = 24;
+breaker_eye_color = breaker_attack_settings().eye_idle_color; // Current glow color, shared with deferred lighting.
+breaker_eye_halo_radius = breaker_attack_settings().eye_halo_radius; // Sprite pixels; shared outer halo and room-light radius.
+breaker_eye_core_halo_radius = breaker_attack_settings().eye_core_halo_radius; // Sprite pixels; shared inner halo radius.
+breaker_eye_glow_scale = 1; // Current halo-radius multiplier; boosted during either melee parry window.
+breaker_eye_glow_gain = 1; // Current halo-brightness multiplier; shared by eye drawing and room lighting.
 breaker_eye_light_strength = 0.85;
 breaker_eye_blink_start = 0.37;
 breaker_eye_blink_slow_interval = 0.24;
@@ -37,6 +40,11 @@ breaker_shield_flash_axis_uniform = shader_get_uniform(sh_BreakerShieldFlash, "u
 breaker_shield_flash_radius_uniform = shader_get_uniform(sh_BreakerShieldFlash, "u_shield_radius");
 breaker_shield_flash_amount_uniform = shader_get_uniform(sh_BreakerShieldFlash, "u_flash");
 breaker_body_flash_uniform = shader_get_uniform(sh_BreakerShieldFlash, "u_whole_body");
+breaker_eye_axis_uniform = shader_get_uniform(sh_BreakerShieldFlash, "u_eye_axis");
+breaker_eye_color_uniform = shader_get_uniform(sh_BreakerShieldFlash, "u_eye_color");
+breaker_eye_radius_uniform = shader_get_uniform(sh_BreakerShieldFlash, "u_eye_radius");
+breaker_eye_active_uniform = shader_get_uniform(sh_BreakerShieldFlash, "u_eye_active");
+breaker_eye_only_uniform = shader_get_uniform(sh_BreakerShieldFlash, "u_eye_only");
 breaker_beam_knockback_distance = 0;
 breaker_beam_knockback_time = 0;
 breaker_control_grace = 0;
@@ -44,6 +52,7 @@ breaker_control_grace_duration = 0.75;
 breaker_stun_budget = 0;
 breaker_stun_elapsed = 0;
 breaker_bash_hit = false;
+breaker_bash_serial = 0; // Attack counter; a parry press can only apply to the shield bash visible when pressed.
 breaker_leap_hit = false;
 breaker_intercept = false;
 breaker_landed = false;
@@ -106,6 +115,13 @@ variable_struct_set(breaker_foot_offsets, sprite_get_name(s_Breaker_landrecovery
 
 // Eye axes sampled from the visible visor pixels of each cropped frame.
 breaker_eye_axes = {};
+// Shielded attack visor positions in cropped sprite pixels; sampled from each frame.
+variable_struct_set(breaker_eye_axes, sprite_get_name(s_Breaker_jumpcharge), [[35.5, 20.5, 38.5, 20.5], [38.5, 25.5, 41.5, 25.5], [39.5, 28.5, 42.5, 28.5], [40.5, 31.5, 43.5, 31.5], [41.5, 34.5, 44.5, 34.5], [42.5, 36.5, 45.5, 36.5], [42.5, 36.5, 45.5, 36.5], [42.5, 36.5, 45.5, 36.5], [42.5, 36.5, 45.5, 36.5], [42.5, 36.5, 45.5, 36.5], [42.5, 36.5, 45.5, 36.5], [42.5, 36.5, 45.5, 36.5], [42.5, 36.5, 45.5, 36.5], [42.5, 36.5, 45.5, 36.5], [44.5, 40.5, 46.5, 40.5]]);
+variable_struct_set(breaker_eye_axes, sprite_get_name(s_Breaker_jump), [[47.5, 72.5, 49.5, 72.5], [44.5, 54.5, 47.5, 54.5], [43.5, 36.5, 43.5, 39.5], [43.5, 36.5, 43.5, 39.5], [43.5, 36.5, 43.5, 39.5], [42.5, 38.5, 45.5, 38.5], [43.5, 38.5, 46.5, 38.5]]);
+variable_struct_set(breaker_eye_axes, sprite_get_name(s_Breaker_slam_trans), [[43.5, 38.5, 46.5, 38.5], [45.5, 39.5, 48.5, 39.5], [48.5, 42.5, 51.5, 42.5], [50.5, 43.5, 53.5, 43.5], [52.5, 45.5, 55.5, 45.5], [55.5, 46.5, 55.5, 49.5], [55.5, 49.5, 58.5, 50.5]]);
+variable_struct_set(breaker_eye_axes, sprite_get_name(s_Breaker_slam), [[56.5, 40.5, 59.5, 41.5]]);
+variable_struct_set(breaker_eye_axes, sprite_get_name(s_Breaker_land), [[56.5, 40.5, 59.5, 41.5], [56.5, 40.5, 59.5, 41.5], [56.5, 40.5, 59.5, 41.5], [56.5, 40.5, 59.5, 41.5], [56.5, 49.5, 58.5, 49.5], [56.5, 40.5, 59.5, 41.5]]);
+variable_struct_set(breaker_eye_axes, sprite_get_name(s_Breaker_shieldbash), [[36.5, 20.5, 39.5, 20.5], [36.5, 24.5, 39.5, 24.5], [36.5, 24.5, 39.5, 24.5], [36.5, 24.5, 39.5, 24.5], [36.5, 24.5, 39.5, 24.5], [36.5, 24.5, 39.5, 24.5], [50.5, 24.5, 53.5, 24.5], [64.5, 24.5, 67.5, 24.5], [65.5, 25.5, 68.5, 25.5], [66.5, 26.5, 68.5, 26.5], [65.5, 25.5, 68.5, 25.5], [64.5, 24.5, 67.5, 24.5]]);
 variable_struct_set(breaker_eye_axes, sprite_get_name(s_Breaker_shieldbreak), [[28.5, 8.5, 31.5, 7.5], [35.5, 8.5, 38.5, 8.5], [36.5, 9.5, 39.5, 9.5], [36.5, 9.5, 39.5, 9.5], [38.5, 11.5, 41.5, 11.5], [39.5, 11.5, 42.5, 11.5], [39.5, 11.5, 42.5, 11.5], [39.5, 11.5, 42.5, 11.5], [39.5, 11.5, 42.5, 11.5], [40.5, 11.5, 43.5, 12.5], [41.5, 13.5, 43.5, 14.5], [41.5, 13.5, 43.5, 14.5], [41.5, 13.5, 43.5, 14.5], [41.5, 13.5, 43.5, 14.5], [41.5, 13.5, 43.5, 14.5], [41.5, 13.5, 43.5, 14.5], [41.5, 13.5, 43.5, 14.5], [41.5, 13.5, 43.5, 14.5], [40.5, 11.5, 43.5, 12.5], [39.5, 11.5, 42.5, 11.5], [38.5, 10.5, 41.5, 10.5], [39.5, 11.5, 42.5, 12.5], [41.5, 12.5, 44.5, 12.5]]);
 variable_struct_set(breaker_eye_axes, sprite_get_name(s_Breaker_idle_unshielded), [[35.5, 10.5, 38.5, 10.5]]);
 variable_struct_set(breaker_eye_axes, sprite_get_name(s_Breaker_walk_unshielded), [[45.5, 11.5, 48.5, 11.5], [45.5, 12.5, 48.5, 12.5], [45.5, 13.5, 48.5, 13.5], [45.5, 12.5, 48.5, 12.5], [45.5, 11.5, 48.5, 11.5], [45.5, 11.5, 48.5, 11.5], [45.5, 10.5, 48.5, 10.5], [45.5, 10.5, 48.5, 10.5], [45.5, 11.5, 48.5, 11.5], [45.5, 11.5, 48.5, 11.5], [45.5, 11.5, 48.5, 11.5], [45.5, 10.5, 48.5, 10.5]]);
@@ -159,6 +175,10 @@ ehp_max = 500;
 ehp = ehp_max;
 shield_hp_max = ehp_max * 0.5;
 shield_hp = shield_hp_max;
+breaker_parry_shield_fraction = 0.05; // Fraction of maximum shield HP lost per full parry; ignores weapon damage multipliers.
+breaker_parry_stun_seconds = 1; // Full-parry stun duration in seconds; does not grant player healing.
+breaker_half_parry_push_speed = 3.25; // Player movement speed units; larger values push the player farther on a half parry.
+breaker_half_parry_push_seconds = 0.12; // Seconds of horizontal push; larger values lengthen the knockback.
 shield_bar_width = 28;
 shield_bar_height = 3;
 shield_bar_y_offset = 12;
@@ -182,12 +202,11 @@ normal_attack_cooldown_min = 0.6 * _breaker_wait;
 normal_attack_cooldown_max = 0.9 * _breaker_wait;
 normal_attack_cooldown = random_range(normal_attack_cooldown_min, normal_attack_cooldown_max);
 stand_range = 85;
-// Human frame numbers: damage and movement start at 7, end after 9.
+// Human frame numbers: both melee lunges use frames 7-9; contact follows the configured frame boundary.
 breaker_bash_first_frame = 7;
 breaker_bash_last_frame = 9;
 breaker_bash_distance = 24;
-// Compress only the six anticipation frames; keep the dash and follow-through.
-breaker_bash_windup = 0.22;
+breaker_attack_speed = 1.0; // Unitless melee attack-speed multiplier: 1 = current speed, 2 = twice as fast, 0.5 = half speed; minimum 0.01.
 leap_damage = 20;
 leap_trigger_min_distance = 260;
 leap_trigger_max_distance = 720;
@@ -224,11 +243,104 @@ slam_stun_duration = 0.2;
 slam_shield_damage_multiplier = 1;
 phase2_slam_damage_multiplier = 1;
 
+breaker_bash_windup_seconds = function() {
+    return breaker_attack_settings().melee_base_windup_seconds
+        / max(0.01, breaker_attack_speed); // Scale anticipation with the same multiplier as the swing and follow-through.
+};
+breaker_bash_animation_duration = function() {
+    var _bash = breaker_sprite(s_Breaker_shieldbash, s_Breaker_shieldbash_unshielded);
+    var _authored_windup = (breaker_bash_first_frame - 1) / breaker_fps(_bash); // Seconds occupied by the original anticipation frames.
+    return breaker_bash_windup_seconds() + breaker_duration(_bash) - _authored_windup; // Actual playback seconds; every part follows breaker_attack_speed.
+};
+breaker_melee_parry_timing = function() {
+    var _settings = breaker_attack_settings();
+    var _warning_start = 0; // Both phases begin their blinking warning on the first animation frame.
+    var _animation_end = breaker_bash_animation_duration(); // Full playback duration in seconds, including follow-through.
+    var _bash = breaker_sprite(s_Breaker_shieldbash, s_Breaker_shieldbash_unshielded);
+    var _contact_frame = clamp(breaker_unshielded
+        ? _settings.unshielded_contact_frame : _settings.shielded_contact_frame,
+        breaker_bash_first_frame, sprite_get_number(_bash)); // Human frame number; contact happens when this frame begins.
+    var _followthrough_frames = sprite_get_number(_bash) - (_contact_frame - 1); // Frames from contact onward remain visual follow-through.
+    var _window_end = _animation_end - _followthrough_frames / breaker_fps(_bash); // Seconds from attack entry until impact.
+    return {
+        warning_start_seconds: _warning_start, // Seconds from attack entry when the blinking warning begins.
+        start_seconds: lerp(_warning_start, _window_end, _settings.melee_warning_fraction), // Seconds from attack entry halfway through the shortened window: active parrying opens.
+        end_seconds: _window_end // Seconds from attack entry when the parry window closes and an unblocked attack lands.
+    };
+};
+breaker_melee_parry_open = function() {
+    if (breaker_state != BreakerState.BASH || breaker_bash_hit) return false;
+    var _window = breaker_melee_parry_timing();
+    return breaker_time >= _window.start_seconds && breaker_time < _window.end_seconds;
+};
+breaker_can_melee_parry = function(_player, _parry_state) {
+    if (breaker_state != BreakerState.BASH || breaker_bash_hit
+        || !instance_exists(_player)) return false;
+    var _phase_parry = breaker_unshielded ? ParryState.HALF : ParryState.FULL;
+    if (_parry_state != _phase_parry) return false;
+    // Use the window the player saw when pressing, independent of player/enemy Step order.
+    for (var _i = 0; _i < array_length(_player.parry_breaker_windows); ++_i) {
+        var _record = _player.parry_breaker_windows[_i];
+        if (_record.boss == id && _record.bash_serial == breaker_bash_serial)
+            return _record.parry_state == _parry_state;
+    }
+    return false;
+};
+breaker_evade_cue_active = function() {
+    var _warning_start = max(0, breaker_jump_charge_duration - breaker_attack_settings().warning_seconds);
+    return (breaker_state == BreakerState.JUMP_CHARGE && breaker_time >= _warning_start)
+        || breaker_contact_active();
+};
+breaker_eye_warning_blink = function(_warning_time) {
+    var _settings = breaker_attack_settings();
+    return (_warning_time mod _settings.warning_blink_period)
+        < _settings.warning_blink_period * _settings.warning_blink_duty;
+};
 // Reuse the exact cropped-frame registration used to draw the body.
 breaker_update_eye_glow = function(_draw_x, _draw_y, _scale_x) {
     breaker_eye_light = undefined;
-    // Start early and accelerate the flashes toward the end; phase two stays lit.
-    breaker_eyes_awake = breaker_unshielded;
+    var _settings = breaker_attack_settings();
+    breaker_eye_color = _settings.eye_idle_color;
+    breaker_eye_glow_scale = 1;
+    breaker_eye_glow_gain = 1;
+    var _evade_warning = breaker_evade_cue_active(); // Slam warning applies with or without the shield.
+    var _bash_warning = breaker_state == BreakerState.BASH && !breaker_bash_hit;
+    var _melee_window = breaker_melee_parry_timing();
+    var _melee_warning_start = _melee_window.warning_start_seconds;
+    _bash_warning = _bash_warning && breaker_time >= _melee_warning_start
+        && breaker_time < _melee_window.end_seconds;
+    if (_evade_warning) {
+        var _warning_brightness = 1; // Steady red once the slam launches.
+        if (breaker_state == BreakerState.JUMP_CHARGE) {
+            var _warning_time = breaker_time - max(0, breaker_jump_charge_duration - _settings.warning_seconds);
+            _warning_brightness = breaker_eye_warning_blink(_warning_time) ? 1 : _settings.warning_glow_minimum;
+        }
+        breaker_eye_color = merge_color(c_black, _settings.evade_color, _warning_brightness);
+    }
+    else if (_bash_warning) {
+        var _color = breaker_unshielded ? _settings.block_color : _settings.full_color;
+        var _pulse = 1; // Hold the attack color steady throughout its parry window.
+        if (breaker_time < _melee_window.start_seconds) {
+            var _blink_time = breaker_time - _melee_warning_start; // Seconds since the green/yellow blinking half began.
+            var _blink_period = _settings.melee_blink_period / max(0.01, breaker_attack_speed); // Seconds per blink at the current attack speed.
+            var _blink_on = (_blink_time mod _blink_period)
+                < _blink_period * _settings.melee_blink_duty;
+            if (breaker_unshielded) {
+                // Replace the red idle glow with full yellow, then switch back to red between blinks.
+                _color = _blink_on ? _settings.block_color : _settings.eye_idle_color;
+            }
+            else {
+                _pulse = _blink_on ? 1 : _settings.warning_glow_minimum;
+            }
+        }
+        else {
+            breaker_eye_glow_scale = _settings.melee_glow_scale;
+            breaker_eye_glow_gain = _settings.melee_glow_gain;
+        }
+        breaker_eye_color = _pulse == 1 ? _color : merge_color(c_black, _color, _pulse);
+    }
+    // Shielded attacks must show their cues too; phase two also glows between attacks.
+    breaker_eyes_awake = breaker_unshielded || _evade_warning || _bash_warning;
     if (breaker_state == BreakerState.SHIELD_BREAK) {
         var _transition_duration = breaker_duration(s_Breaker_shieldbreak);
         var _blink_time = breaker_time - _transition_duration * breaker_eye_blink_start;
@@ -259,7 +371,31 @@ breaker_update_eye_glow = function(_draw_x, _draw_y, _scale_x) {
     var _wx2 = _draw_x + _x2 * _cos + _y2 * _sin;
     var _wy2 = _draw_y - _x2 * _sin + _y2 * _cos;
     breaker_eye_light = { x: (_wx1 + _wx2) * 0.5, y: (_wy1 + _wy2) * 0.5,
-        x1: _wx1, y1: _wy1, x2: _wx2, y2: _wy2, scale: abs(image_yscale) };
+        x1: _wx1, y1: _wy1, x2: _wx2, y2: _wy2, scale: abs(image_yscale),
+        draw_x: _draw_x, draw_y: _draw_y, scale_x: _scale_x };
+};
+breaker_set_eye_uniforms = function(_eye_only) {
+    shader_set_uniform_f(breaker_eye_only_uniform, _eye_only);
+    var _active = breaker_eyes_awake && !is_undefined(breaker_eye_light);
+    shader_set_uniform_f(breaker_eye_active_uniform, _active ? 1 : 0);
+    if (!_active) return;
+    var _eye = breaker_eye_light;
+    shader_set_uniform_f(breaker_eye_axis_uniform, _eye.x1, _eye.y1, _eye.x2, _eye.y2);
+    shader_set_uniform_f(breaker_eye_radius_uniform, breaker_attack_settings().eye_core_radius * _eye.scale);
+    shader_set_uniform_f(breaker_eye_color_uniform, color_get_red(breaker_eye_color) / 255,
+        color_get_green(breaker_eye_color) / 255, color_get_blue(breaker_eye_color) / 255);
+};
+breaker_draw_eye_halo = function(_x, _y, _radius, _color, _alpha) {
+    var _segments = breaker_attack_settings().eye_halo_segments; // Shared circle subdivisions; controls halo smoothness.
+    draw_primitive_begin(pr_trianglelist);
+    for (var _i = 0; _i < _segments; ++_i) {
+        var _angle1 = _i * 360 / _segments; // Degrees to the first rim vertex.
+        var _angle2 = (_i + 1) * 360 / _segments; // Degrees to the next rim vertex.
+        draw_vertex_colour(_x, _y, _color, _alpha);
+        draw_vertex_colour(_x + lengthdir_x(_radius, _angle1), _y + lengthdir_y(_radius, _angle1), _color, 0);
+        draw_vertex_colour(_x + lengthdir_x(_radius, _angle2), _y + lengthdir_y(_radius, _angle2), _color, 0);
+    }
+    draw_primitive_end();
 };
 breaker_draw_eye_glow = function() {
     if (!breaker_eyes_awake || is_undefined(breaker_eye_light)
@@ -267,16 +403,25 @@ breaker_draw_eye_glow = function() {
     var _eye = breaker_eye_light;
     var _old_color = draw_get_color();
     var _old_alpha = draw_get_alpha();
-    gpu_set_blendmode(bm_add);
-    draw_set_alpha(0.22 * image_alpha);
-    draw_circle_colour(_eye.x, _eye.y, breaker_eye_halo_radius * _eye.scale,
-        breaker_eye_color, c_black, false);
-    draw_set_alpha(0.65 * image_alpha);
-    draw_circle_colour(_eye.x, _eye.y, 7 * _eye.scale, breaker_eye_color, c_black, false);
+    // Alpha-composite one selected color instead of adding it over white/red sprite pixels.
     gpu_set_blendmode(bm_normal);
-    draw_set_alpha(image_alpha);
-    draw_set_color(breaker_eye_color);
-    draw_line_width(_eye.x1, _eye.y1, _eye.x2, _eye.y2, 1.4 * _eye.scale);
+    draw_set_alpha(1);
+    breaker_draw_eye_halo(_eye.x, _eye.y, breaker_eye_halo_radius * _eye.scale * breaker_eye_glow_scale,
+        breaker_eye_color, min(1, 0.22 * breaker_eye_glow_gain) * image_alpha);
+    breaker_draw_eye_halo(_eye.x, _eye.y, breaker_eye_core_halo_radius * _eye.scale * breaker_eye_glow_scale,
+        breaker_eye_color, min(1, 0.65 * breaker_eye_glow_gain) * image_alpha);
+    if (shader_is_compiled(sh_BreakerShieldFlash)) {
+        shader_set(sh_BreakerShieldFlash);
+        breaker_set_eye_uniforms(1);
+        draw_sprite_ext(sprite_index, image_index, _eye.draw_x, _eye.draw_y,
+            _eye.scale_x, image_yscale, image_angle, c_white, image_alpha);
+        shader_reset();
+    }
+    else {
+        draw_set_alpha(image_alpha);
+        draw_set_color(breaker_eye_color);
+        draw_line_width(_eye.x1, _eye.y1, _eye.x2, _eye.y2, 2 * _eye.scale);
+    }
     draw_set_color(_old_color);
     draw_set_alpha(_old_alpha);
 };
@@ -285,6 +430,7 @@ breaker_sprite = function(_shielded, _unshielded) {
     return breaker_unshielded ? _unshielded : _shielded;
 };
 breaker_fps = function(_sprite) {
+    // FPS means frames per second; active melee sprites share the Create attack-speed multiplier.
     if (_sprite == s_Breaker_jumpcharge || _sprite == s_Breaker_jumpcharge_unshielded)
         return max(1, sprite_get_number(_sprite)) / breaker_jump_charge_duration;
     if (_sprite == s_Breaker_land || _sprite == s_Breaker_land_unshielded)
@@ -294,6 +440,8 @@ breaker_fps = function(_sprite) {
     var _fps = sprite_get_speed(_sprite);
     if (sprite_get_speed_type(_sprite) == spritespeed_framespergameframe)
         _fps *= game_get_speed(gamespeed_fps);
+    if (_sprite == s_Breaker_shieldbash || _sprite == s_Breaker_shieldbash_unshielded)
+        _fps *= max(0.01, breaker_attack_speed);
     if (_sprite == s_Breaker_bashcooldown_unshielded)
         _fps /= breaker_unshielded_cooldown_multiplier;
     return max(0.001, _fps);
@@ -318,7 +466,10 @@ breaker_set_state = function(_state) {
     breaker_hit_time = 0;
     breaker_hit_elapsed = 0;
     path_end();
-    if (_state == BreakerState.BASH) breaker_bash_hit = false;
+    if (_state == BreakerState.BASH) {
+        breaker_bash_hit = false;
+        breaker_bash_serial += 1;
+    }
     if (_state == BreakerState.JUMP_CHARGE) {
         breaker_leap_hit = false;
     }
@@ -372,7 +523,7 @@ breaker_contact_active = function() {
 breaker_leap_damage_player = function(_target) {
     if (breaker_leap_hit || !instance_exists(_target)) return;
     breaker_leap_hit = true;
-    miniboss_damage_player(_target, leap_damage);
+    miniboss_damage_player(_target, leap_damage, ParryState.UNPARRYABLE);
 };
 breaker_clear_control = function() {
     knockback_timer = 0;
@@ -390,6 +541,19 @@ breaker_request_break = function() {
     if (breaker_airborne_attack() || breaker_state == BreakerState.LAND) return;
     breaker_clear_control();
     breaker_set_state(BreakerState.SHIELD_BREAK);
+};
+breaker_receive_full_parry = function() {
+    breaker_clear_control();
+    breaker_set_state(BreakerState.STUN);
+    breaker_stun_elapsed = 0;
+    stun_timer = breaker_parry_stun_seconds;
+    breaker_stun_budget = breaker_parry_stun_seconds;
+
+    // Shield damage is based on its maximum, never the remaining shield or body HP.
+    shield_hp = max(0, shield_hp - shield_hp_max * breaker_parry_shield_fraction);
+    breaker_shield_flash_time = breaker_shield_flash_duration;
+    if (shield_hp <= 0) breaker_request_break();
+    else breaker_play_hit_sound();
 };
 breaker_react_to_hit = function() {
     if (breaker_unshielded && (breaker_hit_time > 0 || breaker_control_grace > 0)) return;
@@ -409,9 +573,9 @@ breaker_move_x = function(_distance, _needs_floor) {
         x += _dx;
     }
 };
-miniboss_damage_player = function(_target, _damage, _attack_type = "") {
+miniboss_damage_player = function(_target, _damage, _parry_state = ParryState.UNPARRYABLE) {
     if (instance_exists(_target))
-        _target.take_damage(_damage, x, _attack_type);
+        _target.take_damage(_damage, x, _parry_state);
 };
 
 miniboss_parent_take_damage = take_damage;
@@ -463,6 +627,13 @@ take_damage = function(_damage, _knockback_dir = 0, _knockback_force = 0,
     miniboss_parent_take_damage(_damage, _knockback_dir, 0, false);
 };
 slam_interrupt = function() {
+    if (breaker_state == BreakerState.STUN) {
+        // Preserve a shield-bash parry stun; external control cannot extend it.
+        slam_stun_timer = min(slam_stun_timer, breaker_stun_budget);
+        slam_knockback_timer = min(slam_knockback_timer, breaker_stun_budget);
+        stun_timer = min(stun_timer, breaker_stun_budget);
+        return;
+    }
     if (!breaker_unshielded || breaker_attacking() || breaker_control_grace > 0
         || breaker_state == BreakerState.SHIELD_BREAK) {
         breaker_clear_control();
@@ -475,12 +646,6 @@ slam_interrupt = function() {
             + breaker_duration(s_Breaker_stun_exit_unshielded);
         slam_stun_timer = max(slam_stun_timer, _minimum);
         breaker_stun_budget = max(slam_stun_timer, max(slam_knockback_timer, stun_timer));
-    }
-    else {
-        // External control sources cannot replenish an already active stun.
-        slam_stun_timer = min(slam_stun_timer, breaker_stun_budget);
-        slam_knockback_timer = min(slam_knockback_timer, breaker_stun_budget);
-        stun_timer = min(stun_timer, breaker_stun_budget);
     }
 };
 slam_damage = function(_damage, _impact_x, _source) {

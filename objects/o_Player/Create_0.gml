@@ -17,12 +17,20 @@ dmg_cooldown = 0;
 // SWORD PARRY
 // =====================================
 
+// Shared incoming-attack classifications; visual colors never determine the rules.
+enum ParryState {
+    FULL, // Prevent the hit; enemy-specific rewards override the normal damage, stun, and healing.
+    HALF, // Normally half damage without recoil; Breaker instead blocks the hit completely.
+    UNPARRYABLE // No parry protection; take normal damage and recoil.
+}
+
 parry_cooldown = 0;
-parry_miss_cooldown = 5;
+parry_miss_cooldown = 1; // Seconds between missed parries; lower values allow faster retries.
 
 parry_timer = 0;
 parry_duration = 0;
 parry_animation_facing = 1;
+parry_breaker_windows = []; // Breaker window snapshots from the accepted parry press; early presses cannot upgrade themselves.
 
 // Difficulty: 0 = easy, 1 = normal, 2 = hard.
 parry_get_difficulty = function()
@@ -58,18 +66,44 @@ parry_is_active = function()
     return weapon_type == "sword" && parry_timer > 0;
 };
 
-// Returns true when an incoming yellow or green attack was parried.
-parry_melee = function(_enemy, _is_green = false)
+// Full melee parries resolve here; HALF damage is handled by take_damage.
+parry_melee = function(_enemy, _parry_state = ParryState.FULL)
 {
-    if (!parry_is_active() || !instance_exists(_enemy))
+    if (_parry_state != ParryState.FULL || !parry_is_active() || !instance_exists(_enemy))
         return false;
-		parry_cooldown = 0;
+    // Breaker's green eye window also gates the actual press; an early held parry cannot qualify.
+    if (_enemy.object_index == oEnemy_Breaker && !_enemy.breaker_can_melee_parry(id, ParryState.FULL))
+        return false;
+    // Only Scout's roll and its existing short stopping grace can be fully parried.
+    if (_enemy.object_index == oEnemy_Scout && !_enemy.can_parry())
+        return false;
+    parry_cooldown = 0;
 
-    var _heal = parry_get_heal_fraction();
+    if (_enemy.object_index == oEnemy_Breaker)
+    {
+        // Breaker's full parry damages only his shield and never heals the player.
+        _enemy.breaker_receive_full_parry();
+        return true;
+    }
 
-    if (_is_green)
-        _heal *= 2.5;
+    if (_enemy.object_index == oEnemy_Scout)
+    {
+        _enemy.scout_stop_roll_sound();
+        _enemy.attack_state = 5;
+        _enemy.stun_timer = _enemy.parry_stun_duration; // Seconds; keep Scout's existing parry stun.
+        _enemy.attack_rocking = false;
+        _enemy.is_climbing = false;
+        with (_enemy) path_end();
+        var _push_side = sign((_enemy.bbox_left + _enemy.bbox_right) - (bbox_left + bbox_right)); // -1 or 1 pushes away from the player; 0 uses parry facing.
+        if (_push_side == 0) _push_side = parry_animation_facing;
+        var _push_angle = _push_side >= 0 ? 0 : 180; // Degrees; push Scout away from the player's centre.
+        // Match sword knockback while avoiding a second application of the parry damage multiplier.
+        _enemy.take_damage(sword_config.slash_damage * _enemy.parry_damage_multiplier,
+            _push_angle, sword_config.slash_knockback, false);
+        return true;
+    }
 
+    var _heal = parry_get_heal_fraction(); // Fraction of maximum HP restored; depends only on difficulty.
     pHP = min(pHP_max, pHP + pHP_max * _heal);
 
     // Set the reaction before dealing damage: the damage may kill the enemy.
@@ -78,19 +112,9 @@ parry_melee = function(_enemy, _is_green = false)
         _enemy.chip_set_state(ChipRobotState.STUN, 1.5);
         _enemy.take_damage(30, 0, 0, false);
     }
-    else if (_enemy.object_index == oEnemy_Breaker)
-    {
-        _enemy.breaker_set_state(BreakerState.STUN);
-        _enemy.breaker_stun_elapsed = 0;
-        _enemy.slam_stun_timer = 1.5;
-        _enemy.breaker_stun_budget = 1.5;
-
-        // The unshielded stab is parried directly against the Breaker's HP.
-        _enemy.miniboss_parent_take_damage(30, 0, 0, false);
-    }
     else
     {
-        // Scout and Mini Scout use the existing Scout stun state.
+        // Mini Scout and other enemies retain the existing stun and healing behavior.
         _enemy.attack_state = 5;
         _enemy.stun_timer = _enemy.parry_stun_duration;
         _enemy.attack_rocking = false;
@@ -114,32 +138,33 @@ damage_knockback_timer = 0;
 damage_knockback_speed_x = 0;
 damage_knockback_pending = false;
 
-// All attacks use this method. Pass the source's x position when available.
+// Apply damage after a full melee parry attempt; omitted state means UNPARRYABLE.
+// Pass the source's x position when available. HALF is the only damage-reduction state.
 // Returns true only when health was actually lost.
 take_damage = function(
     _amount,
     _source_x = undefined,
-    _attack_type = ""
+    _parry_state = ParryState.UNPARRYABLE
 )
 {
-	    if (grinder_dying) return false;
+    if (grinder_dying) return false;
     // Slam blocks the whole hit, including recoil and trap bounce.
     if (_amount <= 0 || pHP <= 0 || damage_blocks_damage()) return false;
 	
-	// Red attacks are less effective when parried.
-if (_attack_type == "red" && parry_is_active())
-{
-    pHP = max(0, pHP - _amount * 0.5);
-	parry_cooldown = 0;
+    // HALF protects against half the hit; return before healing, stun, or recoil.
+    if (_parry_state == ParryState.HALF && parry_is_active())
+    {
+        pHP = max(0, pHP - _amount * 0.5); // HALF retains 50% of incoming damage; no healing or stun.
+        parry_cooldown = 0;
 
-    if (pHP > 0)
-        audio_play_sound(sfxPTakeDamage, 1, false);
+        if (pHP > 0)
+            audio_play_sound(sfxPTakeDamage, 1, false);
 
-    global.demo_took_damage = true;
+        global.demo_took_damage = true;
 
-    // Return before the usual recoil and knockback code.
-    return true;
-}
+        // Return before the usual recoil and knockback code.
+        return true;
+    }
 
     var _push = 0;
     if (!is_undefined(_source_x)) _push = sign(x - _source_x);

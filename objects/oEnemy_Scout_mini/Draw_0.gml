@@ -19,43 +19,17 @@ draw_sprite_ext(
 
 
 // =====================================
-// CHARGE WARNING
+// CHARGE RING
 // =====================================
 
-if (sprite_index == s_Scout_charge && attack_state == 2)
+if (attack_state == 2 && sprite_index == s_Scout_charge)
 {
-    // Focus the warning inward toward the charge sprite.
-    var _progress = clamp(scout_animation_time / scout_animation_duration(s_Scout_charge), 0, 1);
-    var _ring_scale = lerp(1.6, 1.4, _progress);
-    var _half_width = sprite_get_width(s_Scout_charge) * scout_scale * 0.5;
-    var _half_height = sprite_get_height(s_Scout_charge) * scout_scale * 0.5;
-    var _ring_x = (bbox_left + bbox_right) * 0.5;
-    var _ring_y = bbox_bottom + 1 - _half_height;
-    var _radius_x = _half_width * _ring_scale;
-    var _radius_y = _half_height * _ring_scale;
-    var _old_color = draw_get_color();
-    var _old_alpha = draw_get_alpha();
-
-    draw_set_color(c_yellow);
-    draw_set_alpha(lerp(0.45, 1, _progress));
-    // A filled strip gives the oval a solid three-pixel stroke.
-    var _stroke_half = 1;
-    var _segments = 64;
-    draw_primitive_begin(pr_trianglestrip);
-    for (var _i = 0; _i <= _segments; ++_i)
-    {
-        var _angle = _i * 360 / _segments;
-        var _cos = dcos(_angle);
-        var _sin = dsin(_angle);
-        draw_vertex(_ring_x + (_radius_x + _stroke_half) * _cos,
-            _ring_y + (_radius_y + _stroke_half) * _sin);
-        draw_vertex(_ring_x + (_radius_x - _stroke_half) * _cos,
-            _ring_y + (_radius_y - _stroke_half) * _sin);
-    }
-    draw_primitive_end();
-
-    draw_set_alpha(_old_alpha);
-    draw_set_color(_old_color);
+    var _charge_half_width = sprite_get_width(sprite_index) * scout_scale * 0.5; // Half the drawn width, in room pixels.
+    var _charge_half_height = sprite_get_height(sprite_index) * scout_scale * 0.5; // Half the drawn height, in room pixels.
+    var _charge_cx = (bbox_left + bbox_right) * 0.5; // Horizontal visual centre, in room pixels.
+    var _charge_cy = bbox_bottom + 1 - _charge_half_height; // Vertical visual centre, matching the sprite placement.
+    var _charge_progress = scout_animation_time / scout_animation_duration(s_Scout_charge); // Completion from 0 to 1, including playback variation.
+    draw_charge_ring(_charge_cx, _charge_cy, _charge_half_width, _charge_half_height, _charge_progress);
 }
 
 // =====================================

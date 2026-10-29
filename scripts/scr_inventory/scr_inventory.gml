@@ -1,3 +1,31 @@
+// Draw a gently pulsing outline around a world pickup, then its normal sprite.
+function item_draw_pickup_outline()
+{
+    var _outline_width = 1; // Room pixels; larger values widen the outline around the sprite.
+    var _pulse_seconds = 3; // Seconds per pulse; smaller values make the outline pulse faster.
+    var _minimum_alpha = 0.25; // Opacity from 0 to 1 between pulses; lower values increase contrast.
+    var _outline_alpha = lerp(_minimum_alpha, 1,
+        0.5 + 0.5 * cos(2 * pi * (current_time / 1000) / _pulse_seconds)) * image_alpha;
+    if (shader_is_compiled(sh_ItemOutline))
+    {
+        shader_set(sh_ItemOutline);
+        shader_set_uniform_f(shader_get_uniform(sh_ItemOutline, "u_rainbow"), 0);
+        shader_set_uniform_f(shader_get_uniform(sh_ItemOutline, "u_q4"), 0);
+        for (var _ox = -1; _ox <= 1; _ox++)
+        {
+            for (var _oy = -1; _oy <= 1; _oy++)
+            {
+                if (_ox == 0 && _oy == 0) continue;
+                draw_sprite_ext(sprite_index, image_index, x + _ox * _outline_width,
+                    y + _oy * _outline_width, image_xscale, image_yscale, image_angle,
+                    make_colour_rgb(214,214,214), _outline_alpha);
+            }
+        }
+        shader_reset();
+    }
+    draw_self();
+}
+
 // Inventory and collected controllers belonging to the current run.
 function item_run_inventory()
 {

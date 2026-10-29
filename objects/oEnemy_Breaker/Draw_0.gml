@@ -58,17 +58,23 @@ if (variable_struct_exists(breaker_foot_offsets, _sprite_name)) {
         + (sprite_get_yoffset(sprite_index) - _feet[_frame]) * image_yscale;
 }
 // Phase one flashes shield markings; phase two flashes every red body marking.
+breaker_update_eye_glow(_draw_x, _draw_y, _scale_x);
 var _shield_flash = breaker_shield_flash_time > 0 && !breaker_unshielded
     && variable_struct_exists(breaker_shield_axes, _sprite_name)
     && shader_is_compiled(sh_BreakerShieldFlash);
 var _body_flash = breaker_unshielded && breaker_body_flash_time > 0
     && shader_is_compiled(sh_BreakerShieldFlash);
-if (_shield_flash || _body_flash) {
+var _eye_override = breaker_eyes_awake && !is_undefined(breaker_eye_light);
+var _flash_shader = (_shield_flash || _body_flash || _eye_override)
+    && shader_is_compiled(sh_BreakerShieldFlash);
+if (_flash_shader) {
     shader_set(sh_BreakerShieldFlash);
+    breaker_set_eye_uniforms(0);
     shader_set_uniform_f(breaker_body_flash_uniform, _body_flash ? 1 : 0);
     var _flash_time = _body_flash ? breaker_body_flash_time : breaker_shield_flash_time;
     shader_set_uniform_f(breaker_shield_flash_amount_uniform,
-        min(1, _flash_time / (breaker_shield_flash_duration * 0.5)));
+        (_shield_flash || _body_flash)
+            ? min(1, _flash_time / (breaker_shield_flash_duration * 0.5)) : 0);
 }
 if (_shield_flash) {
     var _axes = variable_struct_get(breaker_shield_axes, _sprite_name);
@@ -86,9 +92,8 @@ if (_shield_flash) {
 }
 draw_sprite_ext(sprite_index, image_index, _draw_x, _draw_y,
     _scale_x, image_yscale, image_angle, image_blend, image_alpha);
-if (_shield_flash || _body_flash) shader_reset();
+if (_flash_shader) shader_reset();
 
-breaker_update_eye_glow(_draw_x, _draw_y, _scale_x);
 var _eye_lighting = instance_find(o_Lighting, 0);
 var _eye_deferred = false;
 if (instance_exists(_eye_lighting) && view_enabled) {
@@ -96,7 +101,51 @@ if (instance_exists(_eye_lighting) && view_enabled) {
         && surface_exists(_eye_lighting.light_surface)
         && !(variable_global_exists("dev_freecam") && global.dev_freecam);
 }
-if (!_eye_deferred) breaker_draw_eye_glow();
+if (!_eye_deferred) {
+    breaker_draw_eye_glow();
+}
+
+// Match Scout's three orbiting stun stars for every source of Breaker stun.
+if (breaker_state == BreakerState.STUN)
+{
+    var _stars_settings = breaker_slam_visual_settings().stun_stars;
+    var _stars_remaining = max(stun_timer, max(slam_stun_timer, slam_knockback_timer));
+    var _stars_old_color = draw_get_color();
+    var _stars_old_alpha = draw_get_alpha();
+    var _stars_scale = abs(image_yscale); // Sprite-to-room scale for the orbit and star size.
+    var _stars_x = (bbox_left + bbox_right) * 0.5;
+    var _head_top = _draw_y - sprite_get_yoffset(sprite_index) * image_yscale;
+    var _stars_y = min(_head_top, bbox_top) - _stars_settings.head_gap_pixels;
+    draw_set_alpha(image_alpha * clamp(_stars_remaining / _stars_settings.fade_seconds, 0, 1));
+
+    for (var _star = 0; _star < 3; ++_star)
+    {
+        var _orbit_angle = breaker_stun_elapsed * _stars_settings.orbit_degrees_per_second + _star * 120;
+        var _star_x = _stars_x + dcos(_orbit_angle) * _stars_settings.orbit_width_pixels * _stars_scale;
+        var _star_y = _stars_y + dsin(_orbit_angle) * _stars_settings.orbit_height_pixels * _stars_scale;
+        var _star_radius = _stars_settings.radius_pixels * _stars_scale * (1 + 0.12 * dsin(_orbit_angle));
+        var _star_rotation = 90 + breaker_stun_elapsed * _stars_settings.rotation_degrees_per_second;
+
+        // Draw the same dark gold border and bright five-pointed fill as Scout.
+        for (var _pass = 0; _pass < 2; ++_pass)
+        {
+            var _outer_radius = _star_radius + (_pass == 0 ? 1 : 0);
+            draw_set_color(_pass == 0 ? make_color_rgb(130, 75, 10) : make_color_rgb(255, 225, 65));
+            draw_primitive_begin(pr_trianglefan);
+            draw_vertex(_star_x, _star_y);
+            for (var _point = 0; _point <= 10; ++_point)
+            {
+                var _point_angle = _star_rotation + _point * 36;
+                var _point_radius = _outer_radius * (_point mod 2 == 0 ? 1 : 0.45);
+                draw_vertex(_star_x + lengthdir_x(_point_radius, _point_angle),
+                    _star_y + lengthdir_y(_point_radius, _point_angle));
+            }
+            draw_primitive_end();
+        }
+    }
+    draw_set_alpha(_stars_old_alpha);
+    draw_set_color(_stars_old_color);
+}
 
 // A small blue bar above the boss shows the remaining shield HP.
 // It disappears once the shield breaks; the red boss bar is unchanged.
@@ -122,39 +171,4 @@ if (shield_hp > 0 && shield_hp_max > 0)
         bar_bottom - 1,
         shield_blue, shield_blue, shield_blue, shield_blue, false
     );
-}
-
-var _warning_color = c_white;
-var _show_warning = false;
-
-if (breaker_state == BreakerState.BASH)
-{
-    _warning_color = breaker_unshielded ? c_yellow : c_red;
-    _show_warning = true;
-}
-else if (breaker_state == BreakerState.JUMP_CHARGE
-    || breaker_airborne_attack())
-{
-    _warning_color = c_blue;
-    _show_warning = true;
-}
-
-if (_show_warning)
-{
-    var _old_warning_color = draw_get_color();
-    var _old_warning_alpha = draw_get_alpha();
-
-    draw_set_color(_warning_color);
-    draw_set_alpha(0.8);
-
-    draw_ellipse(
-        bbox_left - 8,
-        bbox_top - 8,
-        bbox_right + 8,
-        bbox_bottom + 8,
-        true
-    );
-
-    draw_set_color(_old_warning_color);
-    draw_set_alpha(_old_warning_alpha);
 }
