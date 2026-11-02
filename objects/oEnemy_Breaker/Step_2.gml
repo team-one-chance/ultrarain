@@ -21,6 +21,7 @@ if (!breaker_unshielded) {
 else if (_target.parry_is_active() && breaker_can_melee_parry(_target, ParryState.HALF)) {
     breaker_bash_hit = true;
     breaker_stop_bash_sound(); // Cut this bash's attack cue before the parry cue starts.
+    var _block_contact = _target.parry_visual_block_success(); // Visual guard/recoil only after the existing HALF check succeeds.
     _target.parry_cooldown = 0; // The half parry blocks damage without healing or stunning Breaker.
     var _push_side = sign((_target.bbox_left + _target.bbox_right) - (bbox_left + bbox_right));
     if (_push_side == 0) _push_side = facing_direction;
@@ -35,14 +36,15 @@ else if (_target.parry_is_active() && breaker_can_melee_parry(_target, ParryStat
     var _player_edge = _push_side > 0 ? _target.bbox_left : _target.bbox_right;
     var _spark_x = clamp((_breaker_edge + _player_edge) * 0.5,
         min(_breaker_centre, _player_centre), max(_breaker_centre, _player_centre));
-    var _spark_y = (_target.bbox_top + _target.bbox_bottom) * 0.5;
+    _spark_x = _block_contact.px; // World-space contact on the recoiling procedural blade.
+    var _spark_y = _block_contact.py;
     var _spark_settings = breaker_slam_visual_settings().half_parry_sparks;
     var _spark_effect = instance_create_depth(_spark_x, _spark_y, -10000, o_ShotImpact,
-        { impact_parry: true, impact_direction: 0 });
-    _spark_effect.parry_ring_life = 0; // Keep the burst to sparks and a brief flash.
+        { impact_parry: true, impact_block: true,
+          impact_strength: _target.parry_block_config.impact_strength,
+          impact_visual: _target.parry_block_config.impact, impact_direction: _push_side > 0 ? 0 : 180 });
     _spark_effect.spark_color_start = _spark_settings.bright_color;
     _spark_effect.spark_color_end = _spark_settings.fade_color;
-    _spark_effect.flash_radius = _spark_settings.flash_radius_pixels;
     world_sfx_play(sfxNoShieldBashParried, _spark_x, _spark_y, 1, 1, 1280); // Unshielded bash parry cue, audible near the clash.
     exit;
 }

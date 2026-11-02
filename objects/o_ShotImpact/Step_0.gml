@@ -14,4 +14,13 @@ for (var _i = array_length(particles) - 1; _i >= 0; _i--)
     _p.py += _p.vy * _dt;
     if (!_p.dust) _p.vy += spark_gravity * _dt;
 }
-if (array_length(particles) == 0 && parry_ring_life <= 0 && flash_life <= 0) instance_destroy();
+for (var _i = array_length(energy_fragments) - 1; _i >= 0; --_i)
+{
+    var _fragment = energy_fragments[_i];
+    _fragment.life -= _dt;
+    if (_fragment.life <= 0) { array_delete(energy_fragments, _i, 1); continue; }
+    _fragment.px += _fragment.vx * _dt;
+    _fragment.py += _fragment.vy * _dt;
+    _fragment.vy += 130 * _dt; // Pixels/second squared; fragments fall slightly as their light fades.
+}
+if (array_length(particles) == 0 && array_length(energy_fragments) == 0 && parry_ring_life <= 0 && flash_life <= 0) instance_destroy();

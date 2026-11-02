@@ -70,30 +70,7 @@ if (grinder_dying)
 
 // physics_world_draw_debug(phy_debug_render_shapes);
 
-if (!grinder_dying && parry_is_active())
-{
-    var _progress = 1 - parry_timer / max(0.001, parry_duration);
-
-    var _frame = min(
-        sprite_get_number(s_parry_TEMP) - 1,
-        floor(_progress * sprite_get_number(s_parry_TEMP))
-    );
-
-    draw_sprite_ext(
-        s_parry_TEMP,
-        _frame,
-        x,
-        y,
-        parry_animation_facing,
-        1,
-        0,
-        c_white,
-        1
-    );
-
-    // Don't draw the normal player body or weapon rig.
-    exit;
-}
+var _parry_pose = parry_visual_pose();
 
 var _body_facing = sign(image_xscale);
 
@@ -172,6 +149,12 @@ var _front_socket_x =
 
 var _front_socket_y =
     y + _rig.front_y - _origin_y;
+
+// A subtle defensive lean in the modular upper body leaves legs and physics untouched.
+var _brace_offset = _parry_pose.brace * _parry_pose.weight * parry_animation_facing;
+_neck_x -= _brace_offset;
+_back_socket_x -= _brace_offset;
+_front_socket_x -= _brace_offset;
 
 // Assign anatomical arms to the correct visual socket.
 var _shoulder_l_x = 0;
@@ -320,6 +303,15 @@ if (weapon_type == "sword")
         + lengthdir_x(_sword_grip_reach, _sword_forward_angle);
     _weapon_y = _aim_origin_y + sword_config.grip_down
         + lengthdir_y(sword_config.aim_vertical_reach, _sword_forward_angle);
+}
+
+// Blend the hilt target before both hands are solved by the existing IK.
+if (_parry_pose.weight > 0)
+{
+    _weapon_x = lerp(_weapon_x, _aim_origin_x + _parry_pose.hx * parry_animation_facing, _parry_pose.weight);
+    _weapon_y = lerp(_weapon_y, _aim_origin_y + _parry_pose.hy, _parry_pose.weight);
+    var _pose_angle = _parry_pose.angle * parry_animation_facing;
+    _sword_angle += angle_difference(_pose_angle, _sword_angle) * _parry_pose.weight;
 }
 
 // Support-hand point relative to pistol origin
@@ -536,6 +528,77 @@ else
             _rest_arm_facing
         );
     }
+}
+
+// Layered visual effects (VFX) sample the same hand/blade path used by IK.
+// Reconstruct in player space each draw, so movement cannot leave the arc behind.
+if (!parry_visual_block && _parry_pose.weight > 0 && parry_visual_time >= parry_visual_config.windup)
+{
+    var _old_color = draw_get_color();
+    var _old_alpha = draw_get_alpha();
+    var _c = parry_visual_config;
+    var _action_end = _c.windup + _c.swing;
+    var _fade = clamp(1 - max(0, parry_visual_time - _action_end) / _c.trail_duration, 0, 1);
+    _fade *= _c.brightness * (1 + parry_visual_boost * 4);
+    var _head = _parry_pose.sweep;
+    var _tail = max(0, _head - 0.96);
+    for (var _pass = 0; _pass < 4; ++_pass)
+    {
+        draw_primitive_begin(pr_trianglestrip);
+        for (var _i = 0; _i <= 32; ++_i)
+        {
+            var _u = _i / 32;
+            var _phase = lerp(_tail, _head, _u);
+            var _angle = 90 + lerp(_c.prepare_angle, _c.finish_angle, _phase) * parry_animation_facing;
+            var _hx = _aim_origin_x + lerp(-_c.hand_back, _c.hand_forward, _phase) * parry_animation_facing;
+            var _hy = _aim_origin_y + lerp(_c.hand_down, -_c.hand_up, _phase);
+            var _radius = _c.arc_size + (_pass == 3 ? 9 : 0);
+            var _width = _pass == 3 ? 2 : (1 - _pass * 0.42) * _c.trail_width * sin(_u * pi) + 2;
+            var _color = _pass >= 2 ? c_white : make_color_rgb(35, 205, 255);
+            var _alpha = clamp(_fade * (_pass == 0 ? 0.28 : 0.85) * sqrt(_u), 0, 1);
+            draw_vertex_color(_hx + lengthdir_x(_radius, _angle),
+                _hy + lengthdir_y(_radius, _angle), _color, _alpha);
+            draw_vertex_color(_hx + lengthdir_x(_radius - _width, _angle),
+                _hy + lengthdir_y(_radius - _width, _angle), _color, _pass >= 2 ? _alpha * 0.5 : 0);
+        }
+        draw_primitive_end();
+    }
+    // Three short-lived blade echoes emphasize motion without new instances or surfaces.
+    for (var _echo = 1; _echo <= 3; ++_echo)
+    {
+        var _sample = parry_visual_time - _echo / 120;
+        if (_sample < _c.windup || _sample > _action_end) continue;
+        var _past = parry_visual_pose(_sample);
+        draw_sprite_ext(sDarkRepulsor, 0,
+            _aim_origin_x + _past.hx * parry_animation_facing, _aim_origin_y + _past.hy,
+            1, 1, _past.angle * parry_animation_facing, make_color_rgb(110, 245, 255),
+            clamp(_fade * 0.30 / _echo, 0, 1));
+    }
+    draw_set_color(_old_color);
+    draw_set_alpha(_old_alpha);
+}
+else if (parry_visual_block && _parry_pose.weight > 0 && parry_visual_boost > 0)
+{
+    // Gold blade illumination and a shield-shaped angular flare follow the live weapon/recoil.
+    var _old_color = draw_get_color();
+    var _old_alpha = draw_get_alpha();
+    var _flare = clamp(parry_visual_boost / 0.12, 0, 1) * parry_block_config.impact_strength;
+    draw_sprite_ext(sDarkRepulsor, 0, _weapon_x, _weapon_y, 1, 1,
+        _sword_angle, make_color_rgb(255, 235, 100), clamp(_flare, 0, 1));
+    var _blade_dir = 90 + _sword_angle;
+    var _tip_x = _weapon_x + lengthdir_x(55, _blade_dir);
+    var _tip_y = _weapon_y + lengthdir_y(55, _blade_dir);
+    var _edge_x = _weapon_x + lengthdir_x(30, _blade_dir) + 17 * parry_animation_facing;
+    var _edge_y = _weapon_y + lengthdir_y(30, _blade_dir);
+    draw_set_color(make_color_rgb(255, 190, 30));
+    draw_set_alpha(clamp(_flare * 0.30, 0, 1));
+    draw_triangle(_weapon_x, _weapon_y, _tip_x, _tip_y, _edge_x, _edge_y, false);
+    draw_set_color(make_color_rgb(255, 250, 190));
+    draw_set_alpha(clamp(_flare, 0, 1));
+    draw_line_width(_weapon_x, _weapon_y, _edge_x, _edge_y, 2);
+    draw_line_width(_edge_x, _edge_y, _tip_x, _tip_y, 2);
+    draw_set_color(_old_color);
+    draw_set_alpha(_old_alpha);
 }
 
 // draw_text(x - 30, y - 80, sprite_get_name(sprite_index));

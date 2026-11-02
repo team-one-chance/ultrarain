@@ -39,6 +39,166 @@ parry_duration = 0;
 parry_animation_facing = 1;
 parry_breaker_windows = []; // Breaker window snapshots from the accepted parry press; early presses cannot upgrade themselves.
 
+// Presentation only: seconds at 60 FPS; gameplay parry_timer remains independent.
+parry_visual_config = {
+    windup: 2 / 60, // Seconds pulling the hilt down; does not delay protection.
+    swing: 4 / 60, // Seconds sweeping upward; lower values make the strike faster.
+    recovery: 6 / 60, // Seconds blending back into the live aiming pose.
+    hand_back: 7, hand_down: 22, // Pixels from shoulder centre at preparation.
+    hand_forward: 22, hand_up: 3, // Pixels from shoulder centre at follow-through.
+    prepare_angle: -212, finish_angle: -52, // Blade rotation in degrees, mirrored by facing.
+    arc_size: 66, // Pixels from moving hilt to luminous cutting edge.
+    trail_width: 27, // Pixels across the translucent cyan ribbon.
+    trail_duration: 0.11, // Seconds of persistence after the rising action.
+    brightness: 1, // Slash opacity multiplier; larger values brighten the trail.
+    impact_strength: 1, // Overall full-parry visual intensity and camera shake multiplier.
+    impact: {
+        flash_size: 17, flash_duration: 0.065, // Pixels and seconds of white-hot contact.
+        spark_count: 28, spark_speed_min: 180, spark_speed_max: 390, // Count and pixels/second.
+        spark_life_min: 0.10, spark_life_max: 0.23, // Seconds before directional sparks disappear.
+        ring_radius: 58, ring_duration: 0.16, // Pixels and expansion seconds; shorter expands faster.
+        streak_count: 12, fragment_count: 8 // Bounded radial rays and glowing debris.
+    },
+    impact_hold: 2 / 60 // Seconds of visual pose freeze only; physics keeps running.
+};
+// Yellow HALF blocks share the evaluator, but keep the blade diagonally in front.
+parry_block_config = {
+    windup: 2 / 60, // Seconds pulling the blade low before the defensive intercept.
+    swing: 3 / 60, // Seconds snapping upward into the prominent forward guard.
+    recovery: 6 / 60, // Seconds blending into live aim after guard/impact hold.
+    hand_back: 8, hand_down: 19, // Pixels: negative back places the grip in front.
+    hand_forward: 24, hand_up: 5, // Pixels: keep the guard near the chest.
+    prepare_angle: -115, finish_angle: -38, // Degrees: blade leans forward over the grip.
+    impact_hold: 3 / 60, // Seconds holding the guard after confirmed contact.
+    recoil_pixels: 10, // Visual arm/head recoil only; does not alter player velocity.
+    impact_strength: 1, // Overall gold contact intensity; a successful defense deserves equal emphasis.
+    impact: {
+        flash_size: 16, flash_duration: 0.065, // Pixels and seconds of concentrated gold-white contact.
+        spark_count: 30, spark_speed_min: 150, spark_speed_max: 340, // Count and pixels/second.
+        spark_life_min: 0.09, spark_life_max: 0.22, // Seconds; short golden showers.
+        ring_radius: 40, ring_duration: 0.14, // Pixels and expansion seconds of the defensive shockwave.
+        streak_count: 8, fragment_count: 6 // Sharp contact rays and scattering fragments.
+    }
+};
+parry_visual_block = false; // Presentation variant selected from existing FULL/HALF classifications.
+parry_visual_settings = function()
+{
+    return parry_visual_block ? parry_block_config : parry_visual_config;
+};
+
+// Choose presentation from the same pre-Step window snapshot as the accepted press.
+// Restrict selection to the closest facing melee threat; this never grants protection.
+parry_visual_select_block = function()
+{
+    var _nearest = infinity;
+    var _block = false;
+    for (var _i = 0; _i < array_length(parry_breaker_windows); ++_i)
+    {
+        var _record = parry_breaker_windows[_i];
+        var _boss = _record.boss;
+        if (!instance_exists(_boss) || _record.parry_state == ParryState.UNPARRYABLE) continue;
+        if (bbox_bottom < _record.top || bbox_top > _record.bottom) continue;
+        var _side = sign((bbox_left + bbox_right) * 0.5 - _record.centre);
+        if (_side != 0 && _side != _boss.facing_direction) continue;
+        var _gap = max(0, max(_boss.bbox_left - bbox_right, bbox_left - _boss.bbox_right));
+        if (_gap > _boss.normal_attack_range || _gap >= _nearest) continue;
+        _nearest = _gap;
+        _block = _record.parry_state == ParryState.HALF;
+    }
+    return _block;
+};
+
+// Existing yellow-block success calls this after its damage-prevention check.
+parry_visual_block_success = function()
+{
+    parry_visual_block = true;
+    parry_visual_time = parry_block_config.windup + parry_block_config.swing;
+    parry_visual_hold = parry_block_config.impact_hold;
+    parry_visual_boost = 0.12; // Seconds of recoil and gold blade illumination, starting on impact.
+    var _strength = parry_block_config.impact_strength;
+    with (o_CAMERA) start_shake(1.8 * _strength, 0.08);
+    return parry_visual_blade_point(0.65);
+
+};
+
+parry_visual_time = -1; // Negative means inactive; never drives collision or damage.
+parry_visual_hold = 0;
+parry_visual_boost = 0;
+parry_visual_valid = function()
+{
+    return weapon_type == "sword" && pHP > 0 && !grinder_dying
+        && !is_ledge_climbing && !instance_exists(breaker_grab_owner);
+};
+
+// Evaluate a small set of poses; return an override weight for the live AimRig.
+parry_visual_pose = function(_sample_time = parry_visual_time)
+{
+    var _c = parry_visual_settings();
+    var _t = _sample_time;
+    var _weight = 0;
+    var _sweep = 0;
+    if (_t >= 0 && parry_visual_valid())
+    {
+        if (_t < _c.windup) _weight = clamp(_t / _c.windup, 0, 1);
+        else if (_t < _c.windup + _c.swing)
+        {
+            _weight = 1;
+            var _u = clamp((_t - _c.windup) / _c.swing, 0, 1);
+            _sweep = 1 - power(1 - _u, 3); // Fast acceleration into the upward deflection.
+        }
+        else
+        {
+            _sweep = 1;
+            var _u = clamp((_t - _c.windup - _c.swing) / _c.recovery, 0, 1);
+            _weight = 1 - _u * _u * (3 - 2 * _u);
+        }
+    }
+    var _recoil = parry_visual_block
+        ? power(clamp(parry_visual_boost / 0.12, 0, 1), 2) * _c.recoil_pixels : 0;
+    return { weight: _weight, sweep: _sweep, brace: parry_visual_block ? 2 + _recoil * 0.45 : 0,
+        hx: lerp(-_c.hand_back, _c.hand_forward, _sweep) - _recoil,
+        hy: lerp(_c.hand_down, -_c.hand_up, _sweep),
+        angle: lerp(_c.prepare_angle, _c.finish_angle, _sweep) };
+};
+
+// Same shoulder-centred geometry as Draw; contact sits on the visible blocking blade.
+parry_visual_blade_point = function(_fraction)
+{
+    var _pose = parry_visual_pose();
+    var _rig = player_rig_pose(sprite_index, image_index);
+    var _body = sign(image_xscale);
+    if (_body == 0) _body = 1;
+    var _cx = x + ((_rig.back_x + _rig.front_x) * 0.5 - sprite_get_xoffset(sprite_index)) * _body;
+    var _cy = y + (_rig.back_y + _rig.front_y) * 0.5 - sprite_get_yoffset(sprite_index);
+    _cx -= _pose.brace * _pose.weight * parry_animation_facing;
+    var _angle = 90 + _pose.angle * parry_animation_facing;
+    var _reach = sprite_get_yoffset(sDarkRepulsor) * _fraction;
+    return { px: _cx + _pose.hx * parry_animation_facing + lengthdir_x(_reach, _angle),
+        py: _cy + _pose.hy + lengthdir_y(_reach, _angle) };
+};
+
+// Called only after existing gameplay confirms a deflection, before damage can destroy its source.
+parry_visual_success = function(_source)
+{
+    if (parry_visual_block)
+    {
+        parry_visual_block = false;
+        parry_visual_time = parry_visual_config.windup;
+    }
+    var _strength = parry_visual_config.impact_strength;
+    var _cx = clamp((bbox_left + bbox_right) * 0.5, _source.bbox_left, _source.bbox_right);
+    var _cy = clamp((bbox_top + bbox_bottom) * 0.5, _source.bbox_top, _source.bbox_bottom);
+    instance_create_depth(_cx, _cy, depth - 2, o_ShotImpact,
+        { impact_enemy: true, impact_parry: true, impact_sword: true,
+          impact_strength: _strength, impact_visual: parry_visual_config.impact,
+          impact_direction: parry_animation_facing > 0 ? 0 : 180 });
+    if (parry_visual_time < 0)
+        parry_visual_time = parry_visual_config.windup + parry_visual_config.swing;
+    parry_visual_hold = parry_visual_config.impact_hold;
+    parry_visual_boost = 0.10; // Seconds of brighter slash persistence after contact.
+    with (o_CAMERA) start_shake(1.5 * _strength, 0.07);
+};
+
 // Difficulty: 0 = easy, 1 = normal, 2 = hard, 3 = futile.
 parry_get_difficulty = function()
 {
@@ -87,6 +247,7 @@ parry_melee = function(_enemy, _parry_state = ParryState.FULL)
     if (_enemy.object_index == oEnemy_Scout && !_enemy.can_parry())
         return false;
     parry_cooldown = 0;
+    parry_visual_success(_enemy);
 
     if (_enemy.object_index == oEnemy_Breaker)
     {
@@ -163,6 +324,7 @@ take_damage = function(
     // HALF protects against half the hit; return before healing, stun, or recoil.
     if (_parry_state == ParryState.HALF && parry_is_active())
     {
+        parry_visual_block_success();
         pHP = max(0, pHP - _amount * 0.5); // HALF retains 50% of incoming damage; no healing or stun.
         parry_cooldown = 0;
 
