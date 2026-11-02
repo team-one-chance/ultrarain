@@ -104,7 +104,7 @@ drone_fire_shot = function()
         {
             var _player = _trace.hit;
 
-            _player.take_damage(drone_shot_damage, _sx, "red");
+            _player.take_damage(drone_shot_damage, _sx, ParryState.UNPARRYABLE); // Sword parries give no damage or recoil reduction.
         }
     }
 

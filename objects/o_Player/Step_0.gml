@@ -847,6 +847,7 @@ if (_slide_check_direction != 0)
 // Start only while grounded and with space ahead.
 if (!is_sliding
 && !is_ledge_climbing
+&& !parry_is_active()
 && slide_held
 && on_ground
 && move != 0
@@ -945,21 +946,6 @@ var aim_dx = mouse_x - aim_origin_x;
 if (abs(aim_dx) > 1)
 {
     aim_facing = sign(aim_dx);
-}
-
-if (move != 0)
-{
-    sword_last_move_facing = sign(move);
-}
-
-if (weapon_type != "sword")
-{
-    sword_combat_facing_timer = 0;
-}
-else if (sword_swing_timer <= 0)
-{
-    sword_combat_facing_timer = max(0, sword_combat_facing_timer
-        - (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) / 1000000);
 }
 
 // =====================================
@@ -2007,6 +1993,24 @@ var _parry_dt =
 parry_timer = max(0, parry_timer - _parry_dt);
 parry_cooldown = max(0, parry_cooldown - _parry_dt);
 
+if (!parry_visual_valid())
+{
+    parry_visual_time = -1;
+    parry_visual_hold = 0;
+    parry_visual_boost = 0;
+}
+else if (parry_visual_hold > 0)
+    parry_visual_hold = max(0, parry_visual_hold - _parry_dt);
+else if (parry_visual_time >= 0)
+{
+    parry_visual_time += _parry_dt;
+    var _visual_config = parry_visual_settings();
+    if (parry_visual_time >= _visual_config.windup + _visual_config.swing + _visual_config.recovery)
+        parry_visual_time = -1;
+}
+parry_visual_boost = max(0, parry_visual_boost - _parry_dt);
+
+
 // =====================================
 // WEAPON SYSTEM
 // =====================================
@@ -2133,8 +2137,8 @@ else if (weapon_type == "sword")
 	&& sword_swing_timer <= 0
     && chip_sword_cooldown_timer <= 0)
     {
+        parry_visual_time = -1; // A newly accepted sword attack takes pose priority.
         sword_swing_timer = max(0.001, sword_config.swing_duration);
-        sword_combat_facing_timer = sword_combat_facing_duration;
         chip_sword_cooldown_timer = sword_swing_timer * chip_attack_multiplier();
         sword_swing_pending_hit = true;
         // Lock the swing to the cursor's direction when the attack starts.
@@ -2157,22 +2161,18 @@ else if (weapon_type == "sword")
         sword_slash_sound_index = 1 - sword_slash_sound_index;
 
         var slash = instance_create_depth(
-            x + sword_config.slash_forward * sword_swing_facing,
-            y + sword_config.slash_down,
+            x,
+            y,
             depth - 1,
-            oSlashEffect
+            oSwordSlash
         );
 
-        slash.image_xscale = sword_swing_facing * sword_config.slash_scale;
-        slash.image_yscale = sword_config.slash_scale;
         slash.slash_owner = id;
         slash.sync_sword_swing();
-        slash.slash_damage = sword_config.slash_damage;
-        slash.knockback_force = sword_config.slash_knockback;
     }
 }
 
-// Sword combat temporarily turns the body toward the cursor. The swing itself
+// Equipping the sword keeps the body facing the cursor. The swing itself
 // stays locked to its starting direction, as does its slash.
 if (weapon_type == "sword")
 {
@@ -2181,7 +2181,7 @@ if (weapon_type == "sword")
         || (!on_ground && touching_wall && coyote_timer <= 0);
     if (!_sword_facing_locked)
     {
-        image_xscale = sword_combat_facing_timer > 0 ? aim_facing : sword_last_move_facing;
+        image_xscale = aim_facing;
         if (sprite_index == s_Player_Run && move != 0)
         {
             image_speed *= move * sign(image_xscale);
@@ -2274,6 +2274,22 @@ if (!_basher_ui_mouse && !_syringe_combo
 {
     parry_duration = parry_get_duration();
     parry_timer = parry_duration;
+    parry_breaker_windows = breaker_body_snapshot; // Capture only on a new accepted press, never while holding an early parry.
+
+    // Preserve the established slide cancel on an accepted parry.
+    if (is_sliding)
+    {
+        is_sliding = false;
+        slide_direction = 0;
+        slide_exit_timer = 0;
+        phy_speed_x = 0;
+    }
+
+    parry_visual_block = parry_visual_select_block();
+    parry_visual_time = 0;
+    parry_visual_hold = 0;
+    parry_visual_boost = 0;
+    sword_combat_facing_timer = sword_combat_facing_duration;
 
     // A successful parry clears this cooldown.
     parry_cooldown = parry_miss_cooldown;

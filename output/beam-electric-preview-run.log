@@ -1,0 +1,41 @@
+
+***************************************
+ *     GameMaker v2026.0.0.23    *
+***************************************
+Setting scheduler resolution to 1
+Attempting to use high process priority settings
+Set process priority to HIGH_PRIORITY_CLASS
+Set main thread priority to HIGHEST
+Registered with MMCSS 'Games' task
+Set MMCSS thread priority to CRITICAL
+Reading File C:\Users\ali.shirzad\Desktop\UltraRain\ultrarain\output\beam-electric-preview\ULTRA RAIN.win took 6 ms
+DirectX11: Using hardware device
+Collision Event time(microsecs)=34
+Variable_Global_Init()
+PrepareGame()
+Audio_Init()
+Audio group 0 -> Loaded
+Attempting to set gamepadcount to 12
+Game_Prepare()
+Script_Prepare() 
+TimeLine_Prepare() 
+Object_Prepare() 
+Room_Prepare() 
+Finished PrepareGame() 
+Run_Start
+Done g_EffectsManager.Init()
+Done RenderStateManager
+CreateColPairs took 0.000000s 12 usecs for 81 object types obj_col_numb=0 physobjcount=16 resizes 0 final size 21
+Done ObjectLists
+Done Extension_Initialize
+About to startroom
+Total memory used = 40622491 (0x026bd99b) bytes 38.74MB
+Free memory = 5461056 (0x00535440) bytes 5.21MB
+Peak memory used = 40622491 (0x026bd99b) bytes 38.74MB
+**********************************.
+Entering main loop.
+**********************************.
+###game_end###0
+Attempting to set gamepadcount to 0
+Script_Free called with 565 and global 18
+Unsetting previous scheduler resolution of 1

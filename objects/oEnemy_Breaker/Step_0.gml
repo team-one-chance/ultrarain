@@ -150,11 +150,11 @@ if (!_stunned && !_stagger) switch (breaker_state) {
 
     case BreakerState.BASH:
         var _fps = breaker_fps(_bash);
-        var _authored_windup = (breaker_bash_first_frame - 1) / _fps;
-        var _active_start = breaker_bash_windup;
+        var _active_start = breaker_bash_windup_seconds();
         var _active_end = _active_start + (breaker_bash_last_frame - breaker_bash_first_frame + 1) / _fps;
-        if (_previous_time < _active_start && breaker_time >= _active_start) {
-            world_sfx_play(breaker_unshielded ? sfxBreakerStabAttack : sfxBreakerShieldAttack, x, y);
+        if (!breaker_bash_hit && _previous_time < _active_start && breaker_time >= _active_start) {
+            breaker_bash_sound = world_sfx_play(
+                breaker_unshielded ? sfxBreakerStabAttack : sfxBreakerShieldAttack, x, y);
         }
         // Integrate just the part of this Step inside frames 7 through 9.
         var _active_dt = max(0, min(breaker_time, _active_end) - max(_previous_time, _active_start));
@@ -163,6 +163,7 @@ if (!_stunned && !_stagger) switch (breaker_state) {
             var _steps = max(1, ceil(_dash_distance));
             repeat (_steps) {
                 breaker_move_x(facing_direction * _dash_distance / _steps, true);
+                // Both melee phases resolve in End Step after player input.
                 if (!breaker_bash_hit) {
                     var _left = facing_direction > 0 ? bbox_left : bbox_left - normal_attack_range;
                     var _right = facing_direction > 0 ? bbox_right + normal_attack_range : bbox_right;
@@ -191,7 +192,9 @@ else
                 }
             }
         }
-        if (breaker_time >= breaker_duration(_bash) - _authored_windup + breaker_bash_windup) {
+        // Let End Step resolve the final input frame in either phase before entering cooldown.
+        if (breaker_time >= breaker_bash_animation_duration()
+            && breaker_bash_hit) {
             normal_attack_cooldown = random_range(normal_attack_cooldown_min, normal_attack_cooldown_max);
             breaker_set_state(BreakerState.COOLDOWN);
         }
@@ -358,10 +361,11 @@ switch (breaker_state) {
         break;
     case BreakerState.BASH:
         _sprite = _bash;
+        var _bash_windup = breaker_bash_windup_seconds(); // Seconds of anticipation at the current attack speed.
         var _windup_time = (breaker_bash_first_frame - 1) / breaker_fps(_bash);
-        _anim_time = breaker_time < breaker_bash_windup
-            ? breaker_time * _windup_time / breaker_bash_windup
-            : _windup_time + breaker_time - breaker_bash_windup;
+        _anim_time = breaker_time < _bash_windup
+            ? breaker_time * _windup_time / _bash_windup
+            : _windup_time + breaker_time - _bash_windup;
         break;
     case BreakerState.COOLDOWN:
         _sprite = breaker_sprite(s_Breaker_bashcooldown, s_Breaker_bashcooldown_unshielded);
@@ -388,6 +392,14 @@ switch (breaker_state) {
         _sprite = breaker_sprite(s_Breaker_landrecovery, s_Breaker_landrecovery_unshielded); break;
     case BreakerState.SHIELD_BREAK: _sprite = s_Breaker_shieldbreak; break;
     case BreakerState.STUN:
+        if (!breaker_unshielded) {
+            // Keep the shield visible during a successful shield-bash parry reaction.
+            _sprite = breaker_stun_elapsed < breaker_duration(s_Breaker_block)
+                ? s_Breaker_block : s_Breaker_idle;
+            _anim_time = breaker_stun_elapsed;
+            _loop = _sprite == s_Breaker_idle;
+            break;
+        }
         var _exit_time = breaker_duration(s_Breaker_stun_exit_unshielded);
         var _enter_time = breaker_duration(s_Breaker_stun_enter_unshielded);
         if (_stun_remaining <= _exit_time) {

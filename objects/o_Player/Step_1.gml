@@ -1,4 +1,5 @@
 item_controllers_update(id);
+parry_breaker_windows = []; // Only a newly accepted press this frame can parry Breaker's steady green/yellow interval.
 item_notice_time = max(0, item_notice_time - (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) / 1000000);
 // Record both bodies before movement and the physics update.
 // Match the physics fixture, independent of animation bounds and facing.
@@ -10,6 +11,10 @@ breaker_body_snapshot = [];
 with (oEnemy_Breaker) {
     array_push(other.breaker_body_snapshot, {
         boss: id,
+        bash_serial: breaker_bash_serial, // Attack counter identifies the exact bash shown in the previous frame.
+        parry_state: breaker_melee_parry_open()
+            ? (breaker_unshielded ? ParryState.HALF : ParryState.FULL)
+            : ParryState.UNPARRYABLE, // Snapshot before either Step advances: matches the steady eye color the player saw.
         airborne_attack: breaker_contact_active(),
         centre: (bbox_left + bbox_right) * 0.5,
         top: bbox_bottom + 1 - (bbox_bottom - bbox_top + 1) * breaker_body_height_fraction,

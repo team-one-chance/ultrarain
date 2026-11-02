@@ -69,10 +69,11 @@ hit_sprite = s_Scout_ouch;
 // =====================================
 // CLOSE-RANGE ATTACK
 // =====================================
-// Entry, exit and damage all use scout_bite_in_range().
+// Entry and damage use exact bite range; leaving range waits for the current attack cycle.
 scout_bite_reach_extra = 4; // Room pixels added to the close-range attack.
 // Retained name for compatibility with crowd spacing and slam interruption.
 attack_rocking = false;
+scout_bite_exit_after = -1; // Bite animation seconds when an out-of-range attack may finish; -1 means no pending exit.
 
 // =====================================
 // CHARGE ATTACK/ UNIQUE TO ENEMYTEMP
@@ -87,6 +88,17 @@ attack_rocking = false;
 // 5 = stunned after parry
 
 attack_state = 0;
+parry_damage_multiplier = 1.5; // Sword-damage multiplier for a perfect roll parry; 1.5 means 150% of the current sword hit.
+scout_ring_flash_period = 0.20; // Seconds per continuous ring pulse; lower values flash faster.
+scout_ring_flash_minimum = 0.35; // Minimum ring opacity, 0-1; lower values make the pulse more pronounced.
+scout_ring_clearance = 3; // Room pixels added around the artwork before ring scaling; higher values move the ring farther out.
+scout_ring_time = 0; // Seconds accumulated during the roll cue, shared across charge, roll, and stopping grace.
+// Per-frame visible-pixel bounds [left, top, right, bottom], in source sprite pixels.
+// These keep the ring centred on the artwork as Scout steps back and curls up.
+scout_ring_bounds = {};
+variable_struct_set(scout_ring_bounds, sprite_get_name(s_Scout_charge), [[4,0,31,22],[5,0,29,22],[4,0,28,22],[2,0,26,22],[0,0,25,22],[0,0,25,22],[0,0,25,22],[0,0,25,22],[0,0,23,22],[0,0,23,22],[0,0,22,22],[3,0,28,22],[5,0,28,20],[9,0,28,20]]);
+variable_struct_set(scout_ring_bounds, sprite_get_name(s_Scout_roll), [[1,0,17,17],[0,0,16,17],[0,0,17,17],[0,0,17,16],[0,0,17,17],[1,0,17,17],[0,1,17,17],[0,1,17,17]]);
+variable_struct_set(scout_ring_bounds, sprite_get_name(s_Scout_chargeStop), [[5,0,24,20],[5,0,23,23],[5,0,27,22],[0,0,26,22],[0,0,29,22],[0,0,29,22],[0,0,29,22],[0,0,29,22],[0,0,29,22],[0,0,29,22],[0,0,29,22],[0,1,30,22],[0,0,27,23],[0,0,27,22],[0,0,27,22]]);
 // Coyote time after a roll ends; normal sword collision still has to connect.
 scout_parry_grace_duration = 0.15;
 scout_parry_grace_timer = 0;
@@ -136,6 +148,7 @@ scout_roll_time_limit = 0;
 
 // Scout pressure: playback rates preserve every authored animation frame.
 scout_charge_playback_rate = 1.6;
+scout_charge_stop_playback_rate = 1.5; // Animation speed multiplier; higher values shorten the stop sequence and slide.
 scout_charge_rate_variation_min = 0.9;
 scout_charge_rate_variation_max = 1.1;
 scout_charge_rate_variation = 1;
@@ -192,6 +205,16 @@ slam_interrupt = function()
 // =====================================
 // CROWD SPACING
 // =====================================
+scout_receive_electric_stun = function(_seconds)
+{
+    scout_stop_charge_sound();
+    scout_stop_roll_sound();
+    slam_interrupt();
+    scout_hit_pending = false;
+    attack_state = 5;
+    stun_timer = max(stun_timer, _seconds); // Seconds; do not shorten a longer existing stun.
+};
+
 crowd_spacing_enabled = true;
 
 // Minimum centre spacing; collision-box widths also set a lower limit.
@@ -248,7 +271,7 @@ attack_register_dash_hit = function(_player)
     )
     {
         attack_hit_player = true;
-		if (_player.parry_melee(id, false))
+		if (_player.parry_melee(id, ParryState.FULL))
     return;
         // Damage only on the first contact during the active charge attack.
         // Player protection rejects damage and recoil during dash/slam.
@@ -308,6 +331,8 @@ scout_animation_duration = function(_sprite)
         _fps *= game_get_speed(gamespeed_fps);
     if (_sprite == s_Scout_charge)
         _fps *= scout_charge_playback_rate * scout_charge_rate_variation;
+    else if (_sprite == s_Scout_chargeStop)
+        _fps *= scout_charge_stop_playback_rate;
     else if (_sprite == s_Scout_attackEnter)
         _fps *= scout_melee_enter_playback_rate;
     else if (_sprite == s_Scout_chargeStop)

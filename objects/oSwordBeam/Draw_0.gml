@@ -1,7 +1,22 @@
 var _old_colour = draw_get_color();
 var _old_alpha = draw_get_alpha();
 
-draw_self();
+if (beam_lightning)
+{
+    // Match Bulletflash's emissive rendering, including rooms with lighting disabled.
+    var _lighting = instance_find(o_Lighting, 0);
+    var _deferred = false;
+    if (instance_exists(_lighting) && view_enabled)
+    {
+        _deferred = _lighting.enabled && view_camera[view_current] != -1
+            && surface_exists(_lighting.light_surface);
+    }
+    if (!_deferred) draw_electrical_beam();
+}
+else
+{
+    draw_self();
+}
 
 // Brief white flare on multi-coin release.
 if (beam_coins_used > 1 && beam_age < 0.14)

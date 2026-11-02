@@ -19,43 +19,32 @@ draw_sprite_ext(
 
 
 // =====================================
-// CHARGE WARNING
+// CHARGE RING
 // =====================================
 
-if (sprite_index == s_Scout_charge && attack_state == 2)
+if ((attack_state == 2 || attack_state == 3 || (attack_state == 4 && scout_parry_grace_timer > 0))
+    && variable_struct_exists(scout_ring_bounds, sprite_get_name(sprite_index)))
 {
-    // Focus the warning inward toward the charge sprite.
-    var _progress = clamp(scout_animation_time / scout_animation_duration(s_Scout_charge), 0, 1);
-    var _ring_scale = lerp(1.4, 1.2, _progress); //if par1 < par2, focus inwarda and vice versa, par2 = duration
-    var _half_width = sprite_get_width(s_Scout_charge) * scout_scale * 0.5;
-    var _half_height = sprite_get_height(s_Scout_charge) * scout_scale * 0.5;
-    var _ring_x = (bbox_left + bbox_right) * 0.5;
-    var _ring_y = bbox_bottom + 1 - _half_height;
-    var _radius_x = _half_width * _ring_scale;
-    var _radius_y = _half_height * _ring_scale;
-    var _old_color = draw_get_color();
-    var _old_alpha = draw_get_alpha();
-
-    draw_set_color(c_yellow);
-    draw_set_alpha(lerp(0.45, 1, _progress));
-    // A filled strip gives the oval a solid three-pixel stroke.
-    var _stroke_half = 1;
-    var _segments = 64;
-    draw_primitive_begin(pr_trianglestrip);
-    for (var _i = 0; _i <= _segments; ++_i)
-    {
-        var _angle = _i * 360 / _segments;
-        var _cos = dcos(_angle);
-        var _sin = dsin(_angle);
-        draw_vertex(_ring_x + (_radius_x + _stroke_half) * _cos,
-            _ring_y + (_radius_y + _stroke_half) * _sin);
-        draw_vertex(_ring_x + (_radius_x - _stroke_half) * _cos,
-            _ring_y + (_radius_y - _stroke_half) * _sin);
-    }
-    draw_primitive_end();
-
-    draw_set_alpha(_old_alpha);
-    draw_set_color(_old_color);
+    var _ring_frames = variable_struct_get(scout_ring_bounds, sprite_get_name(sprite_index));
+    var _ring_frame = clamp(floor(image_index), 0, array_length(_ring_frames) - 1);
+    var _bounds = _ring_frames[_ring_frame]; // Current visible artwork bounds in sprite pixels.
+    var _draw_x = (bbox_left + bbox_right) * 0.5
+        - scout_facing * sprite_get_width(sprite_index) * scout_scale * 0.5;
+    var _draw_y = bbox_bottom + 1 - sprite_get_height(sprite_index) * scout_scale;
+    var _local_x = (_bounds[0] + _bounds[2] + 1) * 0.5 * scout_facing * scout_scale;
+    var _local_y = (_bounds[1] + _bounds[3] + 1) * 0.5 * scout_scale;
+    var _cos = dcos(image_angle); // Image angle is in degrees; rotate the centre with the artwork.
+    var _sin = dsin(image_angle);
+    var _ring_x = _draw_x + _local_x * _cos + _local_y * _sin;
+    var _ring_y = _draw_y - _local_x * _sin + _local_y * _cos;
+    var _half_width = (_bounds[2] - _bounds[0] + 1) * scout_scale * 0.5; // Horizontal half-size in room pixels.
+    var _half_height = (_bounds[3] - _bounds[1] + 1) * scout_scale * 0.5; // Vertical half-size in room pixels.
+    var _progress = attack_state == 2
+        ? scout_animation_time / scout_animation_duration(s_Scout_charge) : 1;
+    var _flash = lerp(scout_ring_flash_minimum, 1,
+        0.5 + 0.5 * cos(2 * pi * scout_ring_time / scout_ring_flash_period)); // Continuous pulse opacity, 0-1.
+    draw_charge_ring(_ring_x, _ring_y, _half_width + scout_ring_clearance,
+        _half_height + scout_ring_clearance, _progress, c_lime, _flash);
 }
 
 // =====================================

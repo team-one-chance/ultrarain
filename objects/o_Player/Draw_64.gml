@@ -312,6 +312,31 @@ for (var i = 0; i < 2; i++)
     );
 }
 
+// Show the sword's live parry cooldown beside the weapon slots.
+if (weapon_type == "sword")
+{
+    var _parry_gui_x = weapons_gui_x + 2 * (weapon_slot_size + weapon_slot_gap) + 8; // GUI pixels; larger gap moves the indicator right.
+    var _parry_bar_y = weapons_gui_y + 26; // GUI pixels; vertical offset leaves room for the label.
+    var _parry_bar_width = 100; // GUI pixels; length of the cooldown progress bar.
+    var _parry_bar_height = 6; // GUI pixels; thickness of the cooldown progress bar.
+    var _parry_ready = parry_cooldown <= 0;
+    var _parry_fill = 1 - clamp(parry_cooldown / max(0.001, parry_miss_cooldown), 0, 1); // Fraction filled; reaches 1 when ready.
+    var _parry_text = _parry_ready
+        ? "Parry: Ready"
+        : "Parry: " + string_format(ceil(parry_cooldown * 10) / 10, 0, 1) + "s";
+
+    draw_set_halign(fa_left);
+    draw_set_color(_parry_ready ? c_lime : c_white);
+    draw_text(_parry_gui_x, weapons_gui_y, _parry_text);
+
+    draw_set_color(c_dkgray);
+    draw_rectangle(_parry_gui_x, _parry_bar_y,
+        _parry_gui_x + _parry_bar_width, _parry_bar_y + _parry_bar_height, false);
+    draw_set_color(_parry_ready ? c_lime : make_color_rgb(90, 220, 255));
+    draw_rectangle(_parry_gui_x, _parry_bar_y,
+        _parry_gui_x + _parry_bar_width * _parry_fill, _parry_bar_y + _parry_bar_height, false);
+}
+
 draw_set_color(weapons_old_colour);
 draw_set_alpha(weapons_old_alpha);
 draw_set_halign(weapons_old_halign);

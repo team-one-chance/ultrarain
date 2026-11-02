@@ -1,0 +1,26 @@
+{
+  "$GMSound":"v2",
+  "%Name":"sfxBreakerBulletRicochet3",
+  "audioGroupId":{
+    "name":"audiogroup_default",
+    "path":"audiogroups/audiogroup_default",
+  },
+  "bitDepth":1,
+  "channelFormat":0,
+  "compression":0,
+  "compressionQuality":4,
+  "conversionMode":0,
+  "duration":0.5,
+  "exportDir":"",
+  "name":"sfxBreakerBulletRicochet3",
+  "parent":{
+    "name":"BulletShieldRicochet",
+    "path":"folders/SFX/sfxEnemy/sfxBreaker/BulletShieldRicochet.yy",
+  },
+  "preload":false,
+  "resourceType":"GMSound",
+  "resourceVersion":"2.0",
+  "sampleRate":44100,
+  "soundFile":"sfxBreakerBulletRicochet3.mp3",
+  "volume":1.0,
+}
