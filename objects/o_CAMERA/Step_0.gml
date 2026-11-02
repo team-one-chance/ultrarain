@@ -1,3 +1,8 @@
+if (menu_exhibition_active() && !window_get_fullscreen())
+{
+    window_set_fullscreen(true);
+}
+
 // Remove the previous shake before following so repeated impacts cannot cause drift.
 if (camera != -1)
 {
