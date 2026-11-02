@@ -1,4 +1,9 @@
 if (!opened) exit;
+if (pickup_notice_key != "")
+{
+    item_draw_pickup_modal(pickup_notice_key, pickup_notice_layout());
+    exit;
+}
 var _font = draw_get_font();
 var _color = draw_get_color();
 var _alpha = draw_get_alpha();

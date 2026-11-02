@@ -1,6 +1,11 @@
 // Only explode on death; ordinary removal during transitions is silent.
 if (pHP <= 0)
 {
+    if (room == LE_TUTORIAL_WIP)
+    {
+        if (!variable_global_exists("tutorial_death_count")) global.tutorial_death_count = 0;
+        global.tutorial_death_count++; // Count actual deaths, excluding ordinary room transitions and manual restarts.
+    }
     audio_play_sound(sfxPDeath, 1, false);
     if (!instance_exists(oGameOver))
     {

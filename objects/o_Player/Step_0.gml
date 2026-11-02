@@ -79,6 +79,14 @@ if (pHP <= 0)
     exit;
 }
 
+// Ari owns movement and combat until the required tutorial conversation finishes.
+if (instance_exists(ari_interaction_owner))
+{
+    stop_movement_sfx();
+    ari_interaction_owner.ari_hold_player();
+    exit;
+}
+
 // While held, the Breaker positions the player after physics in End Step.
 if (instance_exists(breaker_grab_owner)
     && !(variable_instance_exists(breaker_grab_owner, "train_departing") && breaker_grab_owner.train_departing))
@@ -2289,7 +2297,6 @@ if (!_basher_ui_mouse && !_syringe_combo
     parry_visual_time = 0;
     parry_visual_hold = 0;
     parry_visual_boost = 0;
-    sword_combat_facing_timer = sword_combat_facing_duration;
 
     // A successful parry clears this cooldown.
     parry_cooldown = parry_miss_cooldown;

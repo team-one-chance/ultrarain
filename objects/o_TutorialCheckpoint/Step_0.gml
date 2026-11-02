@@ -21,6 +21,19 @@ if (!instance_exists(_player) || _player.pHP <= 0 || _player.grinder_dying)
 }
 if (variable_global_exists("dev_freecam") && global.dev_freecam) exit;
 
+if (ari_retry_visit_pending)
+{
+    ari_retry_check_seconds = max(0, ari_retry_check_seconds - delta_time / 1000000);
+    if (ari_retry_check_seconds <= 0)
+    {
+        ari_retry_check_seconds = 1; // Seconds between safety checks if the current checkpoint surroundings are blocked.
+        var _ari = noone;
+        with (oAri) if (object_index == oAri) _ari = id; // Samuel inherits the cinematic but must never receive Ari's checkpoint visit.
+        if (!instance_exists(_ari)) _ari = instance_create_depth(respawn_x, respawn_y, -2, oAri);
+        if (_ari.ari_prepare_checkpoint_visit(respawn_x, respawn_y)) ari_retry_visit_pending = false;
+    }
+}
+
 // The skip is available throughout the passage and stops before the chute.
 if (vent_skip_state == 0 && vent_skip_available(_player) && controls_pressed("interact"))
 {

@@ -602,6 +602,16 @@ breaker_request_break = function() {
     breaker_clear_control();
     breaker_set_state(BreakerState.SHIELD_BREAK);
 };
+// Shared parry visual effects (VFX) for both shield phases, using the room-independent boss settings.
+breaker_parry_contact_effect = function(_player, _contact, _direction) {
+    var _settings = breaker_slam_visual_settings().half_parry_sparks;
+    var _effect = instance_create_depth(_contact.px, _contact.py, -10000, o_ShotImpact,
+        { impact_parry: true, impact_block: true,
+          impact_strength: _player.parry_block_config.impact_strength,
+          impact_visual: _player.parry_block_config.impact, impact_direction: _direction });
+    _effect.spark_color_start = _settings.bright_color;
+    _effect.spark_color_end = _settings.fade_color;
+};
 breaker_receive_full_parry = function() {
     breaker_stop_bash_sound();
     breaker_clear_control();

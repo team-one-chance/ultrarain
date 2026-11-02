@@ -1,4 +1,8 @@
 // Room-local progress; only Retry carries it into a rebuilt tutorial.
+if (!variable_global_exists("tutorial_death_count")) global.tutorial_death_count = 0; // Deaths this run, preserved by checkpoint room restarts.
+if (!variable_global_exists("tutorial_ari_assist")) global.tutorial_ari_assist = 0; // 0 = visit pending, 1 = gift dropped, 2 = gift collected; resets on a fresh game.
+ari_retry_visit_pending = false;
+ari_retry_check_seconds = 0; // Seconds before retrying a blocked checkpoint layout.
 respawn_x = 1184;
 respawn_y = 192;
 big_room_cleared = false;
@@ -95,6 +99,7 @@ if (variable_global_exists("tutorial_checkpoint_retry")
 && is_struct(global.tutorial_checkpoint_retry))
 {
     var _retry = global.tutorial_checkpoint_retry;
+    ari_retry_visit_pending = global.tutorial_death_count >= 3 && global.tutorial_ari_assist < 2;
     respawn_x = _retry.x;
     respawn_y = _retry.y;
     big_room_cleared = _retry.cleared;

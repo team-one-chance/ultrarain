@@ -103,6 +103,11 @@ function item_controller_collect(_pickup, _player)
 
     _player.item_notice_key = _pickup.item_key;
     _player.item_notice_time = 5; // Seconds the full pickup description remains visible.
+    if (_pickup.item_key == "coin_anchor" && instance_exists(o_PauseMenu))
+    {
+        o_PauseMenu.pickup_notice_pending = _pickup.item_key; // Open at the next Begin Step, after the pickup collision finishes.
+        _player.item_notice_time = 0; // The centered modal replaces Pinhouse's timed bottom notice.
+    }
 
     return true;
 }
@@ -290,6 +295,62 @@ function item_draw_pickup(_pickup)
 
 
 // Draw the player's inventory at the bottom centre of the GUI.
+// Explicitly dismissed pickup instructions; the pause controller owns the frozen world.
+function item_draw_pickup_modal(_key, _layout)
+{
+    var _item = item_get_definition(_key);
+    var _font = draw_get_font();
+    var _color = draw_get_color();
+    var _alpha = draw_get_alpha();
+    var _halign = draw_get_halign();
+    var _valign = draw_get_valign();
+    var _scale = _layout.scale;
+    var _accent = make_color_rgb(80, 220, 245);
+    draw_set_font(f_Console);
+    draw_set_halign(fa_center);
+    draw_set_valign(fa_top);
+    draw_set_color(c_black);
+    draw_set_alpha(0.7);
+    draw_rectangle(0, 0, display_get_gui_width(), display_get_gui_height(), false);
+    draw_set_alpha(1);
+    draw_set_color(make_color_rgb(9, 15, 22));
+    draw_rectangle(_layout.left, _layout.top, _layout.right, _layout.top + _layout.height, false);
+    draw_set_color(_accent);
+    draw_rectangle(_layout.left, _layout.top, _layout.right, _layout.top + _layout.height, true);
+    draw_rectangle(_layout.left, _layout.top, _layout.right, _layout.top + 3 * _scale, false);
+    draw_text_transformed(_layout.x, _layout.top + 22 * _scale, "ITEM ACQUIRED", 0.8 * _scale, 0.8 * _scale, 0);
+    draw_set_color(c_white);
+    draw_text_transformed(_layout.x, _layout.top + 56 * _scale, _item.name, 1.65 * _scale, 1.65 * _scale, 0);
+    draw_text_transformed(_layout.right - 24 * _scale, _layout.top + 12 * _scale, "X", _scale, _scale, 0);
+    if (_item.icon >= 0)
+    {
+        var _icon_w = sprite_get_width(_item.icon);
+        var _icon_h = sprite_get_height(_item.icon);
+        var _icon_scale = 80 * _scale / max(1, max(_icon_w, _icon_h)); // GUI pixels across the larger icon's longest side.
+        draw_sprite_ext(_item.icon, 0,
+            _layout.x + (sprite_get_xoffset(_item.icon) - _icon_w * 0.5) * _icon_scale,
+            _layout.top + 150 * _scale + (sprite_get_yoffset(_item.icon) - _icon_h * 0.5) * _icon_scale,
+            _icon_scale, _icon_scale, 0, c_white, 1);
+    }
+    draw_text_ext_transformed(_layout.x, _layout.top + 208 * _scale,
+        _item.description, -1, (_layout.width - 64 * _scale) / _scale, _scale, _scale, 0);
+    var _hover = point_in_rectangle(device_mouse_x_to_gui(0), device_mouse_y_to_gui(0),
+        _layout.button_left, _layout.button_top, _layout.button_right, _layout.button_bottom);
+    draw_set_color(_hover ? make_color_rgb(28, 78, 95) : make_color_rgb(18, 42, 54));
+    draw_rectangle(_layout.button_left, _layout.button_top, _layout.button_right, _layout.button_bottom, false);
+    draw_set_color(_accent);
+    draw_rectangle(_layout.button_left, _layout.button_top, _layout.button_right, _layout.button_bottom, true);
+    draw_set_valign(fa_middle);
+    draw_set_color(c_white);
+    draw_text_transformed(_layout.x, (_layout.button_top + _layout.button_bottom) * 0.5,
+        controls_key_name(controls_key("interact")) + " - CONTINUE", 0.9 * _scale, 0.9 * _scale, 0);
+    draw_set_font(_font);
+    draw_set_color(_color);
+    draw_set_alpha(_alpha);
+    draw_set_halign(_halign);
+    draw_set_valign(_valign);
+}
+
 function item_draw_hud(_player)
 {
     if (!instance_exists(_player)) return;

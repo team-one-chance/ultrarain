@@ -1,4 +1,6 @@
 opened = false;
+pickup_notice_pending = ""; // Item key queued by a pickup collision; empty means no pending modal.
+pickup_notice_key = ""; // Item key displayed until the player explicitly closes its panel.
 page = 0;
 selected = 0;
 selection_age = 0;
@@ -35,9 +37,23 @@ pause_layout = function()
         row_height: (page == 3 ? 40 : 54) * _scale, row_top: (display_get_gui_height() - _height) * 0.5 + 150 * _scale };
 };
 
+pickup_notice_layout = function()
+{
+    var _scale = min(1.35, display_get_gui_width() / 1000, display_get_gui_height() / 600); // GUI scale; keeps the larger panel within the screen.
+    var _width = 720 * _scale; // GUI pixels at scale 1; wider than the former 440-pixel notice.
+    var _height = 380 * _scale; // GUI pixels at scale 1; room for a large icon and readable instructions.
+    var _x = display_get_gui_width() * 0.5;
+    var _top = (display_get_gui_height() - _height) * 0.5;
+    return { x: _x, top: _top, width: _width, height: _height, scale: _scale,
+        left: _x - _width * 0.5, right: _x + _width * 0.5,
+        button_left: _x - 130 * _scale, button_right: _x + 130 * _scale,
+        button_top: _top + 310 * _scale, button_bottom: _top + 354 * _scale };
+};
+
 pause_resume = function()
 {
     opened = false;
+    pickup_notice_key = "";
     if (instance_exists(controller))
     {
         controller.thaw_world();

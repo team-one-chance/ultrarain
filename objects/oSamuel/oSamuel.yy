@@ -1,15 +1,20 @@
 {
   "$GMObject":"",
-  "%Name":"oSam",
-  "eventList":[],
+  "%Name":"oSamuel",
+  "eventList":[
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
+  ],
   "managed":true,
-  "name":"oSam",
+  "name":"oSamuel",
   "overriddenProperties":[],
   "parent":{
     "name":"Objects",
     "path":"folders/Objects.yy",
   },
-  "parentObjectId":null,
+  "parentObjectId":{
+    "name":"oAri",
+    "path":"objects/oAri/oAri.yy",
+  },
   "persistent":false,
   "physicsAngularDamping":0.1,
   "physicsDensity":0.5,
@@ -28,8 +33,8 @@
   "resourceVersion":"2.0",
   "solid":false,
   "spriteId":{
-    "name":"sSamIdle",
-    "path":"sprites/sSamIdle/sSamIdle.yy",
+    "name":"sSamuelIdle",
+    "path":"sprites/sSamuelIdle/sSamuelIdle.yy",
   },
   "spriteMaskId":null,
   "visible":true,

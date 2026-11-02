@@ -29,23 +29,8 @@ else if (_target.parry_is_active() && breaker_can_melee_parry(_target, ParryStat
     _target.damage_knockback_timer = breaker_half_parry_push_seconds;
     _target.phy_speed_x = _target.damage_knockback_speed_x;
 
-    // Visual effects (VFX): place the burst between the facing edges of both bodies.
-    var _player_centre = (_target.bbox_left + _target.bbox_right) * 0.5;
-    var _breaker_centre = (bbox_left + bbox_right) * 0.5;
-    var _breaker_edge = _push_side > 0 ? bbox_right : bbox_left;
-    var _player_edge = _push_side > 0 ? _target.bbox_left : _target.bbox_right;
-    var _spark_x = clamp((_breaker_edge + _player_edge) * 0.5,
-        min(_breaker_centre, _player_centre), max(_breaker_centre, _player_centre));
-    _spark_x = _block_contact.px; // World-space contact on the recoiling procedural blade.
-    var _spark_y = _block_contact.py;
-    var _spark_settings = breaker_slam_visual_settings().half_parry_sparks;
-    var _spark_effect = instance_create_depth(_spark_x, _spark_y, -10000, o_ShotImpact,
-        { impact_parry: true, impact_block: true,
-          impact_strength: _target.parry_block_config.impact_strength,
-          impact_visual: _target.parry_block_config.impact, impact_direction: _push_side > 0 ? 0 : 180 });
-    _spark_effect.spark_color_start = _spark_settings.bright_color;
-    _spark_effect.spark_color_end = _spark_settings.fade_color;
-    world_sfx_play(sfxNoShieldBashParried, _spark_x, _spark_y, 1, 1, 1280); // Unshielded bash parry cue, audible near the clash.
+    breaker_parry_contact_effect(_target, _block_contact, _push_side > 0 ? 0 : 180);
+    world_sfx_play(sfxNoShieldBashParried, _block_contact.px, _block_contact.py, 1, 1, 1280); // Unshielded bash parry cue, audible near the clash.
     exit;
 }
 if (breaker_time >= _window.end_seconds) {

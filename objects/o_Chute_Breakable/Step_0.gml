@@ -40,6 +40,8 @@ if (break_requested && !broken)
 
 if (broken)
 {
+    if (spawns_ambush && room == LE_PWR && instance_exists(oSamuel)
+        && !oSamuel.samuel_encounter_finished) exit;
     flash_elapsed += (variable_global_exists("dev_delta_time") ? (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) : delta_time) / 1000000;
 
     // Ordinary covers break without claiming any ambush markers.

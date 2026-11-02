@@ -191,6 +191,7 @@ if (controller_state == 2)
         controller_state = 1;
         stop_wire_flash_sfx();
         drag_wire = -1;
+        keyboard_clear(vk_escape); // Consume the puzzle exit so the same press cannot also open a menu.
     }
     else
     {
@@ -254,14 +255,14 @@ if (controller_state == 2)
         var _gui_h = display_get_gui_height();
 
         var _panel_w = min(380, _gui_w - 24);
-        var _panel_h = min(280, _gui_h - 24);
+        var _panel_h = min(320, _gui_h - 24);
         var _panel_x = (_gui_w - _panel_w) / 2;
         var _panel_y = (_gui_h - _panel_h) / 2;
 
         var _left_x = _panel_x + _panel_w * 0.22;
         var _right_x = _panel_x + _panel_w * 0.78;
         var _first_y = _panel_y + 64;
-        var _row_gap = (_panel_h - 100) / 3;
+        var _row_gap = (_panel_h - 148) / 3; // Match Draw's sockets and reserved instruction footer.
 
         var _mx = device_mouse_x_to_gui(0);
         var _my = device_mouse_y_to_gui(0);
