@@ -806,10 +806,11 @@ slide_boost_timer = 0;
 player_bound_fixture = -1;
 player_collider_short = false;
 
-player_set_collider = function(_short)
+// _force is reserved for validated tutorial spawns; movement still checks headroom before standing.
+player_set_collider = function(_short, _force = false)
 {
     // Never expand an existing body into a ceiling.
-    if (!_short && player_bound_fixture != -1)
+    if (!_short && !_force && player_bound_fixture != -1)
     {
         if (variable_instance_exists(id, "player_can_stand"))
         {
@@ -914,7 +915,21 @@ player_can_stand = function()
 // =====================================
 
 // Current weapon
-weapon_type = "pistol";
+owns_pistol = room != r_preTutorial; // Ownership is instance-local; ordinary gameplay starts with both weapons.
+owns_sword = room != r_preTutorial;
+weapon_type = owns_pistol ? "pistol" : "none";
+weapon_owned = function(_weapon)
+{
+    return (_weapon == "pistol" && owns_pistol) || (_weapon == "sword" && owns_sword);
+};
+weapon_validate = function()
+{
+    if (weapon_owned(weapon_type)) return;
+    weapon_type = owns_pistol ? "pistol" : (owns_sword ? "sword" : "none");
+    sword_swing_timer = 0;
+    sword_swing_pending_hit = false;
+    parry_timer = 0;
+};
 
 // Legacy hit-knockback settings, retained for external attack scripts.
 // The new slam uses slam_base_knockback_speed instead.

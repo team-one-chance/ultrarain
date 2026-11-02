@@ -24,6 +24,30 @@ parallax_layers = [
     }
 ];
 
+// The pre-tutorial folder contains three separate tile layers. Move them
+// together, with a larger camera-relative offset for its vast cyberspace.
+if (room == r_preTutorial)
+{
+    parallax_layers = [];
+    var far_layer_names = ["BG_Far_Red", "BG_Far_Blue", "BG_Far_Green"];
+    for (var i = 0; i < array_length(far_layer_names); i++)
+    {
+        var far_layer = layer_get_id(far_layer_names[i]);
+        if (far_layer == -1) continue;
+
+        layer_shader(far_layer, sh_PreTutorialFarDim);
+        array_push(parallax_layers, {
+            layer_id: far_layer,
+            speed_x: 0.15, // 55% of horizontal camera travel offsets the background.
+            speed_y: 0.30, // 30% of vertical camera travel offsets the background.
+            max_offset_x: -1, // Unlimited horizontal offset, in room pixels.
+            max_offset_y: -1, // Unlimited vertical offset, in room pixels.
+            start_x: 0,
+            start_y: 0
+        });
+    }
+}
+
 for (var i = 0; i < array_length(parallax_layers); i++)
 {
     var entry = parallax_layers[i];
@@ -35,12 +59,8 @@ for (var i = 0; i < array_length(parallax_layers); i++)
     }
 }
 
-var filter_on = function()
-{
-    gpu_set_texfilter(true);
-};
-
-var filter_off = function()
+// Keep pixel-art tile edges crisp at fractional camera positions and display scales.
+var use_nearest_filter = function()
 {
     gpu_set_texfilter(false);
 };
@@ -51,7 +71,7 @@ for (var i = 0; i < array_length(parallax_layers); i++)
 
     if (background_layer != -1)
     {
-        layer_script_begin(background_layer, filter_on);
-        layer_script_end(background_layer, filter_off);
+        layer_script_begin(background_layer, use_nearest_filter);
+        layer_script_end(background_layer, use_nearest_filter);
     }
 }

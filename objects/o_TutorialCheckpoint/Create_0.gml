@@ -7,6 +7,16 @@ checkpoint_layers = undefined;
 checkpoint_layers_pending = false;
 checkpoint_first_door_open = false; // Remember the first tutorial door across a retry.
 checkpoint_first_door_pending = false;
+checkpoint_medkit_owned = false; // Whether the nanoinjector was unlocked at the checkpoint.
+checkpoint_syringe_count = 0; // Charges saved when the checkpoint is reached.
+checkpoint_syringe_max = 3; // Maximum charges saved with the checkpoint.
+checkpoint_syringes_pending = false;
+save_checkpoint_syringes = function(_player)
+{
+    checkpoint_medkit_owned = _player.medkit_owned;
+    checkpoint_syringe_count = _player.syringe_count;
+    checkpoint_syringe_max = _player.syringe_max;
+};
 vent_skip_state = 0; // 0 = idle, 1 = fade out, 2 = fade in.
 vent_skip_alpha = 0; // Black overlay opacity, from 0 to 1.
 vent_skip_fade_seconds = 0.4; // Seconds per fade; larger values slow the transition.
@@ -98,6 +108,13 @@ if (variable_global_exists("tutorial_checkpoint_retry")
     respawn_x = _retry.x;
     respawn_y = _retry.y;
     big_room_cleared = _retry.cleared;
+    if (variable_struct_exists(_retry, "syringe_count"))
+    {
+        checkpoint_medkit_owned = _retry.medkit_owned;
+        checkpoint_syringe_count = _retry.syringe_count;
+        checkpoint_syringe_max = _retry.syringe_max;
+        checkpoint_syringes_pending = true;
+    }
     if (variable_struct_exists(_retry, "first_door_open"))
     {
         checkpoint_first_door_open = _retry.first_door_open;

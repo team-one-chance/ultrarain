@@ -13,6 +13,13 @@ if (checkpoint_layers_pending)
 else if (!is_struct(checkpoint_layers)) save_checkpoint_layers();
 
 var _player = instance_find(o_Player, 0);
+if (checkpoint_syringes_pending && instance_exists(_player))
+{
+    _player.medkit_owned = checkpoint_medkit_owned;
+    _player.syringe_count = checkpoint_syringe_count;
+    _player.syringe_max = checkpoint_syringe_max;
+    checkpoint_syringes_pending = false;
+}
 if (!instance_exists(_player) || _player.pHP <= 0 || _player.grinder_dying)
 {
     vent_skip_state = 0;
@@ -122,9 +129,11 @@ if (!big_room_cleared && array_length(big_room_enemies) > 0)
         respawn_x = 1056; // Room pixels: centre of the vent entrance.
         respawn_y = 2527; // Feet one pixel above the intact vent blocks on retry.
         save_checkpoint_layers();
+        save_checkpoint_syringes(_player);
     }
 }
 
 // Keep the latest tutorial checkpoint available during travel to another room.
 global.menu_checkpoint = { x: respawn_x, y: respawn_y, cleared: big_room_cleared, layers: checkpoint_layers,
-    first_door_open: checkpoint_first_door_open };
+    first_door_open: checkpoint_first_door_open, medkit_owned: checkpoint_medkit_owned,
+    syringe_count: checkpoint_syringe_count, syringe_max: checkpoint_syringe_max };

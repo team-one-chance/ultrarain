@@ -39,7 +39,7 @@ function seamless_capture(_player, _gate, _destination)
         "take_damage", "timerf3", "trap_bounce_pending", "trap_bounce_speed", "trap_knockback_speed_x",
         "trap_knockback_timer", "use_syringe", "visible", "wall_jump_forced_direction", "wall_jump_lock_duration",
         "wall_jump_lock_time", "wall_jump_x", "wall_jump_y", "wall_slide_active", "wall_slide_decel",
-        "wall_slide_speed", "weapon_fire_timer", "weapon_type"
+        "wall_slide_speed", "weapon_fire_timer", "weapon_type", "owns_pistol", "owns_sword"
     ];
     var _values = {};
     for (var _i = 0; _i < array_length(_fields); _i++)

@@ -404,10 +404,10 @@ if (drone_fire_state != 0 && !_can_attack)
     }
 }
 
-// Randomly give one eligible drone the next turn.
+// Randomly fill an available attack slot; Futile allows staggered overlapping volleys.
 if (drone_ready)
 {
-    var _busy = false;
+    var _active_count = 0;
     var _candidates = [];
 
     for (var _i = 0; _i < instance_number(oDrone); _i++)
@@ -416,8 +416,7 @@ if (drone_ready)
 
         if (_drone.drone_fire_state != 0)
         {
-            _busy = true;
-            break;
+            _active_count += 1;
         }
 
         if (_drone.drone_ready
@@ -429,7 +428,7 @@ if (drone_ready)
         }
     }
 
-    if (!_busy && array_length(_candidates) > 0)
+    if (_active_count < drone_attack_slots && array_length(_candidates) > 0)
     {
         var _chosen = _candidates[
             irandom(array_length(_candidates) - 1)
@@ -440,6 +439,13 @@ if (drone_ready)
 
         _chosen.drone_charge_timer =
             _chosen.drone_charge_duration;
+
+        // Reserve a short gap before another drone fills the second slot.
+        var _launch_gap = _chosen.drone_launch_gap;
+        with (oDrone)
+        {
+            drone_turn_wait = max(drone_turn_wait, _launch_gap);
+        }
     }
 }
 

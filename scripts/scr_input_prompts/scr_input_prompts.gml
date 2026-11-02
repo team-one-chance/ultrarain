@@ -8,6 +8,10 @@ function input_prompt_definition(_id)
         case "jump": return { text: "JUMP", icons: [2] };
         case "slide": return { text: "HOLD TO SLIDE", icons: [3] };
         case "dash": return { text: "DASH", icons: [4] };
+        case "air_dash": return { text: "JUMP + AIR DASH", icons: [2, 4] };
+        case "dash_jump": return { text: "DASH, THEN JUMP", icons: [4, 2] };
+        case "pistol": return { text: "EQUIP PISTOL", icons: [9] };
+        case "coin_shoot": return { text: "THROW, THEN SHOOT THE COIN", icons: [8, 7] };
         case "heal": return { text: "HEAL", icons: [5] };
         case "interact": return { text: "INTERACT", icons: [6] };
         case "shoot": return { text: "FIRE / SWORD ATTACK", icons: [7] };
@@ -51,6 +55,10 @@ function input_prompt_actions(_id)
         case "jump": return ["jump"];
         case "slide": return ["slide"];
         case "dash": return ["dash"];
+        case "air_dash": return ["jump", "dash"];
+        case "dash_jump": return ["dash", "jump"];
+        case "pistol": return ["pistol"];
+        case "coin_shoot": return ["coin", "fire"];
         case "heal": return ["heal"];
         case "interact": return ["interact"];
         case "shoot": return ["fire"];
@@ -65,7 +73,7 @@ function input_prompt_actions(_id)
     return [];
 }
 
-function input_prompt_draw(_definition, _text, _x, _y, _id = "")
+function input_prompt_draw(_definition, _text, _x, _y, _id = "", _scale = 1)
 {
     var _font = draw_get_font();
     var _color = draw_get_color();
@@ -75,15 +83,15 @@ function input_prompt_draw(_definition, _text, _x, _y, _id = "")
     draw_set_font(-1);
     draw_set_halign(fa_left);
     draw_set_valign(fa_middle);
-    var _size = 32; // GUI pixels per icon; increase for larger button images.
-    var _gap = 4; // GUI pixels between icons.
+    var _size = 32 * _scale; // GUI pixels per icon; increase for larger button images.
+    var _gap = 4 * _scale; // GUI pixels between icons.
     var _icons_width = array_length(_definition.icons) * (_size + _gap);
-    var _width = _icons_width + string_width(_text) + 24;
+    var _width = _icons_width + string_width(_text) * _scale + 24 * _scale;
     draw_set_alpha(0.8);
     draw_set_color(c_black);
-    draw_rectangle(_x - _width / 2, _y - 24, _x + _width / 2, _y + 24, false);
+    draw_rectangle(_x - _width / 2, _y - 24 * _scale, _x + _width / 2, _y + 24 * _scale, false);
     draw_set_alpha(1);
-    var _left = _x - _width / 2 + 8;
+    var _left = _x - _width / 2 + 8 * _scale;
     var _actions = input_prompt_actions(_id);
     var _defaults = controls_defaults();
     for (var _i = 0; _i < array_length(_definition.icons); _i++)
@@ -94,7 +102,7 @@ function input_prompt_draw(_definition, _text, _x, _y, _id = "")
         {
             // Unavailable icon frames fall back to the current binding's label.
             var _key_text = controls_key_name(controls_key(_actions[_i]));
-            var _text_scale = min(1, (_size - 4) / max(1, string_width(_key_text)));
+            var _text_scale = min(_scale, (_size - 4 * _scale) / max(1, string_width(_key_text)));
             draw_set_color(c_white);
             draw_rectangle(_icon_x, _y - _size / 2, _icon_x + _size, _y + _size / 2, true);
             draw_set_halign(fa_center);
@@ -105,7 +113,7 @@ function input_prompt_draw(_definition, _text, _x, _y, _id = "")
             _y - _size / 2, _size / 64, _size / 64, 0, c_white, 1);
     }
     draw_set_color(c_white);
-    draw_text(_left + _icons_width + 4, _y, _text);
+    draw_text_transformed(_left + _icons_width + 4 * _scale, _y, _text, _scale, _scale, 0);
     draw_set_font(_font);
     draw_set_color(_color);
     draw_set_alpha(_alpha);

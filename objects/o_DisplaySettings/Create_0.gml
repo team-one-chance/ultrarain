@@ -7,6 +7,9 @@ if (instance_number(o_DisplaySettings) > 1)
 
 persistent = true;
 
+// Nearest-neighbor sampling keeps world sprites and the scaled game image crisp.
+gpu_set_texfilter(false);
+
 // Color of the space outside the game image.
 window_set_colour(c_black);
 

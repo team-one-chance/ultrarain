@@ -159,6 +159,9 @@ scout_group_roll_delay_min = 0.45;
 scout_group_roll_delay_max = 0.75;
 scout_group_roll_radius = 576;
 scout_roll_spacing_timer = 0;
+scout_stop_playback_rate = 1; // Animation speed multiplier for recovery after a roll.
+
+scout_apply_futile_pressure();
 attack_dash_overshoot = 16;
 attack_stop_slide_speed = 120; // Initial speed, easing to zero over chargeStop.
 attack_miss_slide_speed = 360; // Preserve roll momentum on a miss, then ease to zero.
@@ -221,7 +224,7 @@ crowd_min_spacing = 1;
 crowd_body_gap = 1;
 
 // Pixels per second. Keep above normal chase speed (currently 300).
-crowd_separation_speed = 420;
+crowd_separation_speed = enemy_difficulty == 3 ? 540 : 420;
 
 // Compare feet so enemies on different floors do not repel each other.
 crowd_floor_tolerance = 12;
@@ -332,6 +335,8 @@ scout_animation_duration = function(_sprite)
         _fps *= scout_charge_stop_playback_rate;
     else if (_sprite == s_Scout_attackEnter)
         _fps *= scout_melee_enter_playback_rate;
+    else if (_sprite == s_Scout_chargeStop)
+        _fps *= scout_stop_playback_rate;
     else if (_sprite == s_Scout_walk)
         _fps *= ground_move_speed / 210;
     return sprite_get_number(_sprite) / max(0.001, _fps);

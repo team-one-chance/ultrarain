@@ -69,8 +69,9 @@ var view_height = camera_get_view_height(cam);
 // TARGET POSITION
 // =====================================
 
-var target_x = o_Player.x - view_width / 2;
-var target_y = o_Player.y - view_height / 1.4;
+// Teleports update the physics body before the old draw coordinates necessarily catch up.
+var target_x = (training_active() ? o_Player.phy_position_x : o_Player.x) - view_width / 2;
+var target_y = (training_active() ? o_Player.phy_position_y : o_Player.y) - view_height / 1.4;
 
 // Hold the camera on the stationary cabin while the scenery moves.
 var _train = instance_find(o_TrainRide, 0);
@@ -155,4 +156,4 @@ if (shake_remaining_seconds > 0)
     shake_offset_x = random_range(-_shake_strength, _shake_strength);
     shake_offset_y = random_range(-_shake_strength, _shake_strength);
 }
-camera_set_view_pos(cam, cam_x + shake_offset_x, cam_y + shake_offset_y);
+camera_set_view_pos(cam, cam_x + shake_offset_x, training_camera_y(cam_y + shake_offset_y));

@@ -96,12 +96,14 @@ function controls_key(_name)
 
 function controls_down(_name)
 {
+    if (!training_action_allowed(_name)) return false;
     var _key = controls_key(_name);
     return _key < 0 ? mouse_check_button(-_key) : keyboard_check(_key);
 }
 
 function controls_pressed(_name)
 {
+    if (!training_action_allowed(_name)) return false;
     var _key = controls_key(_name);
     return _key < 0 ? mouse_check_button_pressed(-_key) : keyboard_check_pressed(_key);
 }

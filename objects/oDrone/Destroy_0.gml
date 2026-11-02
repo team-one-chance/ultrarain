@@ -1,3 +1,8 @@
+if (training_active())
+{
+    if (ehp <= 0) { training_defeated(id); training_dissolve(x, y - 24); }
+    exit;
+}
 // Ordinary removal during room transitions should remain silent.
 if (ehp <= 0)
 {

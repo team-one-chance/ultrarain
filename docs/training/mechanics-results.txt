@@ -1,0 +1,22 @@
+[TEST] slide x=17904.91 y=13919.85 sliding=1 actions={"slide":true}
+[TEST] PASS Actual grounded slide emits objective event
+[TEST] PASS Player can slide through authored low ceiling
+[TEST] PASS Actual jump emits event
+[TEST] air x=18381.21 y=13879.18 actions={"air_dash":true,"jump":true,"slide":true}
+[TEST] PASS Actual air dash emits event
+[TEST] PASS Actual ground dash emits event
+[TEST] PASS Movement demonstrations and end trigger advance
+[TEST] PASS Actual wall contact/hold emits event
+[TEST] slam section=4 x=24721.03 y=17535.85
+[TEST] PASS Actual slam breaks floor and descends into pistol area
+[TEST] PASS All five floor segments break through gameplay
+[TEST] PASS Arrival slam does not consume pistol targets
+[TEST] PASS Coin input spawns player-owned coin
+[TEST] PASS Coin input spawns player-owned coin
+[TEST] PASS Coin input spawns player-owned coin
+[TEST] PASS Three real pistol-to-coin traces complete direct-hit exercise
+[TEST] PASS Coin input spawns player-owned coin
+[TEST] PASS Coin input spawns player-owned coin
+[TEST] PASS Coin input spawns player-owned coin
+[TEST] PASS Repeated real coin ricochets defeat target behind authored wall
+[TEST] MECHANICS COMPLETE
