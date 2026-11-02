@@ -1,13 +1,47 @@
 var _dt = min(0.1, delta_time / 1000000);
+if (!opened && pickup_notice_pending != "")
+{
+    controller = instance_find(o_DevMenu, 0);
+    if (!instance_exists(controller) || controller.opened || controller.time_paused) exit;
+    pickup_notice_key = pickup_notice_pending;
+    pickup_notice_pending = "";
+    opened = true;
+    menu_age = 0;
+    controller.freeze_world(id); // Suspend physics and every gameplay instance while keeping this panel responsive.
+    game_set_speed(controller.base_game_speed, gamespeed_fps);
+    exit;
+}
+if (opened && pickup_notice_key != "")
+{
+    menu_age += _dt;
+    if (menu_age < 0.15) exit; // Seconds before dismissal is accepted; avoids closing from the collection input.
+    var _notice_layout = pickup_notice_layout();
+    var _mouse_x = device_mouse_x_to_gui(0);
+    var _mouse_y = device_mouse_y_to_gui(0);
+    var _close_button = point_in_rectangle(_mouse_x, _mouse_y,
+        _notice_layout.button_left, _notice_layout.button_top, _notice_layout.button_right, _notice_layout.button_bottom);
+    var _close_x = point_in_rectangle(_mouse_x, _mouse_y,
+        _notice_layout.right - 48 * _notice_layout.scale, _notice_layout.top,
+        _notice_layout.right, _notice_layout.top + 48 * _notice_layout.scale);
+    if (controls_pressed("interact") || keyboard_check_pressed(vk_enter) || keyboard_check_pressed(vk_escape)
+        || (mouse_check_button_pressed(mb_left) && (_close_button || _close_x)))
+    {
+        var _interact_key = controls_key("interact");
+        if (_interact_key < 0) mouse_clear(-_interact_key); else keyboard_clear(_interact_key);
+        pause_resume();
+    }
+    exit;
+}
 if (!opened)
 {
     if (!keyboard_check_pressed(vk_escape) || room == LE_MENU
     || instance_exists(o_BootMenu) || instance_exists(oGameOver)) exit;
     var _player = instance_find(o_Player, 0);
     if (!instance_exists(_player) || _player.pHP <= 0 || _player.grinder_dying) exit;
-    // Begin Step runs before the terminal's Step, which consumes Escape to close.
-    // Let the active terminal handle it before the pause menu freezes the world.
+    // Begin Step runs before interaction Steps; let their panels handle Escape before pausing the world.
     var _interaction = _player.hacking_controller;
+    if (instance_exists(_interaction) && _interaction.object_index == o_DoorController
+        && _interaction.controller_state == 2) exit;
     if (instance_exists(_interaction) && _interaction.object_index == o_DemoTerminal
         && _interaction.reading) exit;
     controller = instance_find(o_DevMenu, 0);

@@ -92,6 +92,14 @@ if (pHP <= 0)
     exit;
 }
 
+// Ari owns movement and combat until the required tutorial conversation finishes.
+if (instance_exists(ari_interaction_owner))
+{
+    stop_movement_sfx();
+    ari_interaction_owner.ari_hold_player();
+    exit;
+}
+
 // While held, the Breaker positions the player after physics in End Step.
 if (instance_exists(breaker_grab_owner)
     && !(variable_instance_exists(breaker_grab_owner, "train_departing") && breaker_grab_owner.train_departing))

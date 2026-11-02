@@ -1,4 +1,5 @@
 timerf3 = 0;
+ari_interaction_owner = noone; // Ari instance holding movement and combat during the tutorial conversation.
 
 // Keep the dev controller within GameMaker's drawable depth range.
 if (!instance_exists(o_DevMenu)) instance_create_depth(0, 0, -14000, o_DevMenu);
@@ -170,6 +171,14 @@ parry_visual_blade_point = function(_fraction)
     if (_body == 0) _body = 1;
     var _cx = x + ((_rig.back_x + _rig.front_x) * 0.5 - sprite_get_xoffset(sprite_index)) * _body;
     var _cy = y + (_rig.back_y + _rig.front_y) * 0.5 - sprite_get_yoffset(sprite_index);
+    if (aim_rig_mode == AimRigMode.ONE_HANDED)
+    {
+        // Match Draw's firing shoulder instead of the two-handed shoulder midpoint.
+        var _socket_x = _body > 0 ? _rig.front_x : _rig.back_x;
+        var _socket_y = _body > 0 ? _rig.front_y : _rig.back_y;
+        _cx = x + (_socket_x - sprite_get_xoffset(sprite_index)) * _body;
+        _cy = y + _socket_y - sprite_get_yoffset(sprite_index);
+    }
     _cx -= _pose.brace * _pose.weight * parry_animation_facing;
     var _angle = 90 + _pose.angle * parry_animation_facing;
     var _reach = sprite_get_yoffset(sDarkRepulsor) * _fraction;
@@ -186,16 +195,27 @@ parry_visual_success = function(_source)
         parry_visual_time = parry_visual_config.windup;
     }
     var _strength = parry_visual_config.impact_strength;
-    var _cx = clamp((bbox_left + bbox_right) * 0.5, _source.bbox_left, _source.bbox_right);
-    var _cy = clamp((bbox_top + bbox_bottom) * 0.5, _source.bbox_top, _source.bbox_bottom);
-    instance_create_depth(_cx, _cy, depth - 2, o_ShotImpact,
-        { impact_enemy: true, impact_parry: true, impact_sword: true,
-          impact_strength: _strength, impact_visual: parry_visual_config.impact,
-          impact_direction: parry_animation_facing > 0 ? 0 : 180 });
     if (parry_visual_time < 0)
         parry_visual_time = parry_visual_config.windup + parry_visual_config.swing;
     parry_visual_hold = parry_visual_config.impact_hold;
     parry_visual_boost = 0.10; // Seconds of brighter slash persistence after contact.
+    if (_source.object_index == oEnemy_Breaker)
+    {
+        // Confirmed contact holds the fully raised blade, matching the burst's sampled pose.
+        parry_visual_time = parry_visual_config.windup + parry_visual_config.swing;
+        var _push_side = sign((bbox_left + bbox_right) - (_source.bbox_left + _source.bbox_right));
+        if (_push_side == 0) _push_side = _source.facing_direction;
+        _source.breaker_parry_contact_effect(id, parry_visual_blade_point(0.65), _push_side > 0 ? 0 : 180);
+    }
+    else
+    {
+        var _cx = clamp((bbox_left + bbox_right) * 0.5, _source.bbox_left, _source.bbox_right);
+        var _cy = clamp((bbox_top + bbox_bottom) * 0.5, _source.bbox_top, _source.bbox_bottom);
+        instance_create_depth(_cx, _cy, depth - 2, o_ShotImpact,
+            { impact_enemy: true, impact_parry: true, impact_sword: true,
+              impact_strength: _strength, impact_visual: parry_visual_config.impact,
+              impact_direction: parry_animation_facing > 0 ? 0 : 180 });
+    }
     with (o_CAMERA) start_shake(1.5 * _strength, 0.07);
 };
 
@@ -669,6 +689,11 @@ slide_exit_delay = 0;
 medkit_owned = false;
 syringe_count = 0;
 syringe_max = 3;
+if (room == LE_TUTORIAL_WIP && variable_global_exists("tutorial_ari_assist") && global.tutorial_ari_assist == 2)
+{
+    medkit_owned = true;
+    syringe_count = syringe_max; // Restore Ari's survival gift, refilled after checkpoint respawn.
+}
 
 use_syringe = function(_revive)
 {
@@ -740,6 +765,7 @@ slam_impact_iframe_duration = 0.12;
 damage_blocks_damage = function()
 {
     return (variable_global_exists("dev_invincible") && global.dev_invincible)
+        || instance_exists(ari_interaction_owner) // Protect the locked player from projectiles and damage during Ari's cinematic.
         || is_slamming || slam_iframe_timer > 0 || dash_blocks_damage();
 };
 slam_distance = 0;

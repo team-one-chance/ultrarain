@@ -1,17 +1,23 @@
 if (controller_state == 2)
 {
+    var _old_font = draw_get_font();
+    var _old_color = draw_get_color();
+    var _old_alpha = draw_get_alpha();
+    var _old_halign = draw_get_halign();
+    var _old_valign = draw_get_valign();
+    draw_set_font(f_Console);
     var _gui_w = display_get_gui_width();
     var _gui_h = display_get_gui_height();
 
     var _panel_w = min(380, _gui_w - 24);
-    var _panel_h = min(280, _gui_h - 24);
+    var _panel_h = min(320, _gui_h - 24); // GUI pixels; reserve a separate footer for instructions.
     var _panel_x = (_gui_w - _panel_w) / 2;
     var _panel_y = (_gui_h - _panel_h) / 2;
 
     var _left_x = _panel_x + _panel_w * 0.22;
     var _right_x = _panel_x + _panel_w * 0.78;
     var _first_y = _panel_y + 64;
-    var _row_gap = (_panel_h - 100) / 3;
+    var _row_gap = (_panel_h - 148) / 3; // GUI pixels between sockets; leaves the instruction footer clear.
 
     // Darken the game behind the panel.
     draw_set_color(c_black);
@@ -34,34 +40,19 @@ if (controller_state == 2)
         true
     );
 
-draw_set_halign(fa_center);
-
-var _title = "RECONNECT POWER";
-var _hint = "Drag wires to matching sparks   |   ESC to exit";
-var _text_x = _gui_w / 2;
-var _title_y = _panel_y + 18;
-var _hint_y = _panel_y + _panel_h - 25;
-
-// Black outline, 1 GUI pixel thick.
-draw_set_color(c_black);
-
-for (var _ox = -1; _ox <= 1; _ox++)
-{
-    for (var _oy = -1; _oy <= 1; _oy++)
-    {
-        if (_ox == 0 && _oy == 0) continue;
-
-        draw_text(_text_x + _ox, _title_y + _oy, _title);
-        draw_text(_text_x + _ox, _hint_y + _oy, _hint);
-    }
-}
-
-// White text over the outline.
-draw_set_color(c_white);
-draw_text(_text_x, _title_y, _title);
-draw_text(_text_x, _hint_y, _hint);
-
-draw_set_halign(fa_left);
+    draw_set_halign(fa_center);
+    draw_set_valign(fa_middle);
+    var _text_x = _panel_x + _panel_w * 0.5;
+    var _title = "RECONNECT POWER";
+    var _hint = "Drag wires to matching colors";
+    var _title_scale = min(0.85, (_panel_w - 32) / max(1, string_width(_title))); // Font scale; fit the title inside the panel.
+    var _hint_scale = min(0.65, (_panel_w - 32) / max(1, string_width(_hint)));
+    draw_set_color(c_white);
+    draw_text_transformed(_text_x, _panel_y + 24, _title, _title_scale, _title_scale, 0);
+    draw_set_color(make_color_rgb(195, 210, 220));
+    draw_text_transformed(_text_x, _panel_y + _panel_h - 48, _hint, _hint_scale, _hint_scale, 0);
+    draw_set_color(make_color_rgb(110, 195, 210));
+    draw_text_transformed(_text_x, _panel_y + _panel_h - 23, "ESC - CLOSE", 0.6, 0.6, 0);
 
     var _mx = device_mouse_x_to_gui(0);
     var _my = device_mouse_y_to_gui(0);
@@ -168,5 +159,9 @@ draw_set_halign(fa_left);
         }
     }
 
-    draw_set_color(c_white);
+    draw_set_font(_old_font);
+    draw_set_color(_old_color);
+    draw_set_alpha(_old_alpha);
+    draw_set_halign(_old_halign);
+    draw_set_valign(_old_valign);
 }
