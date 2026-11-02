@@ -9,12 +9,15 @@ var _inside = abs(_player.x - x) <= max(1, trigger_width * abs(image_xscale)) * 
 // Activate on entry so standing in a trigger cannot overwrite another save.
 if (_inside && !player_was_inside)
 {
-    // Keep entry pending until the controller has restored the checkpoint's room state.
-    if (!instance_exists(o_TutorialCheckpoint) || o_TutorialCheckpoint.checkpoint_layers_pending) exit;
+    // Keep entry pending until the controller restores room state and syringe charges.
+    if (!instance_exists(o_TutorialCheckpoint)
+        || o_TutorialCheckpoint.checkpoint_layers_pending
+        || o_TutorialCheckpoint.checkpoint_syringes_pending) exit;
     var _spawn = checkpoint_find_spawn();
     if (!is_struct(_spawn)) exit;
     o_TutorialCheckpoint.respawn_x = _spawn.x;
     o_TutorialCheckpoint.respawn_y = _spawn.y;
     o_TutorialCheckpoint.save_checkpoint_layers();
+    o_TutorialCheckpoint.save_checkpoint_syringes(_player);
 }
 player_was_inside = _inside;
