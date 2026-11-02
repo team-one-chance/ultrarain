@@ -177,6 +177,10 @@ if (instance_exists(inst)
             if (instance_exists(inst)
             && inst.object_index == o_Coin)
             {
+                if (training_active() && !inst.is_pinned
+                    && variable_instance_exists(inst, "coin_owner") && inst.coin_owner == id
+                    && collision_point((inst.bbox_left + inst.bbox_right) / 2, inst.bbox_bottom + 2, o_Block, false, true) == noone)
+                    training_action("direct_coin");
                 var _coin_x = inst.x;
                 var _coin_y = inst.y;
                 _coin_style = coin_ricochet(

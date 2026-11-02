@@ -1,3 +1,8 @@
+if (training_active())
+{
+    o_TrainingSimulation.reset_pending = true;
+    exit;
+}
 // Only explode on death; ordinary removal during transitions is silent.
 if (pHP <= 0)
 {

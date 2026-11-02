@@ -113,7 +113,7 @@ boot_menu_options = function()
 {
     switch (boot_state)
     {
-        case BootMenuState.MAIN: return ["Start", "Settings", "Credits", "Exit"];
+        case BootMenuState.MAIN: return ["TRAINING SIMULATION", "Start", "Settings", "Credits", "Exit"];
         case BootMenuState.DIFFICULTY:
             if (!menu_exhibition_active() && variable_global_exists("dev_futile_unlocked") && global.dev_futile_unlocked)
                 return ["Easy", "Normal", "Hard", "Futile", "Back"];
@@ -176,10 +176,17 @@ boot_menu_activate = function()
         case BootMenuState.MAIN:
             switch (menu_selection)
             {
-                case 0: boot_menu_open(BootMenuState.DIFFICULTY); break;
-                case 1: boot_menu_open(BootMenuState.SETTINGS); break;
-                case 2: boot_menu_open(BootMenuState.CREDITS); break;
-                case 3:
+                case 0:
+                    global.demo_travel_state = undefined;
+                    global.menu_checkpoint = undefined;
+                    global.tutorial_checkpoint_retry = undefined;
+                    global.menu_launch_room = r_preTutorial;
+                    game_restart();
+                    break;
+                case 1: boot_menu_open(BootMenuState.DIFFICULTY); break;
+                case 2: boot_menu_open(BootMenuState.SETTINGS); break;
+                case 3: boot_menu_open(BootMenuState.CREDITS); break;
+                case 4:
                     if (global.exhibition_exit_locked) exit_flash = 0.65;
                     else boot_menu_open(BootMenuState.CONFIRM_EXIT);
                     break;
@@ -219,7 +226,7 @@ boot_menu_activate = function()
             else if (global.exhibition_exit_locked)
             {
                 boot_menu_open(BootMenuState.MAIN);
-                menu_selection = 3;
+                menu_selection = 4;
                 exit_flash = 0.65;
             }
             else game_end();

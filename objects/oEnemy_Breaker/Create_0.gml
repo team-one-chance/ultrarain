@@ -201,8 +201,8 @@ breaker_half_parry_push_seconds = 0.12; // Seconds of horizontal push; larger va
 shield_bar_width = 28;
 shield_bar_height = 3;
 shield_bar_y_offset = 12;
-shield_front_bullet_multiplier = 0.10;
-shield_front_sword_multiplier = 5;
+shield_front_bullet_multiplier = shield_material_settings().bullet;
+shield_front_sword_multiplier = shield_material_settings().sword;
 shield_front_beam_multiplier = 1;
 // One through four coins: very little, little, moderate, relatively large.
 shield_beam_knockback_distances = [4, 12, 28, 56];

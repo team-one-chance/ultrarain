@@ -102,7 +102,11 @@ pause_activate = function()
         case 1:
             // Activate the checkpoint controller before reading its room-local data.
             pause_resume();
-            if (room == LE_TUTORIAL_WIP && instance_exists(o_TutorialCheckpoint))
+            if (training_active())
+            {
+                o_TrainingSimulation.reset_pending = true;
+            }
+            else if (room == LE_TUTORIAL_WIP && instance_exists(o_TutorialCheckpoint))
             {
                 var _checkpoint = instance_find(o_TutorialCheckpoint, 0);
                 global.tutorial_checkpoint_retry = {
@@ -131,7 +135,7 @@ pause_activate = function()
                 pause_new_run(LE_TUTORIAL_WIP, global.menu_checkpoint);
             else pause_new_run(room == TESTING ? TESTING : LE_TUTORIAL_WIP);
             break;
-        case 2: pause_new_run(room == TESTING ? TESTING : LE_TUTORIAL_WIP); break;
+        case 2: pause_new_run(room == r_preTutorial ? r_preTutorial : (room == TESTING ? TESTING : LE_TUTORIAL_WIP)); break;
         case 3: page = 1; selected = 0; selection_age = 0; break;
         case 4: page = 2; selected = 0; selection_age = 0; break;
         case 5: pause_new_run(undefined); break;

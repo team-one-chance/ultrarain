@@ -12,3 +12,6 @@ if (!instance_exists(o_Parallax))
 {
     instance_create_layer(0, 0, "Player", o_Parallax);
 }
+
+// Room-owned state never survives a simulation exit.
+instance_create_layer(0, 0, "Instances", o_TrainingSimulation);

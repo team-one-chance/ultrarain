@@ -59,12 +59,8 @@ for (var i = 0; i < array_length(parallax_layers); i++)
     }
 }
 
-var filter_on = function()
-{
-    gpu_set_texfilter(true);
-};
-
-var filter_off = function()
+// Keep pixel-art tile edges crisp at fractional camera positions and display scales.
+var use_nearest_filter = function()
 {
     gpu_set_texfilter(false);
 };
@@ -75,7 +71,7 @@ for (var i = 0; i < array_length(parallax_layers); i++)
 
     if (background_layer != -1)
     {
-        layer_script_begin(background_layer, filter_on);
-        layer_script_end(background_layer, filter_off);
+        layer_script_begin(background_layer, use_nearest_filter);
+        layer_script_end(background_layer, use_nearest_filter);
     }
 }

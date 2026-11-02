@@ -122,6 +122,8 @@ if (medkit_owned)
 // COIN ICON AND COUNTER
 // =====================================
 
+if (training_action_allowed("throw_coin") && owns_pistol)
+{
 var coin_gui_x = 20;
 var coin_gui_y = 75;
 
@@ -212,6 +214,8 @@ draw_set_valign(old_valign);
 // =====================================
 
 // Position and sizing
+}
+
 var weapons_gui_x = 20;
 var weapons_gui_y = 110;
 var weapon_slot_size = 44;
@@ -234,6 +238,7 @@ draw_set_valign(fa_top);
 
 for (var i = 0; i < 2; i++)
 {
+    if (!weapon_owned(weapon_names[i])) continue;
     var slot_x = weapons_gui_x
         + i * (weapon_slot_size + weapon_slot_gap);
 

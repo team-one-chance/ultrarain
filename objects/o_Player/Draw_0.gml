@@ -412,6 +412,24 @@ else
         + lengthdir_y(rig_free_arm_reach, _free_arm_angle);
 }
 
+// An unarmed pose uses two relaxed hands; sockets remain valid during every animation.
+if (weapon_type == "none")
+{
+    _shoulder_r_x += 3; // Pixels right; translate the unarmed arm's shoulder and hand together.
+    _shoulder_r_y -= 2; // Pixels up.
+    _right_target_x = _shoulder_r_x + (_left_target_x - _shoulder_l_x);
+    _right_target_y = _shoulder_r_y + (_left_target_y - _shoulder_l_y);
+    if (sprite_index == s_Player_Run)
+    {
+        // Opposite run phase: one relaxed arm moves forward while the other moves back.
+        var _right_arm_angle = 270 + dsin(_run_cycle + rig_free_arm_phase + 180)
+            * rig_free_arm_swing * _body_facing;
+        _right_target_x = _shoulder_r_x + lengthdir_x(rig_free_arm_reach, _right_arm_angle);
+        _right_target_y = _shoulder_r_y + lengthdir_y(rig_free_arm_reach, _right_arm_angle);
+    }
+}
+var _right_arm_facing = weapon_type == "none" ? _rest_arm_facing : _part_facing; // Unarmed elbow follows the body, not the cursor.
+
 // Draw rear arm
 if (_arm_layer_facing == 1)
 {
@@ -444,8 +462,8 @@ else
         _right_target_y,
         rig_upper_arm_length,
         rig_lower_arm_length,
-        _part_facing,
-        _part_facing
+        _right_arm_facing,
+        _right_arm_facing
     );
 }
 
@@ -506,8 +524,8 @@ if (_arm_layer_facing == 1)
         _right_target_y,
         rig_upper_arm_length,
         rig_lower_arm_length,
-        _part_facing,
-        _part_facing
+        _right_arm_facing,
+        _right_arm_facing
     );
 }
 else

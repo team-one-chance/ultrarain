@@ -1,0 +1,45 @@
+[TEST] PASS 178.1 Larger text and button prompt scales
+[TEST] PASS 178.2 Abyss left boundary exists
+[TEST] PASS 178.5 Abyss transfer has a world marker
+[TEST] PASS 178.2 Actual physics prevents drifting left out of abyss trigger
+[TEST] PASS 178.3 Combined dash and jump prompts use both bindings
+[TEST] PASS 178.3 Gap reminder remains visible after an earlier air dash
+[TEST] PASS 178.3 Long-gap reminder combines dash and jump after earlier demonstrations
+[TEST] PASS 178.4 Sliding footprint activates dash exit
+[TEST] PASS 178.4 Teleport clears slide and dash state
+[TEST] PASS 178.4 Teleport restores authored wallhold spawn
+[TEST] camera=22784.00 player=23504.00 physics=23504.00 width=1440 generation=4
+[TEST] PASS 178.4 Camera snaps to destination
+[TEST] PASS 178.9 Slam prompt is absent at wallhold entrance
+[TEST] PASS 178.6 Falling down the middle cannot bypass wallhold gate
+[TEST] PASS 178.6 Falling is not wallholding
+[TEST] PASS 178.6 A brief wall brush cannot complete the objective
+[TEST] PASS 178.6 Sustained actual wallhold releases gate
+[TEST] PASS 178.9 Wallhold confirmation keeps descent prompt until the floor
+[TEST] PASS 178.6/8 Retry replaces gate and pillar collider without duplicates
+[TEST] PASS 178.8 Painted pillar has a right-face collider
+[TEST] PASS 178.8 Actual movement cannot enter pillar from right
+[TEST] PASS 178.9 Slam prompt stays out of descent shaft
+[TEST] PASS 178.9 Slam prompt appears beside authored breakable floor
+[TEST] PASS 178.7 Breakables draw in front of middleground
+[TEST] PASS 178.10 Pistol firing area has player-only side barriers
+[TEST] PASS 178.10 Player cannot walk out of pistol firing area
+[TEST] PASS 178.10 Actual pistol fire kills all four targets through barriers
+[TEST] PASS 178.12 Actual sword parry works before coins unlock and does not crash
+[TEST] PASS 178.12 Sword parry does not unlock pistol coins early
+[TEST] PASS 178.10 First sword dummy still requires actual sword strikes
+[TEST] PASS 178.10 Far follow-up sword-area target can be killed by real pistol fire
+[TEST] PASS 178.11 Materials roof stops upward escape
+[TEST] PASS 178.11 Camera cannot expose neighboring course above materials
+[TEST] PASS 178.1/11 Materials camera leaves player clear of enlarged HUD
+[TEST] PASS 178.12 Parry remains safe alongside materials dummy
+[TEST] PASS 178.13 Coin instruction first asks to equip pistol
+[TEST] PASS 178.14 Initial coin text does not reveal chains
+[TEST] PASS 178.13 Coin step waits for demonstrated pistol selection
+[TEST] PASS 178.13 Equipping pistol advances to throw and shoot prompt
+[TEST] PASS 178.14 Active coin instruction does not reveal chains
+[TEST] PASS 178.13 New equip step still permits three actual coin hits
+[TEST] PASS 178.13/14 Coin exercises remain completable by real shooting and ricochets
+[TEST] PASS 178 Normal gameplay retains default equipment
+[TEST] PASS 178 Materials camera restriction does not leak outside simulation
+[TEST] ISSUE 178 COMPLETE

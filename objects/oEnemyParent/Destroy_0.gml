@@ -1,3 +1,8 @@
+if (training_active())
+{
+    if (ehp <= 0) { training_defeated(id); training_dissolve(x, y - 24); }
+    exit;
+}
 // Ordinary removal and room teardown must not produce death effects.
 if (variable_instance_exists(id, "ehp") && ehp <= 0)
 {

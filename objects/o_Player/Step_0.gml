@@ -1,3 +1,15 @@
+weapon_validate();
+if (training_active() && o_TrainingSimulation.ending_time >= 0)
+{
+    stop_movement_sfx();
+    exit;
+}
+if (training_active() && (pHP <= 0 || grinder_dying))
+{
+    o_TrainingSimulation.reset_pending = true;
+    stop_movement_sfx();
+    exit;
+}
 // Track actual movement so pushing against a wall does not make footsteps.
 gun_reticle_flash_timer = max(0, gun_reticle_flash_timer
     - (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) / 1000000);
@@ -75,6 +87,7 @@ if (grinder_dying)
 // Resolve lethal hits before interaction locks or healing can skip death.
 if (pHP <= 0)
 {
+    if (training_active()) { o_TrainingSimulation.reset_pending = true; exit; }
     instance_destroy();
     exit;
 }
@@ -442,13 +455,13 @@ if (on_ground)
 
 var move = 0;
 
-if ((controls_key_unassigned(vk_right) && keyboard_check(vk_right))
+if ((training_action_allowed("right") && controls_key_unassigned(vk_right) && keyboard_check(vk_right))
 || controls_down("right"))
 {
     move += 1;
 }
 
-if ((controls_key_unassigned(vk_left) && keyboard_check(vk_left))
+if ((training_action_allowed("left") && controls_key_unassigned(vk_left) && keyboard_check(vk_left))
 || controls_down("left"))
 {
     move -= 1;
@@ -1104,9 +1117,10 @@ if (!on_ground
 && slam_cooldown_timer <= 0)
 {
     if (controls_pressed("slam")
-|| (controls_key_unassigned(vk_down) && keyboard_check_pressed(vk_down)))
+|| (training_action_allowed("slam") && controls_key_unassigned(vk_down) && keyboard_check_pressed(vk_down)))
 {
     is_slamming = true;
+    training_action("slam");
 
     // A hit from before the slam must not interrupt the protected descent.
     damage_knockback_timer = 0;
@@ -1128,9 +1142,9 @@ if (!on_ground
 
 // You are holding the wall unless you
 // deliberately press AWAY from it.
-var wall_holding =
-    (touching_left_wall && move <= 0)
-    || (touching_right_wall && move >= 0);
+var wall_holding = training_action_allowed("wall") &&
+    ((touching_left_wall && move <= 0)
+    || (touching_right_wall && move >= 0));
 
 
 // =====================================
@@ -1520,6 +1534,7 @@ if (dash_pressed && !is_sliding)
     {	
 		audio_play_sound(sfxJumpDash, 1, false);
 		dash_iframe_timer = ground_dash_iframe_duration;
+        training_action("ground_dash");
         dash_iframe_is_ground = true;
         // Cancel wall-jump control lock
         wall_jump_lock_time = 0;
@@ -1574,6 +1589,7 @@ phy_speed_x =
     {
 		audio_play_sound(sfxJumpDash, 1, false);
 		dash_iframe_timer = air_dash_iframe_duration;
+        training_action("air_dash");
         dash_iframe_is_ground = false;
         // Cancel wall-jump control lock
         wall_jump_lock_time = 0;
@@ -1729,7 +1745,7 @@ if (slide_double_boost_stage > 0)
 
 var jump_pressed =
     controls_pressed("up")
-    || (controls_key_unassigned(vk_up) && keyboard_check_pressed(vk_up))
+    || (training_action_allowed("jump") && controls_key_unassigned(vk_up) && keyboard_check_pressed(vk_up))
     || controls_pressed("jump");
 
 
@@ -1847,6 +1863,7 @@ if (slide_double_jump_timer > 0)
 
 else
 {
+    training_action("jump");
     audio_play_sound(dash_chain > 0 ? sfxJumpDash : sfxJump, 1, false);
     phy_speed_y =
         jump_speed;
@@ -2015,7 +2032,7 @@ parry_visual_boost = max(0, parry_visual_boost - _parry_dt);
 // WEAPON SYSTEM
 // =====================================
 
-if (controls_pressed("pistol"))
+if (owns_pistol && controls_pressed("pistol"))
 {
     if (weapon_type != "pistol")
     {
@@ -2023,11 +2040,12 @@ if (controls_pressed("pistol"))
         audio_play_sound(sfxSwitchGun, 1, false);
     }
     weapon_type = "pistol";
+    training_action("equip_pistol");
     sword_swing_timer = 0;
     sword_swing_pending_hit = false;
 }
 
-if (controls_pressed("sword"))
+if (owns_sword && controls_pressed("sword"))
 {
     if (weapon_type != "sword")
     {
@@ -2194,7 +2212,7 @@ if (weapon_type == "sword")
 // ALT FIRE - RIGHT MOUSE / THROW COIN
 // =====================================
 timerf3 = timerf3 - (variable_global_exists("dev_delta_time") ? (variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) : delta_time) / 1000000
-if (!menu_exhibition_active() && keyboard_check_direct(vk_f3))
+if (!training_active() && weapon_owned("pistol") && !menu_exhibition_active() && keyboard_check_direct(vk_f3))
 { 
     // Only throw if we actually have a coin.
     if (coin_count > 0)
@@ -2289,7 +2307,6 @@ if (!_basher_ui_mouse && !_syringe_combo
     parry_visual_time = 0;
     parry_visual_hold = 0;
     parry_visual_boost = 0;
-    sword_combat_facing_timer = sword_combat_facing_duration;
 
     // A successful parry clears this cooldown.
     parry_cooldown = parry_miss_cooldown;
@@ -2548,6 +2565,7 @@ if (
 
 if (pHP <= 0)
 {
+    if (training_active()) { o_TrainingSimulation.reset_pending = true; exit; }
     instance_destroy();
     exit;
 }
@@ -2674,3 +2692,6 @@ else
     // Start with a footstep when grounded running resumes.
     footstep_timer = 0;
 }
+
+if (is_sliding && on_ground && _footstep_moved) training_action("slide");
+if (chip_wall_holding_now) training_action("wall");

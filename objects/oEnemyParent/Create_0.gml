@@ -3,7 +3,7 @@
 // =====================================
 
 // Direct room launches default to Normal. Children tune their own idle delays.
-enemy_difficulty = variable_global_exists("game_difficulty") ? global.game_difficulty : 1;
+enemy_difficulty = room == r_preTutorial ? 0 : (variable_global_exists("game_difficulty") ? global.game_difficulty : 1);
 
 // Shared by full-size and miniature Scouts so Futile pressure stays consistent.
 scout_apply_futile_pressure = function()
