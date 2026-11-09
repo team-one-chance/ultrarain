@@ -227,6 +227,15 @@ function item_get_definition(_key)
 {
     switch (_key)
     {
+        case "medkit":
+            return {
+                name: "Medkit",
+                icon: object_get_sprite(o_MedkitPickup),
+                description: "Carries four syringes. Press " + controls_key_name(controls_key("heal")) + " to use one and restore a third of your maximum health. Medkit pickups refill all syringes.",
+                short_description: controls_key_name(controls_key("heal")) + " uses a syringe to heal.",
+                quality: 1
+            };
+
         case "coin_rounding":
             return {
                 name: "PI-tastic",

@@ -81,7 +81,7 @@ bloom_radius = 4;
 // Extra emission width feeds the blur; the visible shot remains one pixel wide.
 hitscan_bloom_width = 6;
 hitscan_bloom_strength = 0.9;
-bloom_resolution = 1; // Full resolution keeps thin highlights stable during camera motion.
+bloom_resolution = 0.5; // Fraction of application resolution; half size shades 75% fewer pixels, capped at world resolution.
 bloom_camera = -1;
 bloom_surface_a = -1;
 bloom_surface_b = -1;
@@ -103,6 +103,19 @@ pixelation_camera = -1;
 pixelation_grid_uniform = shader_get_uniform(sh_WorldPixelate, "u_grid");
 pixelation_texel_uniform = shader_get_uniform(sh_WorldPixelate, "u_texel");
 light_surface = -1;
+light_resolution = 0.5; // Fraction of world resolution; smooth illumination does not need full-size buffers.
+light_pixel_budget = 259200; // Maximum light-map pixels (720 x 360); wider views trade buffer detail for stable cost.
+
+// Include blur spill outside the view so halos do not pop at screen edges.
+bloom_source_visible = function(_source, _padding)
+{
+    if (!_source.visible || _source.image_alpha <= 0 || !layer_get_visible(_source.layer)) return false;
+    var _cam = view_camera[view_current];
+    return _source.bbox_right + _padding >= camera_get_view_x(_cam)
+        && _source.bbox_bottom + _padding >= camera_get_view_y(_cam)
+        && _source.bbox_left - _padding <= camera_get_view_x(_cam) + camera_get_view_width(_cam)
+        && _source.bbox_top - _padding <= camera_get_view_y(_cam) + camera_get_view_height(_cam);
+};
 
 // Draw into the light map using world coordinates and the active camera.
 draw_soft_light = function(_x, _y, _radius, _color, _strength)
@@ -134,24 +147,29 @@ draw_light_cone = function(_lamp, _config, _brightness = 1)
     var _columns = 16;
     var _strength = clamp(_config.strength * _brightness, 0, 1);
     var _cam = view_camera[view_current];
-    // Conservative bounds include rotation and stretching.
-    var _reach = (_config.length + _half_width + _config.length * _spread
-        + abs(_center - _origin_x) + abs(_config.lamp_y - _origin_y))
-        * max(abs(_lamp.image_xscale), abs(_lamp.image_yscale));
-    if (_lamp.x + _reach < camera_get_view_x(_cam)
-    || _lamp.y + _reach < camera_get_view_y(_cam)
-    || _lamp.x - _reach > camera_get_view_x(_cam) + camera_get_view_width(_cam)
-    || _lamp.y - _reach > camera_get_view_y(_cam) + camera_get_view_height(_cam)) return;
+    // Bound the actual trapezoid; the old radius also admitted cones pointing away from the view.
+    var _anchor_x = (_center - _origin_x) * _lamp.image_xscale;
+    var _anchor_y = (_config.lamp_y - _origin_y) * _lamp.image_yscale;
+    var _top_x = _lamp.x + _anchor_x * _cos + _anchor_y * _sin;
+    var _top_y = _lamp.y - _anchor_x * _sin + _anchor_y * _cos;
+    var _bottom_x = _top_x + _config.length * _lamp.image_yscale * _sin;
+    var _bottom_y = _top_y + _config.length * _lamp.image_yscale * _cos;
+    var _top_extent_x = abs(_half_width * _lamp.image_xscale * _cos);
+    var _top_extent_y = abs(_half_width * _lamp.image_xscale * _sin);
+    var _bottom_width = _half_width + _config.length * _spread;
+    var _bottom_extent_x = abs(_bottom_width * _lamp.image_xscale * _cos);
+    var _bottom_extent_y = abs(_bottom_width * _lamp.image_xscale * _sin);
+    if (max(_top_x + _top_extent_x, _bottom_x + _bottom_extent_x) < camera_get_view_x(_cam)
+    || max(_top_y + _top_extent_y, _bottom_y + _bottom_extent_y) < camera_get_view_y(_cam)
+    || min(_top_x - _top_extent_x, _bottom_x - _bottom_extent_x) > camera_get_view_x(_cam) + camera_get_view_width(_cam)
+    || min(_top_y - _top_extent_y, _bottom_y - _bottom_extent_y) > camera_get_view_y(_cam) + camera_get_view_height(_cam)) return;
 
     if (cone_shader_enabled && shader_is_compiled(sh_CeilingCone))
     {
         if (_lamp.image_xscale == 0 || _lamp.image_yscale == 0) return;
-        var _anchor_x = (_center - _origin_x) * _lamp.image_xscale;
-        var _anchor_y = (_config.lamp_y - _origin_y) * _lamp.image_yscale;
         shader_set(sh_CeilingCone);
         shader_set_uniform_f(cone_origin_uniform,
-            _lamp.x + _anchor_x * _cos + _anchor_y * _sin,
-            _lamp.y - _anchor_x * _sin + _anchor_y * _cos);
+            _top_x, _top_y);
         shader_set_uniform_f(cone_transform_uniform, _cos, _sin,
             1 / _lamp.image_xscale, 1 / _lamp.image_yscale);
         shader_set_uniform_f(cone_shape_uniform, _config.length, _half_width, _spread,

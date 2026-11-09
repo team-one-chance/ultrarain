@@ -82,6 +82,17 @@ for (var b = 0; b < ds_list_size(_blocks); b++)
 
 ds_list_destroy(_blocks);
 
+// Regular doors give way to the sword's active strike, without accepting bullet damage.
+var _doors = ds_list_create();
+collision_rectangle_list(bbox_left, bbox_top, bbox_right, bbox_bottom,
+    o_Door_Breakable, false, true, _doors, false);
+for (var _door_i = 0; _door_i < ds_list_size(_doors); _door_i++)
+{
+    var _door = _doors[| _door_i];
+    if (instance_exists(_door)) _door.door_break();
+}
+ds_list_destroy(_doors);
+
 var _lamps = ds_list_create();
 collision_rectangle_list(bbox_left, bbox_top, bbox_right, bbox_bottom,
     [o_light_ceil_long, o_light_ceil_long_strong, o_light_ceil_long_ow], false, true, _lamps, false);

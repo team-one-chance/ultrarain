@@ -99,8 +99,33 @@ if (ari_state == "arriving" || ari_state == "departing")
 }
 if (ari_state == "dialogue")
 {
-    ari_text_chars = min(string_length(ari_dialogue[ari_dialogue_index]),
+    var _old_chars = floor(ari_text_chars);
+    var _line = ari_dialogue[ari_dialogue_index];
+    ari_text_chars = min(string_length(_line),
         ari_text_chars + ari_scene_config.text_chars_per_second * _dt);
+    ari_voice_cooldown = max(0, ari_voice_cooldown - _dt);
+    // Read only newly typed characters: revealing a whole line never queues a burst of sounds.
+    var _voiced = false;
+    for (var _letter = _old_chars + 1; _letter <= floor(ari_text_chars); ++_letter)
+    {
+        var _char = string_char_at(_line, _letter);
+        if (string_pos(_char, ".,!?;:") > 0)
+        {
+            ari_voice_cooldown = max(ari_voice_cooldown, string_pos(_char, ".!?") > 0 ? 0.18 : 0.10);
+        }
+        else if (!_voiced && ari_voice_cooldown <= 0
+            && string_pos(string_lower(_char), "abcdefghijklmnopqrstuvwxyz0123456789") > 0)
+        {
+            if (ari_voice_handle != -1) audio_sound_gain(ari_voice_handle, 0, 8);
+            // Letter-based variation avoids consuming gameplay's random-number sequence.
+            var _variation = sin(ord(_char) * 1.73 + _letter * 0.91 + ari_dialogue_index * 2.3);
+            var _pitch = ari_voice_config.pitch + _variation * ari_voice_config.pitch_range;
+            ari_voice_handle = audio_play_sound(ari_voice_config.sound, 2, false,
+                ari_voice_config.gain, 0, _pitch);
+            ari_voice_cooldown = ari_voice_config.interval;
+            _voiced = true;
+        }
+    }
 }
 if (!controls_pressed("interact")) exit;
 
@@ -115,11 +140,13 @@ if (ari_state == "prompt")
 }
 if (ari_text_chars < string_length(ari_dialogue[ari_dialogue_index]))
 {
+    ari_stop_voice();
     ari_text_chars = string_length(ari_dialogue[ari_dialogue_index]); // One press finishes typing; the next advances.
     exit;
 }
 if (ari_dialogue_index < array_length(ari_dialogue) - 1)
 {
+    ari_stop_voice();
     ari_dialogue_index++;
     ari_text_chars = 0;
     exit;

@@ -8,14 +8,14 @@ if (!variable_global_exists("scrap_rng_started"))
 
 drop_min_y = 544;
 drop_max_y = 545;
-drop_interval_min = 0.55;
-drop_interval_max = 0.6;
-drop_quiet_chance = 0.15;
+drop_interval_min = 0.9; // Seconds between drops; larger values thin out the scrap.
+drop_interval_max = 1.2; // Seconds; keep a steady hazard instead of dense waves.
+drop_quiet_chance = 0; // Probability per drop; no long safe windows between waves.
 drop_quiet_min = 3.0;
 drop_quiet_max = 4.8;
-drop_burst_chance = 0.95;
-drop_burst_min_delay = 0.15;
-drop_burst_max_delay = 0.55;
+drop_burst_chance = 0; // Probability per drop; disable extra drops stacked on the regular cadence.
+drop_burst_min_delay = 0.45;
+drop_burst_max_delay = 0.95;
 drop_timer = random_range(1.25, 1.8);
 pending_burst = 0;
 burst_timer = 0;

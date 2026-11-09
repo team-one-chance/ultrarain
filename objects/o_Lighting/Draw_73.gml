@@ -6,8 +6,10 @@ var _cx = camera_get_view_x(_cam);
 var _cy = camera_get_view_y(_cam);
 var _vw = camera_get_view_width(_cam);
 var _vh = camera_get_view_height(_cam);
-var _w = max(1, ceil(_vw));
-var _h = max(1, ceil(_vh));
+var _light_scale = min(clamp(light_resolution, 0.125, 1),
+    sqrt(max(1, light_pixel_budget) / max(1, _vw * _vh)));
+var _w = max(1, floor(_vw * _light_scale));
+var _h = max(1, floor(_vh * _light_scale));
 if (surface_exists(light_surface))
 {
     if (surface_get_width(light_surface) != _w || surface_get_height(light_surface) != _h)
@@ -119,7 +121,10 @@ matrix_set(matrix_projection, _projection);
 draw_set_color(c_white);
 draw_set_alpha(1);
 gpu_set_blendmode_ext(bm_dest_colour, bm_zero);
+var _light_filter = gpu_get_texfilter();
+gpu_set_texfilter(true);
 draw_surface_stretched(light_surface, _cx, _cy, _vw, _vh);
+gpu_set_texfilter(_light_filter);
 gpu_set_blendmode(bm_normal);
 // Shot centers stay bright and feed bloom extraction.
 with (o_HitscanVisual)
@@ -148,8 +153,9 @@ if (bloom_enabled && (bloom_strength > 0 || scout_bloom_strength > 0 || player_b
 && surface_exists(application_surface)
 && shader_is_compiled(sh_BloomExtract) && shader_is_compiled(sh_BloomBlur))
 {
-    var _bw = max(1, ceil(surface_get_width(application_surface) * clamp(bloom_resolution, 0.125, 1)));
-    var _bh = max(1, ceil(surface_get_height(application_surface) * clamp(bloom_resolution, 0.125, 1)));
+    // Never blur more pixels than the world contains, even on a high-resolution display.
+    var _bw = max(1, ceil(min(_vw, surface_get_width(application_surface) * clamp(bloom_resolution, 0.125, 1))));
+    var _bh = max(1, ceil(min(_vh, surface_get_height(application_surface) * clamp(bloom_resolution, 0.125, 1))));
     if (surface_exists(bloom_surface_a))
     {
         if (surface_get_width(bloom_surface_a) != _bw || surface_get_height(bloom_surface_a) != _bh)
@@ -281,7 +287,25 @@ if (bloom_enabled && (bloom_strength > 0 || scout_bloom_strength > 0 || player_b
         draw_set_alpha(clamp(bloom_strength, 0, 1));
         draw_surface_stretched(bloom_surface_a, _cx, _cy, _vw, _vh);
         // Shared Scout/Drone glow: gain is applied AFTER blur, independently of scene bloom.
-        if ((instance_exists(oEnemy_Scout) || instance_exists(oDrone)) && scout_bloom_strength > 0)
+        var _scout_sources = []; // Visible instance IDs; empty lists skip both full-buffer enemy blur passes.
+        var _drone_sources = [];
+        if (scout_bloom_strength > 0)
+        {
+            with (oEnemy_Scout)
+            {
+                // Scout artwork is drawn larger than its collision bounds.
+                var _padding = max(sprite_get_width(sprite_index), sprite_get_height(sprite_index)) * scout_scale
+                    + max(0, _renderer.scout_bloom_radius) * 4;
+                if (_renderer.bloom_source_visible(id, _padding)) array_push(_scout_sources, id);
+            }
+            with (oDrone)
+            {
+                var _padding = max(abs(attack_shake_x), abs(attack_shake_y))
+                    + max(0, _renderer.scout_bloom_radius) * 4;
+                if (_renderer.bloom_source_visible(id, _padding)) array_push(_drone_sources, id);
+            }
+        }
+        if (array_length(_scout_sources) + array_length(_drone_sources) > 0)
         {
             draw_set_alpha(1);
             draw_set_color(c_white);
@@ -293,7 +317,8 @@ if (bloom_enabled && (bloom_strength > 0 || scout_bloom_strength > 0 || player_b
             shader_set_uniform_f(bloom_gain_uniform, 1);
             shader_set_uniform_f(bloom_threshold_uniform, clamp(scout_bloom_threshold, 0, 0.99));
             gpu_set_texfilter(false);
-            with (oEnemy_Scout)
+            for (var _source_index = 0; _source_index < array_length(_scout_sources); _source_index++)
+            with (_scout_sources[_source_index])
             {
                 var _source_x = (bbox_left + bbox_right) * 0.5
                     - scout_facing * sprite_get_width(sprite_index) * scout_scale * 0.5;
@@ -306,7 +331,8 @@ if (bloom_enabled && (bloom_strength > 0 || scout_bloom_strength > 0 || player_b
                     image_angle, image_blend,
                     image_alpha);
             }
-            with (oDrone)
+            for (var _source_index = 0; _source_index < array_length(_drone_sources); _source_index++)
+            with (_drone_sources[_source_index])
             {
                 // Match the sprite pose drawn by oEnemyParent, including attack shake.
                 draw_sprite_ext(sprite_index, image_index,

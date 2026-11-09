@@ -16,6 +16,17 @@ if (instance_exists(_player))
     {
         _player.medkit_owned = true;
         _player.syringe_count = _player.syringe_max;
+        // Run inventory remembers the first pickup across rooms and checkpoint retries.
+        if (item_add_level(_player, "medkit"))
+        {
+            _player.item_notice_key = "medkit";
+            _player.item_notice_time = 5; // Seconds of fallback instructions when no pause controller exists.
+            if (instance_exists(o_PauseMenu))
+            {
+                o_PauseMenu.pickup_notice_pending = "medkit"; // Open the same paused panel as Pinhouse on the next Begin Step.
+                _player.item_notice_time = 0;
+            }
+        }
         if (variable_instance_exists(id, "ari_assist_gift") && ari_assist_gift)
             global.tutorial_ari_assist = 2; // This one-time gift and medkit ownership survive subsequent checkpoint deaths.
 

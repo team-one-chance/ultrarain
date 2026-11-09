@@ -11,10 +11,6 @@ if (break_requested && !broken)
         if (!instance_exists(_samuel)) _samuel = instance_create_depth(0, 0, -2, oSamuel);
         _samuel.samuel_arm_entrance(id, _alarm_player); // Open the entrance now; Samuel waits until the player actually crosses inside.
     }
-    var _samuel_pending = room == LE_PWR && instance_exists(oSamuel)
-        && !oSamuel.samuel_encounter_finished;
-    if (instance_exists(_alarm_player) && !_samuel_pending) _alarm_player.start_ambush_alarm_sfx(id);
-
     physics_remove_fixture(id, door_fixture);
     door_fixture = -1;
 
@@ -47,6 +43,13 @@ if (break_requested && !broken)
 
 if (broken)
 {
+    // The tutorial room controller starts group 0 on entry, independently of this doorway.
+    if (room == LE_TUTORIAL_WIP && ambush_group == 0 && instance_exists(o_TutorialCheckpoint))
+    {
+        instance_destroy();
+        exit;
+    }
+
     // LE_PWR's door never spawns enemies. Samuel alone releases its group after the conversation.
     if (room == LE_PWR)
     {

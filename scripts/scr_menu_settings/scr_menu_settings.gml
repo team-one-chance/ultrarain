@@ -7,7 +7,7 @@ function menu_exhibition_active()
 function controls_defaults()
 {
     return { left: ord("A"), right: ord("D"), up: ord("W"), jump: vk_space,
-        slide: vk_control, dash: vk_shift, slam: ord("S"), heal: ord("H"),
+        slide: vk_control, dash: vk_shift, slam: ord("S"), heal: ord("Q"),
         pistol: ord("1"), sword: ord("2"), interact: ord("E"),
         fire: -1, coin: -2, pin: -3 };
 }

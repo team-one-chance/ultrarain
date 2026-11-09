@@ -120,6 +120,7 @@ pause_activate = function()
             pause_resume();
             if (training_active())
             {
+                o_TrainingSimulation.full_retry_pending = true;
                 o_TrainingSimulation.reset_pending = true;
             }
             else if (room == LE_TUTORIAL_WIP && instance_exists(o_TutorialCheckpoint))

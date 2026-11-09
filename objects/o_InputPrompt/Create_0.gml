@@ -3,3 +3,4 @@
 // Position is the trigger centre; width and height are room pixels. A larger
 // priority wins when areas overlap; equal priorities select the closest centre.
 prompt_definition = input_prompt_definition(prompt_id);
+prompt_scale = room == LE_TUTORIAL_WIP ? 2 : 1; // GUI size multiplier; doubles tutorial icons, text, and backing panel.

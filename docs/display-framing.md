@@ -1,8 +1,10 @@
 # Display framing
 
-Every room uses a 2160 x 720 camera view and a 3240 x 1080 output viewport.
-Both use a 3:1 aspect ratio, with the same 1.5 output pixels per world pixel
-on each axis, so the game image is not distorted.
+Every room uses a 2160 x 720 camera view and a 2160 x 720 output viewport.
+Both use a 3:1 aspect ratio, with one output pixel per world pixel on each
+axis, so the game image is not distorted. The logical GUI stays at
+3240 x 1080 to preserve the authored interface layout. See
+[lighting performance](lighting-performance.md) for the rendering budget.
 
 The previous camera view was 1440 x 720. Keeping the 720-world-pixel height
 preserves the vertical framing and scale on a screen of the same height.

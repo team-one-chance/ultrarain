@@ -6,6 +6,7 @@ if (training_kind == 4 && training_active() && o_TrainingSimulation.section == 0
 {
     if (point_distance(mouse_x, mouse_y, x + 12, y + 12) < 28)
     {
+        audio_play_sound(sfxBalloonPop, 2, false, 0.65, 0, 1 + 0.06 * sin(x * 0.13 + y * 0.07)); // Slight pitch variation per balloon.
         ehp = 0;
         instance_destroy();
     }
