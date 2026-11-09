@@ -5,6 +5,7 @@ function input_prompt_definition(_id)
     switch (string_lower(_id))
     {
         case "move": return { text: "MOVE", icons: [0, 1] };
+        case "training_move": return { text: "WASD OR ARROW KEYS TO MOVE", icons: [0, 1] };
         case "jump": return { text: "JUMP", icons: [2] };
         case "slide": return { text: "HOLD TO SLIDE", icons: [3] };
         case "dash": return { text: "DASH", icons: [4] };
@@ -51,7 +52,7 @@ function input_prompt_actions(_id)
 {
     switch (string_lower(_id))
     {
-        case "move": return ["left", "right"];
+        case "move": case "training_move": return ["left", "right"];
         case "jump": return ["jump"];
         case "slide": return ["slide"];
         case "dash": return ["dash"];

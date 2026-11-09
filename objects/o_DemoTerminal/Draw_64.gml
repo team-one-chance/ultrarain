@@ -39,15 +39,29 @@ draw_text_ext(
     _pw - 64
 );
 
-// Command hint.
+// Highlight only the required command; keep the surrounding instruction plain.
+var _hint_previous_font = draw_get_font();
+draw_set_font(f_Console);
 draw_set_halign(fa_left);
-draw_set_color(make_color_rgb(130, 145, 140));
+draw_set_color(c_white);
 
 draw_text(
     _px + 32,
     _py + _ph - 118,
-    "Type below, then press Enter: vrain initiate restart.exe"
+    "Type " + terminal_restart_command + " below, then press Enter"
 );
+
+var _command_x = _px + 32 + string_width("Type ");
+var _command_y = _py + _ph - 118;
+var _highlight_padding = 3; // GUI pixels around the command, leaving adjacent words unhighlighted.
+draw_set_color(make_color_rgb(255, 220, 90));
+draw_rectangle(_command_x - _highlight_padding, _command_y - 2,
+    _command_x + string_width(terminal_restart_command) + _highlight_padding,
+    _command_y + string_height(terminal_restart_command) + 2, false);
+draw_set_color(make_color_rgb(18, 22, 28));
+draw_text(_command_x, _command_y, terminal_restart_command);
+
+draw_set_font(_hint_previous_font);
 
 // Command input, using the menu's console font.
 var _previous_font = draw_get_font();

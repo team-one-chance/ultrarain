@@ -37,12 +37,23 @@ function training_action(_action)
     if (!training_active()) return;
     var _controller = instance_find(o_TrainingSimulation, 0);
     if (_controller.reset_pending || _controller.ending_time >= 0) return;
+    if (_action == "wall")
+    {
+        // Only a downward wall slide at the barrier qualifies, never earlier wall contact.
+        if (_controller.section != 3 || !instance_exists(_controller.wall_gate)) return;
+        var _gate = _controller.wall_gate;
+        var _player = instance_find(o_Player, 0);
+        if (!instance_exists(_player)) return;
+        var _feet = _player.phy_position_y + _player.player_collider_height / 2;
+        if (_feet < _gate.bbox_top - 32 || _feet > _gate.bbox_bottom + 16
+            || _player.x < _gate.bbox_left - _player.player_collider_half_width
+            || _player.x > _gate.bbox_right + _player.player_collider_half_width) return;
+    }
     if (_action == "direct_coin")
     {
         if (_controller.section == 7 && _controller.stage >= 1) _controller.coin_hits = min(3, _controller.coin_hits + 1);
         return;
     }
-    if (_action == "wall") return; // A single contact is insufficient; training_update measures a sustained hold.
     variable_struct_set(_controller.actions, _action, true);
 }
 
@@ -70,13 +81,12 @@ function training_initialize()
     section = -1; // Ordered section index; printed with a one-based number in diagnostics.
     generation = 0; // Reset token invalidates callbacks belonging to a previous encounter.
     reset_pending = false;
+    full_retry_pending = false; // Explicit restarts and broken encounters rebuild targets; falls preserve sword progress.
     resetting = false;
     targets = [];
     floor_blocks = [];
     section_geometry = []; // Runtime colliders/barriers owned by this section; never saved in the room.
     wall_gate = noone;
-    wall_hold_time = 0; // Seconds continuously holding a wall at near-zero vertical speed.
-    wall_hold_required = 0.35; // Seconds required; longer values make a passing wall brush less likely to qualify.
     materials_camera_top = 16800; // Room Y: hides courses above materials while leaving player headroom below the enlarged HUD.
     ui_text_scale = 1.75; // Multiplier on the tutorial font before adapting to GUI resolution.
     ui_prompt_scale = 1.5; // Multiplier on icons and binding text before adapting to GUI resolution.
@@ -204,7 +214,7 @@ function training_initialize()
                 // Close the missing right face of the painted pillar, without changing its tiles.
                 add_geometry(24224, 12992, 32, 3264, false);
                 add_geometry(24000, 12992, 224, 32, false); // Close the painted top as well as the missing right face.
-                // A temporary solid gate catches bypass attempts; jumping from it still permits a real wall hold.
+                // A temporary gate opens as soon as the player slides against a wall.
                 wall_gate = add_geometry(23744, 14080, 224, 16, false);
                 break;
             case 4:
@@ -235,7 +245,7 @@ function training_initialize()
             case 2:
                 var _exit = note("end of slide and dash");
                 return { x: _exit.x, y: _exit.y - 24, width: 64, height: 112,
-                    ready: demonstrated("slide") && demonstrated("air_dash") && demonstrated("ground_dash") };
+                    ready: true }; // Reaching this transfer is sufficient; movement prompts are guidance only.
             case 4: _title = "up next sword"; break;
             case 5: _title = "up next materials"; break;
             case 6: _title = "up next coins"; break;
@@ -301,8 +311,8 @@ function training_initialize()
         coin_hits = 0;
         ending_time = -1;
         terminal_ready = false;
-        wall_hold_time = 0;
         reset_pending = false;
+        full_retry_pending = false;
         if (!instance_exists(o_Player)) instance_create_layer(0, 0, "Player", o_Player);
         with (o_Player)
         {
@@ -328,14 +338,14 @@ function training_initialize()
                     array_push(targets, { actor: _actor, defeated: false });
                 }
                 break;
-            case 1: teleport("spawn jump"); say("JUMP ACROSS. DROP INTO THE HOLE.", "jump"); break;
+            case 1: teleport("spawn jump"); say("JUMP ACROSS. DROP INTO THE HOLE.", "training_move"); break;
             case 2:
                 if (!_physical) teleport("spawn slide");
                 say("SLIDE UNDER THE CEILING", "slide");
                 break;
             case 3:
                 teleport("spawn wallhold");
-                say("JUMP AGAINST A WALL. HOLD TOWARD IT TO STOP.", "move");
+                say("SLIDE DOWN A WALL TO OPEN THE PASSAGE.", "move");
                 var _floor = note("breakablefloor");
                 for (var _i = 0; _i < 5; ++_i)
                 {
@@ -396,13 +406,34 @@ function training_update()
     {
         resetting = true;
         var _section = section;
+        var _resume_sword = section == 5 && !full_retry_pending;
+        var _weapon = instance_exists(o_Player) ? o_Player.weapon_type : (stage > 0 ? "sword" : "pistol");
         // Recreate the player to clear every movement, trap, attack and damage timer.
         if (instance_exists(o_Player))
         {
             o_Player.pHP = 150;
             with (o_Player) instance_destroy();
         }
-        enter(_section);
+        if (_resume_sword)
+        {
+            // Replace only the player: surviving targets, damage, defeated targets and wave stage stay intact.
+            instance_create_layer(0, 0, "Player", o_Player);
+            with (o_Player)
+            {
+                pHP_max = 150;
+                pHP = 150;
+                owns_pistol = true;
+                owns_sword = true;
+                weapon_type = _weapon;
+                weapon_validate();
+            }
+            with (oSwordSlash) instance_destroy();
+            with (oSwordBeam) instance_destroy();
+            with (o_Coin) instance_destroy();
+            teleport("spawn sword");
+            reset_pending = false;
+        }
+        else enter(_section);
         resetting = false;
         return;
     }
@@ -433,6 +464,7 @@ function training_update()
         }
         if (!targets[_i].defeated && !instance_exists(targets[_i].actor))
         {
+            full_retry_pending = true;
             reset_pending = true; // Unexpected removal cannot silently complete an objective.
             return;
         }
@@ -454,6 +486,11 @@ function training_update()
             if (all_defeated()) enter(1);
             break;
         case 1:
+            if (stage == 0 && _player.phy_position_x > 14048) // Room pixels: right edge of the starting platform.
+            {
+                stage = 1; // Keep the movement hint dismissed if the player walks back.
+                prompt = "jump";
+            }
             var _abyss = note("abyss tp");
             if (demonstrated("jump") && _player.y >= _abyss.y
                 && _player.x >= note("dead end").right && _player.x <= _abyss.right)
@@ -467,14 +504,7 @@ function training_update()
             var _exit_front = _player.phy_position_x + 0.5 + _player.player_collider_half_width;
             if (_exit_front >= note("end of slide and dash").x - 32)
             {
-                if (demonstrated("slide") && demonstrated("air_dash") && demonstrated("ground_dash")) enter(3);
-                else
-                {
-                    var _missing = !demonstrated("slide") ? "SLIDE TO COMPLETE THIS SECTION"
-                        : (!demonstrated("air_dash") ? "JUMP AND DASH MIDAIR" : "DASH ON THE GROUND");
-                    if (objective != _missing) say(_missing, !demonstrated("slide") ? "slide"
-                        : (!demonstrated("air_dash") ? "air_dash" : "dash_jump"));
-                }
+                enter(3);
             }
             else if (_player.x >= note("bp dash").x)
             {
@@ -486,18 +516,11 @@ function training_update()
             }
             break;
         case 3:
-            var _holding = _player.chip_wall_holding_now && abs(_player.phy_speed_y) <= 0.5
-                && (controls_down("left") || controls_down("right"));
-            if (!demonstrated("wall"))
+            if (demonstrated("wall") && instance_exists(wall_gate))
             {
-                wall_hold_time = _holding ? wall_hold_time + _dt : 0;
-                if (wall_hold_time >= wall_hold_required)
-                {
-                    actions.wall = true;
-                    if (instance_exists(wall_gate)) with (wall_gate) instance_destroy();
-                    wall_gate = noone;
-                    say("WALL HOLD CONFIRMED. DESCEND BETWEEN THE RED WALLS.", "move");
-                }
+                with (wall_gate) instance_destroy();
+                wall_gate = noone;
+                say("PASSAGE OPEN. DESCEND BETWEEN THE RED WALLS.", "move");
             }
             if (demonstrated("wall") && abs(_player.x - note("bp slam").x) <= 224
                 && _player.y >= note("bp slam").y - 224 && _player.y <= note("breakablefloor").y + 64)

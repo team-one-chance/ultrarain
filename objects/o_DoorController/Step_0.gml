@@ -16,8 +16,8 @@ if (instance_exists(_player))
 }
 
 
-// First E breaks the controller.
-// Second E starts the wire puzzle.
+// Tutorial: one interaction breaks the panel and opens the puzzle below.
+// Other rooms retain separate break-panel and puzzle interactions.
 if (player_near && controls_pressed("interact"))
 {
     if (controller_state == 0)
@@ -29,7 +29,7 @@ if (player_near && controls_pressed("interact"))
         image_speed = 0;
         spark_timer = 0;
 
-        exit; // stop this Step event after breaking the panel
+        if (room != LE_TUTORIAL_WIP) exit;
     }
     else if (controller_state == 1)
     {

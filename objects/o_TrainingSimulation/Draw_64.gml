@@ -34,18 +34,6 @@ if (section == 7 && stage >= 1)
     draw_text_transformed(_width / 2, _panel_bottom - 28 * _ui_scale,
         string(coin_hits) + " / 3 COINS HIT", 1.25 * _ui_scale, 1.25 * _ui_scale, 0);
 }
-if (section == 3 && !demonstrated("wall"))
-{
-    var _half_bar = 100 * _ui_scale;
-    var _bar_y = _panel_bottom - 16 * _ui_scale;
-    draw_set_alpha(1);
-    draw_set_color(c_dkgray);
-    draw_rectangle(_width / 2 - _half_bar, _bar_y, _width / 2 + _half_bar, _bar_y + 5 * _ui_scale, false);
-    draw_set_color(c_aqua);
-    draw_rectangle(_width / 2 - _half_bar, _bar_y,
-        _width / 2 - _half_bar + _half_bar * 2 * clamp(wall_hold_time / wall_hold_required, 0, 1),
-        _bar_y + 5 * _ui_scale, false);
-}
 if (transition_time > 0)
 {
     draw_set_color(c_aqua);
@@ -84,7 +72,7 @@ if (debug_visible && instance_exists(o_Player))
         + " dash/slide=" + string(training_action_allowed("dash"))
         + " wall/slam=" + string(training_action_allowed("slam"))
         + " coins=" + string(training_action_allowed("coin"))
-        + "\nwall hold=" + string_format(wall_hold_time, 0, 2) + "/" + string(wall_hold_required)
+        + "\nwall slide=" + string(demonstrated("wall"))
         + " gate=" + string(instance_exists(wall_gate)) + " geometry=" + string(array_length(section_geometry))
         + "\nactions=" + json_stringify(actions) + " direct coins=" + string(coin_hits) + "/3"
         + "\nactive targets=" + string(_remaining) + " reset=" + string(reset_pending)

@@ -1,25 +1,9 @@
 broken = false;
 break_requested = false;
-door_hp = 50;
-
-
-
+// Keep the damage hook for bullet traces; regular doors only break from slides or sword slashes.
 door_take_damage = function(_amount)
 {
-    if (broken || break_requested) return;
-
-    door_hp = max(0, door_hp - max(0, _amount));
-
-    show_debug_message(
-        "Door hit: damage=" + string(_amount)
-        + ", HP remaining=" + string(door_hp)
-    );
-
-    if (door_hp <= 0)
-    {
-        show_debug_message("Door break requested");
-        door_break();
-    }
+    return;
 };
 
 

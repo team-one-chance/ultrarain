@@ -47,14 +47,14 @@ Die Tabelle zeigt die Standardbelegung. Unter **Settings → Controls** im Haupt
 | Rechte Maustaste | Mit der Pistole eine Münze werfen / mit dem Schwert parieren |
 | `1` / `2` | Pistole / Schwert ausrüsten |
 | Mittlere Maustaste | Mit Pinhouse eine Münze fixieren, sofern verfügbar |
-| `H` | Spritze zur Heilung verwenden, sofern verfügbar |
+| `Q` | Spritze zur Heilung verwenden, sofern verfügbar |
 | `E` | Mit Türsteuerungen und Terminals interagieren |
 | `Esc` | Pausenmenü öffnen / Interaktion verlassen |
 | `F11` | Vollbild umschalten |
 
 An passenden Kanten zieht sich der Spieler automatisch hoch. Mit `W` und einer Bewegungsrichtung lässt sich daran ein weiterer Sprung anschliessen. Die Pfeiltasten bleiben als alternative Bewegungs-, Sprung- und Slam-Eingaben verfügbar, solange sie keiner anderen Aktion zugewiesen sind.
 
-Münzen lassen sich mit der Pistole treffen, um Schüsse umzulenken. Beim Parieren zählen das Timing und die Angriffsart: Nicht jeder Angriff lässt sich vollständig abwehren. Die optionale Heilung mit beiden Maustasten kann in den Einstellungen aktiviert werden; standardmässig wird mit `H` geheilt.
+Münzen lassen sich mit der Pistole treffen, um Schüsse umzulenken. Beim Parieren zählen das Timing und die Angriffsart: Nicht jeder Angriff lässt sich vollständig abwehren. Die optionale Heilung mit beiden Maustasten kann in den Einstellungen aktiviert werden; standardmässig wird mit `Q` geheilt.
 
 ## Projekt starten
 

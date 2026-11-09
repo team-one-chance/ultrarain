@@ -2,6 +2,21 @@ ari_state = "waiting"; // Scene order: closing bars, arriving, prompt/dialogue, 
 ari_elapsed = 0; // Seconds spent in the current scene state.
 ari_bars = 0; // Normalized cinematic bar closure: 0 = open, 1 = fully closed.
 ari_text_chars = 0; // Revealed characters in the current dialogue line; fractional progress keeps typing smooth.
+ari_voice_config = {
+    sound: sfxAriTalk,
+    gain: 0.55, // Linear gain; keep the voice below combat effects.
+    pitch: 1.0, // Playback ratio; Samuel overrides this shared dialogue configuration.
+    pitch_range: 0.10, // Maximum pitch deviation per syllable; larger values sound more animated.
+    interval: 0.075 // Seconds between syllables; rate limiting prevents overlapping chatter on slow frames.
+};
+ari_voice_handle = -1;
+ari_voice_cooldown = 0; // Seconds until another syllable can play.
+ari_stop_voice = function()
+{
+    if (ari_voice_handle != -1) audio_stop_sound(ari_voice_handle);
+    ari_voice_handle = -1;
+    ari_voice_cooldown = 0;
+};
 ari_scene_config = {
     bar_seconds: 0.55, // Seconds to close or reopen the cinematic bars.
     bar_fraction: 0.12, // Fraction of screen width covered by each fully closed side bar.
@@ -38,6 +53,7 @@ ari_dialogue = [
 
 ari_set_state = function(_state)
 {
+    ari_stop_voice();
     ari_state = _state;
     ari_elapsed = 0;
 };
@@ -60,6 +76,7 @@ ari_hold_player = function()
 
 ari_release_player = function()
 {
+    ari_stop_voice();
     if (ari_enemy_freeze_owned)
     {
         global.dev_freeze_enemies = ari_previous_enemy_freeze;

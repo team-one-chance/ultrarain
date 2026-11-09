@@ -105,7 +105,7 @@ if (reading)
     if (keyboard_check_pressed(vk_enter))
     {
         if (string_lower(command_input)
-            == "vrain initiate restart.exe")
+            == terminal_restart_command)
         {
             stop_command_result_sfx();
             command_result_sound = audio_play_sound(sfxTerminalValid, 1, false);

@@ -21,4 +21,4 @@ for (var _i = 0; _i < instance_number(o_InputPrompt); _i++)
 }
 if (_winner != id) exit;
 var _text = prompt_text == "" ? prompt_definition.text : prompt_text;
-input_prompt_draw(prompt_definition, _text, display_get_gui_width() * 0.5, display_get_gui_height() * 0.2, prompt_id);
+input_prompt_draw(prompt_definition, _text, display_get_gui_width() * 0.5, display_get_gui_height() * 0.2, prompt_id, prompt_scale);

@@ -32,6 +32,7 @@ terminal_text_none =
 	terminal_display_text = terminal_text;
 	
 	command_input = "";
+terminal_restart_command = "restart.exe"; // Shared command for the instruction and case-insensitive input validation.
 command_feedback = "";
 command_cursor_timer = 0;
 command_result_sound = -1;

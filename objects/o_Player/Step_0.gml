@@ -2702,4 +2702,6 @@ else
 }
 
 if (is_sliding && on_ground && _footstep_moved) training_action("slide");
-if (chip_wall_holding_now) training_action("wall");
+// The training controller accepts a real downward wall slide only when close to the barrier.
+if (!on_ground && touching_wall && wall_slide_active && phy_speed_y > 0
+    && !is_ledge_climbing && !is_slamming) training_action("wall");

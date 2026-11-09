@@ -8,6 +8,13 @@ if (room != LE_PWR)
 ari_state = "waiting"; // Override Ari's ambient-room default; Samuel's cinematic belongs to LE_PWR.
 visible = false;
 ari_display_name = "Samuel";
+ari_voice_config = {
+    sound: sfxSamTalk,
+    gain: 0.50, // Linear gain; the heavier voice stays below combat effects.
+    pitch: 0.90, // Playback ratio; makes Samuel lower than Ari.
+    pitch_range: 0.07, // Smaller pitch movement gives Samuel a more restrained delivery.
+    interval: 0.095 // Seconds between syllables; slower than Ari's lighter chatter.
+};
 ari_visit = "samuel";
 samuel_encounter_finished = false; // Gate the existing ambush until the final cinematic frame.
 samuel_door_broken = false; // Breaking the LE_PWR entrance only arms the interception; crossing inside starts it.

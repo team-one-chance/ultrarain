@@ -688,7 +688,7 @@ slide_exit_delay = 0;
 
 medkit_owned = false;
 syringe_count = 0;
-syringe_max = 3;
+syringe_max = 4; // Maximum syringes carried; medkit pickups refill every charge.
 if (room == LE_TUTORIAL_WIP && variable_global_exists("tutorial_ari_assist") && global.tutorial_ari_assist == 2)
 {
     medkit_owned = true;
@@ -723,7 +723,7 @@ use_syringe = function(_revive)
 // NORMAL JUMP
 // =====================================
 
-jump_speed = -5.2;
+jump_speed = -7.2;
 
 // =====================================
 // WALL JUMP
@@ -1153,7 +1153,7 @@ wall_slide_decel = 0.15;
 // =====================================
 
 dash_speed = 6;
-air_dash_speed = 3;
+air_dash_speed = 6.5; // Added horizontal physics speed (pixels/step); higher values extend air-dash range.
 dash_decay = 0.1;
 
 dash_iframe_timer = 0;
