@@ -1,3 +1,6 @@
+// Reapply the saved profile after room changes and surface loss.
+display_settings_apply();
+
 // F11 switches between fullscreen and windowed mode.
 if (keyboard_check_pressed(vk_f11))
 {

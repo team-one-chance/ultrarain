@@ -103,7 +103,7 @@ if (boot_state >= BootMenuState.MAIN && boot_state <= BootMenuState.CONTROLS)
     if (_click) menu_selection = _hover;
     if (keyboard_check_pressed(vk_escape))
     {
-        if (boot_state == BootMenuState.CONTROLS) { boot_menu_open(BootMenuState.SETTINGS); menu_selection = 3; }
+        if (boot_state == BootMenuState.CONTROLS) { boot_menu_open(BootMenuState.SETTINGS); menu_selection = 5; }
         else if (boot_state != BootMenuState.MAIN) boot_menu_open(BootMenuState.MAIN);
     }
     else if (keyboard_check_pressed(vk_enter) || _click)

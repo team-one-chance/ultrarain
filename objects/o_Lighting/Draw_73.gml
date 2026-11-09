@@ -153,9 +153,14 @@ if (bloom_enabled && (bloom_strength > 0 || scout_bloom_strength > 0 || player_b
 && surface_exists(application_surface)
 && shader_is_compiled(sh_BloomExtract) && shader_is_compiled(sh_BloomBlur))
 {
-    // Never blur more pixels than the world contains, even on a high-resolution display.
-    var _bw = max(1, ceil(min(_vw, surface_get_width(application_surface) * clamp(bloom_resolution, 0.125, 1))));
-    var _bh = max(1, ceil(min(_vh, surface_get_height(application_surface) * clamp(bloom_resolution, 0.125, 1))));
+    // Quality restores full application-resolution glow; Performance keeps the world-resolution cap.
+    var _bw = max(1, ceil(surface_get_width(application_surface) * clamp(bloom_resolution, 0.125, 1)));
+    var _bh = max(1, ceil(surface_get_height(application_surface) * clamp(bloom_resolution, 0.125, 1)));
+    if (bloom_limit_to_world)
+    {
+        _bw = min(_bw, max(1, ceil(_vw)));
+        _bh = min(_bh, max(1, ceil(_vh)));
+    }
     if (surface_exists(bloom_surface_a))
     {
         if (surface_get_width(bloom_surface_a) != _bw || surface_get_height(bloom_surface_a) != _bh)

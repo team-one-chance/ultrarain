@@ -33,12 +33,20 @@ draw_set_color(c_white);
 var _title = page == 0 ? "PAUSED" : (page == 1 ? "SETTINGS" : (page == 3 ? "CONTROLS" : "CREDITS"));
 draw_text_transformed(_layout.x, _layout.top + 94 * _scale, _title, 1.7 * _scale, 1.7 * _scale, 0);
 var _options = pause_options();
+if (page == 1)
+{
+    draw_set_color(make_color_rgb(110, 135, 152));
+    var _hint = menu_display_hint(selected);
+    var _hint_scale = min(0.65 * _scale, (_layout.width - 32 * _scale) / max(1, string_width(_hint)));
+    draw_text_transformed(_layout.x, _layout.top + 126 * _scale, _hint, _hint_scale, _hint_scale, 0);
+}
 for (var _i = 0; _i < array_length(_options); _i++)
 {
     var _item = page == 3 ? controls_menu_item_layout(_i, array_length(_options) - 4, _layout) : undefined;
     var _x = page == 3 ? _item.x : _layout.x;
     var _y = page == 3 ? _item.y : _layout.row_top + (_i + 0.5) * _layout.row_height;
-    var _text_scale = page == 3 ? min(_scale, (_item.width - 12 * _scale) / max(1, string_width(_options[_i]))) : _scale;
+    var _text_scale = min(_scale, ((page == 3 ? _item.width - 12 * _scale : _layout.width - 48 * _scale))
+        / max(1, string_width(_options[_i])));
     if (page == 3 && _i >= array_length(_options) - 4) _text_scale *= 0.8;
     draw_set_color(_i == selected ? c_white : make_color_rgb(155, 172, 187));
     draw_text_transformed(_x, _y, _options[_i], _text_scale, _text_scale, 0);

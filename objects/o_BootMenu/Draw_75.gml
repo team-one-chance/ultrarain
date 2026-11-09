@@ -179,8 +179,12 @@ draw_text_transformed(
                     ".\\menu.exe start --difficulty " + string_lower(_options[menu_selection]);
                 break;
             case BootMenuState.SETTINGS:
-                if (menu_selection == 4) _command += ".\\menu.exe";
-                else if (menu_selection == 3) _command += ".\\controls.exe";
+                if (menu_selection == 6) _command += ".\\menu.exe";
+                else if (menu_selection == 5) _command += ".\\controls.exe";
+                else if (menu_selection == 4)
+                    _command += ".\\display.exe --aspect " + (global.settings_ultrawide ? "original" : "ultrawide");
+                else if (menu_selection == 3)
+                    _command += ".\\display.exe --graphics " + (display_performance_active() ? "quality" : "performance");
                 else if (menu_selection == 2)
                     _command += ".\\controls.exe --mouse-heal " + (global.heal_mouse_combo ? "off" : "on");
                 else if (menu_selection == 1)
@@ -197,6 +201,12 @@ draw_text_transformed(
         }
         var _command_y = _controls ? _control_layout.row_top + 360 * _control_layout.scale + 10
             : _layout.y + array_length(_options) * _layout.row_height + 24;
+        if (boot_state == BootMenuState.SETTINGS)
+        {
+            draw_set_color(_theme_dim);
+            draw_text(_layout.x, _command_y, menu_display_hint(menu_selection));
+            _command_y += string_height("Ag") + 24;
+        }
         if (boot_state == BootMenuState.DIFFICULTY)
         {
             // Reserve the same space for Back so the command does not jump.

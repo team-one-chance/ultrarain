@@ -119,9 +119,7 @@ boot_menu_options = function()
                 return ["Easy", "Normal", "Hard", "Futile", "Back"];
             return ["Easy", "Normal", "Hard", "Back"];
         case BootMenuState.SETTINGS:
-            return ["Fullscreen: " + (window_get_fullscreen() ? "On" : "Off"),
-                "Pixelization: " + (menu_pixelization_active() ? "On" : "Off"),
-                "Mouse combo heal: " + (global.heal_mouse_combo ? "On" : "Off"), "Controls", "Back"];
+            return menu_display_options();
         case BootMenuState.CONTROLS: return controls_menu_options(controls_page, controls_capture);
         case BootMenuState.CREDITS: return ["Back"];
         case BootMenuState.CONFIRM_EXIT: return ["Cancel", "Quit game"];
@@ -205,7 +203,9 @@ boot_menu_activate = function()
             if (menu_selection == 0) window_set_fullscreen(!window_get_fullscreen());
             else if (menu_selection == 1) menu_toggle_pixelization();
             else if (menu_selection == 2) global.heal_mouse_combo = !global.heal_mouse_combo;
-            else if (menu_selection == 3) { controls_page = 0; boot_menu_open(BootMenuState.CONTROLS); }
+            else if (menu_selection == 3) menu_toggle_graphics();
+            else if (menu_selection == 4) menu_toggle_aspect_ratio();
+            else if (menu_selection == 5) { controls_page = 0; boot_menu_open(BootMenuState.CONTROLS); }
             else boot_menu_open(BootMenuState.MAIN);
             break;
         case BootMenuState.CONTROLS:
@@ -216,7 +216,7 @@ boot_menu_activate = function()
             else if (menu_selection == _count) { controls_page = (controls_page + _pages - 1) mod _pages; menu_selection = 0; }
             else if (menu_selection == _count + 1) { controls_page = (controls_page + 1) mod _pages; menu_selection = 0; }
             else if (menu_selection == _count + 2) { global.controls_bindings = controls_defaults(); controls_save(); }
-            else { boot_menu_open(BootMenuState.SETTINGS); menu_selection = 3; }
+            else { boot_menu_open(BootMenuState.SETTINGS); menu_selection = 5; }
             break;
         case BootMenuState.CREDITS:
             boot_menu_open(BootMenuState.MAIN);
