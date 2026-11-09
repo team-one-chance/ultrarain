@@ -1,4 +1,6 @@
 pixelation_size = menu_pixelization_active() ? pixelation_alternate_size : 1.0;
+if (graphics_performance != display_performance_active()
+|| graphics_ultrawide != global.settings_ultrawide) apply_graphics_settings();
 
 // Keep the sprite and emitted light on the same per-instance flicker state.
 var _dt = min((variable_global_exists("dev_delta_time") ? global.dev_delta_time : delta_time) / 1000000, 0.05);

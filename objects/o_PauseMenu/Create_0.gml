@@ -18,9 +18,7 @@ pause_options = function()
 {
     switch (page)
     {
-        case 1: return ["Fullscreen: " + (window_get_fullscreen() ? "On" : "Off"),
-            "Pixelization: " + (menu_pixelization_active() ? "On" : "Off"),
-            "Mouse combo heal: " + (global.heal_mouse_combo ? "On" : "Off"), "Controls", "Back"];
+        case 1: return menu_display_options();
         case 2: return ["Back"];
         case 3: return controls_menu_options(controls_page, controls_capture);
     }
@@ -29,8 +27,9 @@ pause_options = function()
 
 pause_layout = function()
 {
-    var _scale = min(1.5, display_get_gui_width() / 850, display_get_gui_height() / 650);
-    var _height = 540 * _scale;
+    var _base_height = page == 1 ? 150 + array_length(pause_options()) * 54 + 65 : 540; // GUI pixels; leave room for every settings row and the footer.
+    var _scale = min(1.5, display_get_gui_width() / 850, display_get_gui_height() / max(650, _base_height + 40));
+    var _height = _base_height * _scale;
     return { x: display_get_gui_width() * 0.5,
         top: (display_get_gui_height() - _height) * 0.5,
         width: 600 * _scale, height: _height, scale: _scale,
@@ -88,7 +87,9 @@ pause_activate = function()
         if (selected == 0) window_set_fullscreen(!window_get_fullscreen());
         else if (selected == 1) menu_toggle_pixelization();
         else if (selected == 2) global.heal_mouse_combo = !global.heal_mouse_combo;
-        else if (selected == 3) { page = 3; selected = 0; controls_page = 0; }
+        else if (selected == 3) menu_toggle_graphics();
+        else if (selected == 4) menu_toggle_aspect_ratio();
+        else if (selected == 5) { page = 3; selected = 0; controls_page = 0; }
         else { page = 0; selected = 3; }
         selection_age = 0;
         return;
@@ -108,7 +109,7 @@ pause_activate = function()
         else if (selected == _count) { controls_page = (controls_page + ceil(array_length(_names) / 8) - 1) mod ceil(array_length(_names) / 8); selected = 0; }
         else if (selected == _count + 1) { controls_page = (controls_page + 1) mod ceil(array_length(_names) / 8); selected = 0; }
         else if (selected == _count + 2) { global.controls_bindings = controls_defaults(); controls_save(); }
-        else { page = 1; selected = 3; }
+        else { page = 1; selected = 5; }
         selection_age = 0;
         return;
     }

@@ -144,7 +144,7 @@ var _chain_hit_enemies = ds_list_create();
         {
             _coin_shot_count = 4;
             _chain_perfect_apex = true;
-			_current_damage += 7
+			_current_damage += 15
 
             perfect_apex_flash_timer =
                 perfect_apex_flash_duration;
@@ -154,7 +154,7 @@ var _chain_hit_enemies = ds_list_create();
         else if (_coin_y_speed <= _split_threshold)
         {
             _coin_shot_count = 2;
-			_current_damage += 5
+			_current_damage += 8
         }
 
 
@@ -163,7 +163,7 @@ var _chain_hit_enemies = ds_list_create();
         // =================================
 
 var _damage_before_multiplier = _current_damage;
-var _damage_before_rounding = _damage_before_multiplier * 1.45;
+var _damage_before_rounding = _damage_before_multiplier * 1.55;
 
 _current_damage = coin_round_damage(
     _damage_before_rounding,

@@ -81,7 +81,7 @@ bloom_radius = 4;
 // Extra emission width feeds the blur; the visible shot remains one pixel wide.
 hitscan_bloom_width = 6;
 hitscan_bloom_strength = 0.9;
-bloom_resolution = 0.5; // Fraction of application resolution; half size shades 75% fewer pixels, capped at world resolution.
+// Buffer resolutions come from the shared display profile below.
 bloom_camera = -1;
 bloom_surface_a = -1;
 bloom_surface_b = -1;
@@ -103,8 +103,17 @@ pixelation_camera = -1;
 pixelation_grid_uniform = shader_get_uniform(sh_WorldPixelate, "u_grid");
 pixelation_texel_uniform = shader_get_uniform(sh_WorldPixelate, "u_texel");
 light_surface = -1;
-light_resolution = 0.5; // Fraction of world resolution; smooth illumination does not need full-size buffers.
-light_pixel_budget = 259200; // Maximum light-map pixels (720 x 360); wider views trade buffer detail for stable cost.
+apply_graphics_settings = function()
+{
+    var _profile = display_settings_profile();
+    graphics_performance = display_performance_active(); // Last applied mode; checked again after returning from pause.
+    graphics_ultrawide = global.settings_ultrawide; // Quality's full-view light budget also changes with aspect ratio.
+    light_resolution = _profile.light_resolution;
+    light_pixel_budget = _profile.light_pixel_budget;
+    bloom_resolution = _profile.bloom_resolution;
+    bloom_limit_to_world = _profile.bloom_limit_to_world;
+};
+apply_graphics_settings();
 
 // Include blur spill outside the view so halos do not pop at screen edges.
 bloom_source_visible = function(_source, _padding)

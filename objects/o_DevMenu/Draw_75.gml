@@ -16,7 +16,12 @@ var _gh = display_get_gui_height();
 if (world_frozen && surface_exists(paused_surface))
 {
     draw_set_color(c_white);
-    draw_surface_stretched(paused_surface, 0, 0, _gw, _gh);
+    // Keep the frozen image proportional while the aspect setting changes behind the pause panel.
+    var _paused_scale = min(_gw / surface_get_width(paused_surface), _gh / surface_get_height(paused_surface));
+    var _paused_width = surface_get_width(paused_surface) * _paused_scale;
+    var _paused_height = surface_get_height(paused_surface) * _paused_scale;
+    draw_surface_stretched(paused_surface, (_gw - _paused_width) * 0.5, (_gh - _paused_height) * 0.5,
+        _paused_width, _paused_height);
 }
 
 if (opened && map_open)

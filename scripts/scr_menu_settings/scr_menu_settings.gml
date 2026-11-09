@@ -158,6 +158,115 @@ function controls_assign(_name, _key)
     controls_save();
 }
 
+// These defaults preserve the current low-cost rendering and wide framing.
+function display_settings_init()
+{
+    if (variable_global_exists("settings_performance")) return;
+    ini_open("display.ini");
+    global.settings_performance = ini_read_real("display", "performance", 1) != 0;
+    global.settings_ultrawide = ini_read_real("display", "ultrawide", 1) != 0;
+    ini_close();
+}
+
+function display_performance_active()
+{
+    display_settings_init();
+    return global.settings_performance;
+}
+
+// Shared rendering budget for the menu, TESTING, and every gameplay room.
+function display_settings_profile()
+{
+    display_settings_init();
+    var _width = global.settings_ultrawide ? 2160 : 1440; // World pixels; wider framing reveals more level on each side.
+    var _height = 720; // World pixels; both aspect ratios keep the same vertical framing.
+    return {
+        width: _width, height: _height,
+        render_scale: global.settings_performance ? 1 : 1.5, // Output pixels per world pixel; Quality restores the former rendering scale.
+        gui_height: 1080, // Logical interface pixels; independent of graphics quality.
+        light_resolution: global.settings_performance ? 0.5 : 1, // Light-map dimensions relative to the world camera.
+        light_pixel_budget: global.settings_performance ? 259200 : _width * _height, // Maximum illumination pixels; Quality uses the full world view.
+        bloom_resolution: global.settings_performance ? 0.5 : 1, // Glow-buffer dimensions relative to the application surface.
+        bloom_limit_to_world: global.settings_performance // Performance caps glow work even on larger render targets.
+    };
+}
+
+function display_settings_apply(_resize_window = false)
+{
+    var _profile = display_settings_profile();
+    var _cam = view_camera[0];
+    if (_cam != -1 && (camera_get_view_width(_cam) != _profile.width
+    || camera_get_view_height(_cam) != _profile.height))
+    {
+        // Preserve the camera center when switching horizontal field of view.
+        var _center_x = camera_get_view_x(_cam) + camera_get_view_width(_cam) * 0.5;
+        var _center_y = camera_get_view_y(_cam) + camera_get_view_height(_cam) * 0.5;
+        camera_set_view_size(_cam, _profile.width, _profile.height);
+        camera_set_view_pos(_cam, _center_x - _profile.width * 0.5, _center_y - _profile.height * 0.5);
+    }
+    view_wport[0] = round(_profile.width * _profile.render_scale);
+    view_hport[0] = round(_profile.height * _profile.render_scale);
+    var _gui_width = _profile.width * _profile.gui_height / _profile.height;
+    if (display_get_gui_width() != _gui_width || display_get_gui_height() != _profile.gui_height)
+        display_set_gui_size(_gui_width, _profile.gui_height);
+    if (surface_exists(application_surface))
+    {
+        if (surface_get_width(application_surface) != view_wport[0]
+        || surface_get_height(application_surface) != view_hport[0])
+            surface_resize(application_surface, view_wport[0], view_hport[0]);
+    }
+    if (_resize_window)
+    {
+        var _ratio = _profile.width / _profile.height;
+        var _window_height = max(1, floor(min(720, display_get_width() * 0.9 / _ratio,
+            display_get_height() * 0.9))); // Window pixels; fit inside 90% of the monitor, including room for borders.
+        window_set_size(round(_window_height * _ratio), _window_height);
+        window_center();
+    }
+}
+
+function display_settings_save()
+{
+    ini_open("display.ini");
+    ini_write_real("display", "performance", global.settings_performance);
+    ini_write_real("display", "ultrawide", global.settings_ultrawide);
+    ini_close();
+}
+
+function menu_toggle_graphics()
+{
+    display_settings_init();
+    global.settings_performance = !global.settings_performance;
+    display_settings_save();
+    display_settings_apply();
+}
+
+function menu_toggle_aspect_ratio()
+{
+    display_settings_init();
+    global.settings_ultrawide = !global.settings_ultrawide;
+    display_settings_save();
+    display_settings_apply(true);
+}
+
+function menu_display_options()
+{
+    display_settings_init();
+    return ["Fullscreen: " + (window_get_fullscreen() ? "On" : "Off"),
+        "Pixelization: " + (menu_pixelization_active() ? "On" : "Off"),
+        "Mouse combo heal: " + (global.heal_mouse_combo ? "On" : "Off"),
+        "Graphics: " + (global.settings_performance ? "Performance" : "Quality"),
+        "Aspect ratio: " + (global.settings_ultrawide ? "Ultrawide (3:1)" : "Original (2:1)"),
+        "Controls", "Back"];
+}
+
+function menu_display_hint(_selection)
+{
+    if (_selection == 3) return "Performance reduces GPU load; Quality restores finer detail.";
+    if (_selection == 4) return "Ultrawide shows more level; vertical framing stays the same.";
+    return "F11 also toggles fullscreen";
+}
+
 function menu_pixelization_active()
 {
     return variable_global_exists("settings_pixelization") && global.settings_pixelization;

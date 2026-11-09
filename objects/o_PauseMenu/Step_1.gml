@@ -83,7 +83,7 @@ menu_exhibition_hotkey();
 
 if (keyboard_check_pressed(vk_escape))
 {
-    if (page == 3) { page = 1; selected = 3; selection_age = 0; }
+    if (page == 3) { page = 1; selected = 5; selection_age = 0; }
     else if (page != 0) { selected = page == 1 ? 3 : 4; page = 0; selection_age = 0; }
     else pause_resume();
     exit;
