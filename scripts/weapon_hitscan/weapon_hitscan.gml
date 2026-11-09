@@ -1,0 +1,323 @@
+// A broken lamp remains as a dark fixture but emits no light or bloom.
+function ceiling_light_break(_lamp)
+{
+    if (!instance_exists(_lamp)) return;
+    if (variable_instance_exists(_lamp, "lamp_broken") && _lamp.lamp_broken) return;
+    _lamp.lamp_broken = true;
+    _lamp.image_speed = 0;
+    _lamp.image_index = 0;
+    _lamp.image_blend = make_color_rgb(55, 55, 55);
+}
+
+// Bullet visual effects use the same shield-side decision as Breaker's damage handling.
+function weapon_bullet_impact(_target, _x, _y, _direction, _enemy)
+{
+    var _shield = false;
+    if (instance_exists(_target) && variable_instance_exists(_target, "breaker_hit_from_back"))
+    {
+        _shield = _target.shield_hp > 0 && !_target.is_invulnerable()
+            && !_target.breaker_hit_from_back();
+    }
+    if (_shield) return; // The outgoing ricochet is the shield hit's visual feedback.
+    instance_create_depth(_x, _y, -10000, o_ShotImpact,
+        { impact_direction: _direction, impact_enemy: _enemy });
+}
+
+function weapon_hitscan(_damage, _range, _piercing)
+{
+    // =====================================
+    // MUZZLE AND AIM
+    // =====================================
+
+    var _muzzle = player_get_muzzle();
+
+	var start_x = _muzzle.aim_x;
+	var start_y = _muzzle.aim_y;
+
+    // Aim from the shot's actual start to the crosshair in room coordinates.
+    // The body-based weapon angle otherwise makes shots miss the cursor up close.
+    var shoot_direction = point_direction(start_x, start_y, mouse_x, mouse_y); // Degrees; follows the crosshair at any distance.
+    if (start_x == mouse_x && start_y == mouse_y)
+    {
+        shoot_direction = aim_angle; // Keep the weapon direction when the cursor is exactly on the muzzle.
+    }
+
+    // Default: bullet reaches full range.
+    var final_x =
+        start_x + lengthdir_x(_range, shoot_direction);
+
+    var final_y =
+        start_y + lengthdir_y(_range, shoot_direction);
+
+    // =====================================
+    // PIERCING
+    // =====================================
+
+    // 0 = first object stops bullet.
+    // 1 = pass first, second stops bullet.
+    // 2 = pass first two, third stops bullet.
+    var max_hits = _piercing + 1;
+    var hit_count = 0;
+    var stopped = false;
+    var _coin_style = undefined;
+    var _shield_bounce = noone;
+    var _shield_bounce_x = 0;
+    var _shield_bounce_y = 0;
+
+    // Count each object only once.
+    var already_hit = ds_list_create();
+    var point_hits = ds_list_create();
+
+    // =====================================
+    // WALK ALONG THE RAY
+    // =====================================
+
+    for (var dist = 0; dist <= _range; dist += 1)
+    {
+        var check_x =
+            start_x + lengthdir_x(dist, shoot_direction);
+
+        var check_y =
+            start_y + lengthdir_y(dist, shoot_direction);
+
+        ds_list_clear(point_hits);
+
+        collision_point_list(
+            check_x,
+            check_y,
+            [
+                oEnemyParent,
+                o_Block,
+                o_Coin,
+                o_SecurityCamera,
+                o_Door_Breakable,
+                o_Chute_Breakable,
+				o_light_ceil_long, o_light_ceil_long_strong, o_light_ceil_long_ow,
+				o_Door_UNB
+            ],
+            false,
+            true,
+            point_hits,
+            false
+        );
+
+        // =================================
+        // PROCESS NEW OBJECTS
+        // =================================
+
+        for (var i = 0; i < ds_list_size(point_hits); i++)
+        {
+            var inst = point_hits[| i];
+
+            var _lamp = instance_exists(inst) && (inst.object_index == o_light_ceil_long
+                || inst.object_index == o_light_ceil_long_strong || inst.object_index == o_light_ceil_long_ow);
+            if (_lamp && ((variable_instance_exists(inst, "lamp_broken") && inst.lamp_broken)
+                || !layer_get_visible(inst.layer))) continue;
+
+            // Broken doors no longer stop shots.
+            if (instance_exists(inst)
+            && variable_instance_exists(inst, "door_take_damage"))
+            {
+                if (inst.broken || inst.break_requested)
+                {
+                    continue;
+                }
+            }
+
+            // Broken cameras no longer stop shots.
+            if (instance_exists(inst)
+            && inst.object_index == o_SecurityCamera
+            && inst.broken)
+            {
+                continue;
+            }
+
+            if (ds_list_find_index(already_hit, inst) != -1)
+            {
+                continue;
+            }
+
+            ds_list_add(already_hit, inst);
+
+            // Spawn before damage so lethal hits also leave a burst.
+// Distance from the shoulder to the muzzle along the firing direction.
+var _muzzle_distance =
+    (_muzzle.muzzle_x - start_x) * lengthdir_x(1, shoot_direction)
+    + (_muzzle.muzzle_y - start_y) * lengthdir_y(1, shoot_direction);
+
+// Only show an impact if the shot reached or passed the muzzle.
+if (instance_exists(inst)
+&& inst.object_index != o_Coin
+&& dist >= _muzzle_distance)
+{
+    var _enemy_impact = inst.object_index == oEnemyParent
+        || object_is_ancestor(inst.object_index, oEnemyParent);
+
+    weapon_bullet_impact(inst,
+        check_x - lengthdir_x(1, shoot_direction),
+        check_y - lengthdir_y(1, shoot_direction),
+        shoot_direction, _enemy_impact
+    );
+}
+
+            // =================================
+            // BREAKABLE BLOCK
+            // =================================
+
+            if (instance_exists(inst)
+            && inst.object_index == o_Block_Breakable)
+            {
+                inst.take_damage(_damage);
+            }
+
+            // =================================
+            // COIN
+            // =================================
+
+            if (instance_exists(inst)
+            && inst.object_index == o_Coin)
+            {
+                if (training_active() && !inst.is_pinned
+                    && variable_instance_exists(inst, "coin_owner") && inst.coin_owner == id
+                    && collision_point((inst.bbox_left + inst.bbox_right) / 2, inst.bbox_bottom + 2, o_Block, false, true) == noone)
+                    training_action("direct_coin");
+                var _coin_x = inst.x;
+                var _coin_y = inst.y;
+                _coin_style = coin_ricochet(
+                    inst,
+                    _damage,
+                    _range,
+                    coin_split_y_speed_threshold
+                );
+
+                final_x = _coin_x;
+                final_y = _coin_y;
+                stopped = true;
+                break;
+            }
+
+            // =================================
+            // SECURITY CAMERA
+            // =================================
+
+            if (instance_exists(inst)
+            && inst.object_index == o_SecurityCamera)
+            {
+                inst.camera_break();
+            }
+
+            if (_lamp) ceiling_light_break(inst);
+
+            // =================================
+            // BREAKABLE DOORS AND CHUTES
+            // =================================
+
+            if (instance_exists(inst)
+            && variable_instance_exists(inst, "door_take_damage"))
+            {
+                inst.door_take_damage(_damage);
+            }
+
+            // =================================
+            // ENEMY
+            // =================================
+
+            if (instance_exists(inst)
+            && (
+                inst.object_index == oEnemyParent
+                || object_is_ancestor(inst.object_index, oEnemyParent)
+            ))
+            {
+                if (variable_instance_exists(inst, "breaker_hit_from_back")
+                    && inst.shield_hp > 0 && !inst.is_invulnerable()
+                    && !inst.breaker_hit_from_back())
+                {
+                    _shield_bounce = inst;
+                    _shield_bounce_x = check_x;
+                    _shield_bounce_y = check_y;
+                }
+                inst.take_damage(_damage);
+            }
+
+            // =================================
+            // WALL
+            // =================================
+
+            else if (instance_exists(inst)
+            && inst.object_index == o_Block)
+            {
+                show_debug_message("Wall hit!");
+            }
+
+            hit_count++;
+
+            if (hit_count >= max_hits || inst == _shield_bounce)
+            {
+                final_x = check_x;
+                final_y = check_y;
+                stopped = true;
+                break;
+            }
+        }
+
+        if (stopped)
+        {
+            break;
+        }
+    }
+
+    // =====================================
+    // CLEANUP
+    // =====================================
+
+    ds_list_destroy(point_hits);
+    ds_list_destroy(already_hit);
+
+    if (instance_exists(_shield_bounce))
+        breaker_bullet_ricochet(_shield_bounce, _shield_bounce_x,
+            _shield_bounce_y, _damage);
+
+    // =====================================
+    // HITSCAN VISUAL
+    // =====================================
+	
+	// Compare the hit position with the muzzle along the firing direction.
+var _dir_x = lengthdir_x(1, shoot_direction);
+var _dir_y = lengthdir_y(1, shoot_direction);
+
+var _muzzle_distance =
+    (_muzzle.muzzle_x - start_x) * _dir_x
+    + (_muzzle.muzzle_y - start_y) * _dir_y;
+
+var _hit_distance =
+    (final_x - start_x) * _dir_x
+    + (final_y - start_y) * _dir_y;
+
+var _blocked_before_muzzle =
+    stopped && _hit_distance < _muzzle_distance;
+
+// The shot hit something before leaving the barrel.
+// Its impact effect was already created during the collision check.
+if (_blocked_before_muzzle)
+    return false;
+
+    var shot = instance_create_layer(
+        0,
+        0,
+        "Instances",
+        o_HitscanVisual
+    );
+
+	shot.line_x1 = _muzzle.muzzle_x;
+	shot.line_y1 = _muzzle.muzzle_y;
+    shot.line_x2 = final_x;
+    shot.line_y2 = final_y;
+    // Give the muzzle-to-first-coin segment the same effect as the whole chain.
+    if (!is_undefined(_coin_style))
+    {
+        shot.line_color = _coin_style.color;
+        shot.line_width = _coin_style.width;
+        shot.set_coin_effects(_coin_style.bounces, _coin_style.bullet_flash);
+    }
+}
+return true;

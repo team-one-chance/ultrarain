@@ -1,0 +1,1 @@
+vent_cover_names = ["graphic_193AF68D"];

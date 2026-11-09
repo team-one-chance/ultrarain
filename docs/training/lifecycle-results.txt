@@ -1,0 +1,43 @@
+[TEST] PASS Menu exists
+[TEST] PASS Training is above Start
+[TEST] PASS Menu launches training
+[TEST] PASS Persistent menu removed
+[TEST] PASS Starts unarmed
+[TEST] PASS Fixed HP
+[TEST] PASS Initial action locks
+[TEST] PASS All notes recovered
+[TEST] PASS Waiting does not complete aim exercise
+[TEST] PASS Actual aiming completes all eight nodes
+[TEST] PASS Slide section initializes
+[TEST] PASS Movement-only unlocks
+[TEST] PASS Five slam floor segments
+[TEST] PASS Retry restores floor without duplicates
+[TEST] PASS Pistol-only unlock
+[TEST] PASS Four pistol targets
+[TEST] PASS Pistol kills advance; sword wave waits for switch
+[TEST] PASS Sword switch spawns first wave once
+[TEST] PASS First sword kill spawns two targets
+[TEST] PASS Sword wave advances to materials
+[TEST] PASS Armored material spawns second
+[TEST] PASS Pistol chips shield using x0.1
+[TEST] PASS Sword strips shield using x5
+[TEST] PASS Floating plate and unarmored body are separate
+[TEST] PASS Materials advance to coins
+[TEST] PASS Coin ability unlock
+[TEST] PASS Lethal damage resets only current section
+[TEST] PASS Retry preserves correct equipment and resets objective
+[TEST] PASS Sword-only selection is valid
+[TEST] PASS Removing all weapons clears selection
+[TEST] PASS Ricochet exercise locks movement but permits shooting
+[TEST] PASS Combat starts with one-second spawn delay
+[TEST] PASS Scout appears exactly once
+[TEST] PASS Scout kill spawns drone
+[TEST] PASS Drone kill exposes terminal
+[TEST] PASS No unrelated boss spawned
+[TEST] PASS Terminal interaction starts error sequence
+[TEST] PASS Terminal error sequence returns to main menu
+[TEST] PASS Completion clears gameplay run state
+[TEST] PASS Simulation can be replayed cleanly
+[TEST] PASS Normal game starts with default equipment
+[TEST] PASS Training restrictions do not leak
+[TEST] COMPLETE
